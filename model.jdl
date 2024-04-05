@@ -1,0 +1,100 @@
+NAME_MAX_LENGTH = 200
+PHONE_MAX_LENGTH = 20
+
+entity System {
+  enabled Boolean
+
+}
+
+entity Booth {
+  title String maxlength(NAME_MAX_LENGTH) unique required // Should be used as "Standnummer"
+  ceilingHeight BigDecimal
+  available Boolean required(true)
+  // servicePackage
+}
+
+entity Location {
+  location String maxlength(NAME_MAX_LENGTH) unique
+}
+
+entity Company  {
+  name String maxlength(NAME_MAX_LENGTH)
+  mail String
+  billingAddress String
+  logo String
+  description String
+  waitingList Boolean
+  exhibitorList Boolean
+  // departments
+  // jobs
+}
+
+entity Department {
+  name String
+  description String
+}
+
+entity ServicePackage {
+  name String
+  price BigDecimal
+  description String
+}
+
+entity Booking {
+  received Date
+  status BookingStatus
+}
+
+entity BoothUser {
+  phone String maxlength(PHONE_MAX_LENGTH)
+  note TextBlob
+  verificationCode UUID
+  verified Date
+  lastLogin Date
+  disabled Boolean
+
+}
+
+entity Contact {
+  firstName String maxlength(NAME_MAX_LENGTH)
+  lastName String maxlength(NAME_MAX_LENGTH)
+  mail String
+  phone String maxlength(PHONE_MAX_LENGTH)
+  responsibility ContactResponsibility
+  note TextBlob
+}
+
+relationship ManyToOne {
+//  Job to Company
+  Booking{company required} to Company{bookings}
+  Booking{booth required} to Booth
+  BoothUser{company} to Company
+}
+
+relationship ManyToMany {
+  Department to Company
+  Contact to Company
+  ServicePackage to Booth
+}
+
+relationship OneToMany {
+  Location{booths} to Booth{location}
+}
+
+relationship OneToOne {
+  BoothUser{user} to @OnDelete("CASCADE") User{boothUser} with builtInEntity
+}
+
+enum BookingStatus {
+  PREBOOKED (prebooked)
+  CONFIRMED (confirmed)
+  REJECTED (rejected)
+}
+
+enum ContactResponsibility {
+  PRESS
+  COMPANY_ADMIN
+  GENERALLY
+  OTHER
+}
+
