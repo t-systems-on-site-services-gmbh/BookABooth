@@ -1,0 +1,11 @@
+id;phone;note;verification_code;verified;last_login;disabled
+1;(0027) 011141386;../fake-data/blob/hipster.txt;3d290462-d104-469a-b3f2-1902d107b0f3;2024-04-07T01:27:27;2024-04-07T16:08:00;false
+2;(0547) 362168493;../fake-data/blob/hipster.txt;ba2e0bb8-eded-4e5b-9245-ba6d771f53bc;2024-04-07T02:58:11;2024-04-07T12:18:35;true
+3;(03152) 0136211;../fake-data/blob/hipster.txt;2034c37e-605b-4be9-8809-60e2c64f3abc;2024-04-07T16:00:28;2024-04-07T05:29:13;true
+4;(0069) 699828883;../fake-data/blob/hipster.txt;f9dbbfaa-00e4-4913-afa7-35f9cec5f803;2024-04-07T15:28:34;2024-04-07T20:02:55;true
+5;(01390) 0264422;../fake-data/blob/hipster.txt;2011715f-cdb3-4277-909b-25f662559bee;2024-04-07T19:49:38;2024-04-07T04:19:51;false
+6;+49-8496-70033260;../fake-data/blob/hipster.txt;ed0c7625-d91f-4718-a79d-0871617da5f2;2024-04-07T14:09:07;2024-04-07T05:16:37;false
+7;+49-5518-98298908;../fake-data/blob/hipster.txt;f35b8cae-03eb-42cc-b57c-642ff55ee2a8;2024-04-07T08:59:19;2024-04-07T04:48:39;true
+8;(0582) 619640889;../fake-data/blob/hipster.txt;cf19967f-da3d-4ffa-8f91-fc3388f36a80;2024-04-06T20:29:05;2024-04-06T23:38:39;true
+9;(0559) 112984387;../fake-data/blob/hipster.txt;c651f466-36c0-49df-97e6-e1a47fdc0e8e;2024-04-07T02:31:17;2024-04-07T02:40:41;true
+10;(0556) 744148962;../fake-data/blob/hipster.txt;6bd2e7ee-2ee0-4aee-87f9-c9ba41dcfbfb;2024-04-06T21:55:56;2024-04-06T23:26:12;true

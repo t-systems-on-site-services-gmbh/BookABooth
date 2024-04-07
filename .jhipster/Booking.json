@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20240407201617"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "received",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "BookingStatus",
+      "fieldValues": "PREBOOKED (prebooked),CONFIRMED (confirmed),REJECTED (rejected)"
+    }
+  ],
+  "name": "Booking",
+  "relationships": [
+    {
+      "otherEntityName": "company",
+      "otherEntityRelationshipName": "bookings",
+      "relationshipName": "company",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityName": "booth",
+      "relationshipName": "booth",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no"
+}

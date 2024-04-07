@@ -52,6 +52,23 @@ public class CacheConfiguration {
             createCache(cm, de.tsystems.onsite.bookabooth.domain.User.class.getName() + ".authorities");
             createCache(cm, de.tsystems.onsite.bookabooth.domain.PersistentToken.class.getName());
             createCache(cm, de.tsystems.onsite.bookabooth.domain.User.class.getName() + ".persistentTokens");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.System.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Booth.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Booth.class.getName() + ".servicePackages");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Location.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Location.class.getName() + ".booths");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Company.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Company.class.getName() + ".bookings");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Company.class.getName() + ".departments");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Company.class.getName() + ".contacts");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Department.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Department.class.getName() + ".companies");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.ServicePackage.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.ServicePackage.class.getName() + ".booths");
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Booking.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.BoothUser.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Contact.class.getName());
+            createCache(cm, de.tsystems.onsite.bookabooth.domain.Contact.class.getName() + ".companies");
             // jhipster-needle-ehcache-add-entry
         };
     }

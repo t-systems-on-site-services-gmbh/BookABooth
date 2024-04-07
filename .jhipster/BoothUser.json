@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "changelogDate": "20240407201618"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "phone",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "fieldName": "note",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "fieldName": "verificationCode",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "verified",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "lastLogin",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "disabled",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "BoothUser",
+  "relationships": [
+    {
+      "options": {
+        "onDelete": "CASCADE"
+      },
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "boothUser",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "company",
+      "relationshipName": "company",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

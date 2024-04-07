@@ -1,0 +1,31 @@
+{
+  "annotations": {
+    "changelogDate": "20240407201616"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "price",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    }
+  ],
+  "name": "ServicePackage",
+  "relationships": [
+    {
+      "otherEntityName": "booth",
+      "otherEntityRelationshipName": "servicePackage",
+      "relationshipName": "booth",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no"
+}

@@ -1,0 +1,16 @@
+{
+  "annotations": {
+    "changelogDate": "20240407201611"
+  },
+  "applications": "*",
+  "entityTableName": "jhi_system",
+  "fields": [
+    {
+      "fieldName": "enabled",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "System",
+  "relationships": [],
+  "searchEngine": "no"
+}

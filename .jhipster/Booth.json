@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "changelogDate": "20240407201612"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "unique", "required"],
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "ceilingHeight",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "available",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Booth",
+  "relationships": [
+    {
+      "otherEntityName": "location",
+      "otherEntityRelationshipName": "booths",
+      "relationshipName": "location",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "servicePackage",
+      "otherEntityRelationshipName": "booth",
+      "relationshipName": "servicePackage",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no"
+}

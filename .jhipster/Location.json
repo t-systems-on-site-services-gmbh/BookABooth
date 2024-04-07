@@ -1,0 +1,25 @@
+{
+  "annotations": {
+    "changelogDate": "20240407201613"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "location",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "unique"],
+      "fieldValidateRulesMaxlength": "200"
+    }
+  ],
+  "name": "Location",
+  "relationships": [
+    {
+      "otherEntityName": "booth",
+      "otherEntityRelationshipName": "location",
+      "relationshipName": "booths",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no"
+}

@@ -1,0 +1,63 @@
+{
+  "annotations": {
+    "changelogDate": "20240407201614"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "mail",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "billingAddress",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "logo",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "waitingList",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "exhibitorList",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Company",
+  "relationships": [
+    {
+      "otherEntityName": "booking",
+      "otherEntityRelationshipName": "company",
+      "relationshipName": "bookings",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "department",
+      "otherEntityRelationshipName": "company",
+      "relationshipName": "department",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "contact",
+      "otherEntityRelationshipName": "company",
+      "relationshipName": "contact",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no"
+}
