@@ -9,7 +9,7 @@ entity System {
 entity Booth {
   title String maxlength(NAME_MAX_LENGTH) unique required // Should be used as "Standnummer"
   ceilingHeight BigDecimal
-  available Boolean required(true)
+  available Boolean required
   // servicePackage
 }
 
