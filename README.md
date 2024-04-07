@@ -2,6 +2,17 @@
 
 BookABooth lets the user/organization book a booth at an exhibition. It is initially being developed for the "Jade Karrieretag" hosted by Jade Hochschule in Wilhelmshaven.
 
+# Quick installation guide for the development environment
+
+1. install you favorite IDE (IntelliJ IDEA is recommended)
+2. install jdk21 https://adoptium.net/de/temurin/releases/?os=windows&arch=x64&package=jdk
+3. install node https://nodejs.org/dist/v20.12.1/node-v20.12.1-x64.msi
+4. ensure proxy if needed (default: already set the telekom proxy for the maven wrapper in <projekt>/.mvn/jvm.config)
+5. install heidi as DB-Tool (from telekom software center)
+6. install MariaDB https://dlm.mariadb.com/3744151/MariaDB/mariadb-10.11.7/winx64-packages/mariadb-10.11.7-winx64.msi
+7. create database "bookabooth" user: root | pw: <without password>
+8. start the application with: mvnw
+
 # jhipster
 
 This application was generated using JHipster 8.2.1, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v8.2.1](https://www.jhipster.tech/documentation-archive/v8.2.1).
