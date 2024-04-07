@@ -41,7 +41,7 @@ entity ServicePackage {
 }
 
 entity Booking {
-  received Date
+  received ZonedDateTime
   status BookingStatus
 }
 
@@ -49,8 +49,8 @@ entity BoothUser {
   phone String maxlength(PHONE_MAX_LENGTH)
   note TextBlob
   verificationCode UUID
-  verified Date
-  lastLogin Date
+  verified ZonedDateTime
+  lastLogin ZonedDateTime
   disabled Boolean
 
 }
