@@ -11,7 +11,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
@@ -46,6 +48,7 @@ public class ServicePackageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicePackage> createServicePackage(@RequestBody ServicePackage servicePackage) throws URISyntaxException {
         log.debug("REST request to save ServicePackage : {}", servicePackage);
         if (servicePackage.getId() != null) {
@@ -68,6 +71,7 @@ public class ServicePackageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicePackage> updateServicePackage(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ServicePackage servicePackage
@@ -102,6 +106,7 @@ public class ServicePackageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicePackage> partialUpdateServicePackage(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ServicePackage servicePackage
@@ -179,6 +184,7 @@ public class ServicePackageResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteServicePackage(@PathVariable("id") Long id) {
         log.debug("REST request to delete ServicePackage : {}", id);
         servicePackageRepository.deleteById(id);
