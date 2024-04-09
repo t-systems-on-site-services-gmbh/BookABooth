@@ -11,7 +11,24 @@ BookABooth lets the user/organization book a booth at an exhibition. It is initi
 5. install heidi as DB-Tool (from telekom software center)
 6. install MariaDB https://dlm.mariadb.com/3744151/MariaDB/mariadb-10.11.7/winx64-packages/mariadb-10.11.7-winx64.msi
 7. create database "bookabooth" user: root | pw: <without password>
-8. start the application with: mvnw
+8. Edit/Create the proxies session in your ~/.m2/settings.xml file:
+
+```
+   <proxies>
+   <proxy>
+   <id>id</id>
+   <active>true</active>
+   <protocol>http</protocol>
+   <username>username</username>
+   <password>password</password>
+   <host>host</host>
+   <port>port</port>
+   <nonProxyHosts>local.net|some.host.com</nonProxyHosts>
+   </proxy>
+   </proxies>
+```
+
+9. build & start the application with: mvnw
 
 # jhipster
 
