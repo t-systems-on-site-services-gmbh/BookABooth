@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="ServicePackageHeading">
-      <span id="service-package-heading">Service Packages</span>
+      <span id="service-package-heading">Service Pakete</span>
       <div class="d-flex justify-content-end">
         <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>
@@ -14,7 +14,7 @@
             class="btn btn-primary jh-create-entity create-service-package"
           >
             <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span>Service Package erstellen</span>
+            <span>Service Paket erstellen</span>
           </button>
         </router-link>
       </div>
@@ -29,9 +29,9 @@
           <tr>
             <th scope="row"><span>ID</span></th>
             <th scope="row"><span>Name</span></th>
-            <th scope="row"><span>Price</span></th>
-            <th scope="row"><span>Description</span></th>
-            <th scope="row"><span>Booth</span></th>
+            <th scope="row"><span>Preis</span></th>
+            <th scope="row"><span>Beschreibung</span></th>
+            <th scope="row"><span>Stand</span></th>
             <th scope="row"></th>
           </tr>
         </thead>

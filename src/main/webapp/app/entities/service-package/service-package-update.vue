@@ -3,7 +3,7 @@
     <div class="col-8">
       <form name="editForm" role="form" novalidate v-on:submit.prevent="save()">
         <h2 id="bookaboothApp.servicePackage.home.createOrEditLabel" data-cy="ServicePackageCreateUpdateHeading">
-          Service Package erstellen oder bearbeiten
+          Service Paket erstellen oder bearbeiten
         </h2>
         <div>
           <div class="form-group" v-if="servicePackage.id">
@@ -11,7 +11,7 @@
             <input type="text" class="form-control" id="id" name="id" v-model="servicePackage.id" readonly />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="service-package-name">Name</label>
+            <label class="form-control-label" for="service-package-name">Titel</label>
             <input
               type="text"
               class="form-control"
@@ -23,7 +23,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="service-package-price">Price</label>
+            <label class="form-control-label" for="service-package-price">Preis</label>
             <input
               type="number"
               class="form-control"
@@ -35,7 +35,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="service-package-description">Description</label>
+            <label class="form-control-label" for="service-package-description">Beschreibung</label>
             <input
               type="text"
               class="form-control"
@@ -47,7 +47,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="service-package-booth">Booth</label>
+            <label for="service-package-booth">Stand</label>
             <select
               class="form-control"
               id="service-package-booths"
@@ -62,7 +62,7 @@
                 v-for="boothOption in booths"
                 :key="boothOption.id"
               >
-                {{ boothOption.id }}
+                {{ boothOption.title }}
               </option>
             </select>
           </div>
