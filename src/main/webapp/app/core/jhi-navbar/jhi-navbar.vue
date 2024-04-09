@@ -43,46 +43,6 @@
         </b-nav-item-dropdown>
         <b-nav-item-dropdown
           right
-          id="admin-menu"
-          v-if="hasAnyAuthority('ROLE_ADMIN') && authenticated"
-          :class="{ 'router-link-active': subIsActive('/admin') }"
-          active-class="active"
-          class="pointer"
-          data-cy="adminMenu"
-        >
-          <template #button-content>
-            <span class="navbar-dropdown-menu">
-              <font-awesome-icon icon="users-cog" />
-              <span class="no-bold">Administration</span>
-            </span>
-          </template>
-          <b-dropdown-item to="/admin/user-management" active-class="active">
-            <font-awesome-icon icon="users" />
-            <span>Benutzerverwaltung</span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/metrics" active-class="active">
-            <font-awesome-icon icon="tachometer-alt" />
-            <span>Metriken</span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/health" active-class="active">
-            <font-awesome-icon icon="heart" />
-            <span>Status</span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/configuration" active-class="active">
-            <font-awesome-icon icon="cogs" />
-            <span>Konfiguration</span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/logs" active-class="active">
-            <font-awesome-icon icon="tasks" />
-            <span>Protokoll</span>
-          </b-dropdown-item>
-          <b-dropdown-item v-if="openAPIEnabled" to="/admin/docs" active-class="active">
-            <font-awesome-icon icon="book" />
-            <span>API</span>
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown
-          right
           href="javascript:void(0);"
           id="account-menu"
           :class="{ 'router-link-active': subIsActive('/account') }"
