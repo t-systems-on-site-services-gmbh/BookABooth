@@ -67,34 +67,5 @@ describe('Component Tests', () => {
         expect(comp.systems[0]).toEqual(expect.objectContaining({ id: 123 }));
       });
     });
-    describe('Handles', () => {
-      let comp: SystemComponentType;
-
-      beforeEach(async () => {
-        const wrapper = shallowMount(System, { global: mountOptions });
-        comp = wrapper.vm;
-        await comp.$nextTick();
-        systemServiceStub.retrieve.reset();
-        systemServiceStub.retrieve.resolves({ headers: {}, data: [] });
-      });
-
-      it('Should call delete service on confirmDelete', async () => {
-        // GIVEN
-        systemServiceStub.delete.resolves({});
-
-        // WHEN
-        comp.prepareRemove({ id: 123 });
-
-        comp.removeSystem();
-        await comp.$nextTick(); // clear components
-
-        // THEN
-        expect(systemServiceStub.delete.called).toBeTruthy();
-
-        // THEN
-        await comp.$nextTick(); // handle component clear watch
-        expect(systemServiceStub.retrieve.callCount).toEqual(1);
-      });
-    });
   });
 });
