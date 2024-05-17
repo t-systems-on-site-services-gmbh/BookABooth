@@ -16,10 +16,7 @@ const error = {
 
 const axiosStub = {
   get: sinon.stub(axios, 'get'),
-  post: sinon.stub(axios, 'post'),
-  put: sinon.stub(axios, 'put'),
   patch: sinon.stub(axios, 'patch'),
-  delete: sinon.stub(axios, 'delete'),
 };
 
 describe('Service Tests', () => {
@@ -33,7 +30,7 @@ describe('Service Tests', () => {
     });
 
     describe('Service methods', () => {
-      it('should find an element', async () => {
+      it('should find one element', async () => {
         const returnedFromService = Object.assign({}, elemDefault);
         axiosStub.get.resolves({ data: returnedFromService });
 
@@ -46,59 +43,6 @@ describe('Service Tests', () => {
         axiosStub.get.rejects(error);
         return service
           .find(123)
-          .then()
-          .catch(err => {
-            expect(err).toMatchObject(error);
-          });
-      });
-
-      it('should create a System', async () => {
-        const returnedFromService = Object.assign(
-          {
-            id: 123,
-          },
-          elemDefault,
-        );
-        const expected = Object.assign({}, returnedFromService);
-
-        axiosStub.post.resolves({ data: returnedFromService });
-        return service.create({}).then(res => {
-          expect(res).toMatchObject(expected);
-        });
-      });
-
-      it('should not create a System', async () => {
-        axiosStub.post.rejects(error);
-
-        return service
-          .create({})
-          .then()
-          .catch(err => {
-            expect(err).toMatchObject(error);
-          });
-      });
-
-      it('should update a System', async () => {
-        const returnedFromService = Object.assign(
-          {
-            enabled: true,
-          },
-          elemDefault,
-        );
-
-        const expected = Object.assign({}, returnedFromService);
-        axiosStub.put.resolves({ data: returnedFromService });
-
-        return service.update(expected).then(res => {
-          expect(res).toMatchObject(expected);
-        });
-      });
-
-      it('should not update a System', async () => {
-        axiosStub.put.rejects(error);
-
-        return service
-          .update({})
           .then()
           .catch(err => {
             expect(err).toMatchObject(error);
@@ -152,24 +96,6 @@ describe('Service Tests', () => {
 
         return service
           .retrieve()
-          .then()
-          .catch(err => {
-            expect(err).toMatchObject(error);
-          });
-      });
-
-      it('should delete a System', async () => {
-        axiosStub.delete.resolves({ ok: true });
-        return service.delete(123).then(res => {
-          expect(res.ok).toBeTruthy();
-        });
-      });
-
-      it('should not delete a System', async () => {
-        axiosStub.delete.rejects(error);
-
-        return service
-          .delete(123)
           .then()
           .catch(err => {
             expect(err).toMatchObject(error);

@@ -11,17 +11,15 @@ export default defineComponent({
     const systemService = inject('systemService', () => new SystemService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
-    const systems: Ref<ISystem[]> = ref([]);
+    const system: Ref<ISystem> = ref();
 
     const isFetching = ref(false);
 
-    const clear = () => {};
-
-    const retrieveSystems = async () => {
+    const retrieveSystem = async () => {
       isFetching.value = true;
       try {
         const res = await systemService().retrieve();
-        systems.value = res.data;
+        system.value = res.data;
       } catch (err) {
         alertService.showHttpError(err.response);
       } finally {
@@ -29,47 +27,25 @@ export default defineComponent({
       }
     };
 
-    const handleSyncList = () => {
-      retrieveSystems();
-    };
-
-    onMounted(async () => {
-      await retrieveSystems();
-    });
-
-    const removeId: Ref<number> = ref(null);
-    const removeEntity = ref<any>(null);
-    const prepareRemove = (instance: ISystem) => {
-      removeId.value = instance.id;
-      removeEntity.value.show();
-    };
-    const closeDialog = () => {
-      removeEntity.value.hide();
-    };
-    const removeSystem = async () => {
+    const toggleSysEnabled = async () => {
       try {
-        await systemService().delete(removeId.value);
-        const message = 'A System is deleted with identifier ' + removeId.value;
-        alertService.showInfo(message, { variant: 'danger' });
-        removeId.value = null;
-        retrieveSystems();
-        closeDialog();
-      } catch (error) {
-        alertService.showHttpError(error.response);
+        system.value.enabled = !system.value.enabled;
+        const res = await systemService().partialUpdate(system.value);
+        system.value = res;
+      } catch (err) {
+        alertService.showHttpError(err.response);
       }
     };
 
+    onMounted(async () => {
+      await retrieveSystem();
+    });
+
     return {
-      systems,
-      handleSyncList,
+      system,
       isFetching,
-      retrieveSystems,
-      clear,
-      removeId,
-      removeEntity,
-      prepareRemove,
-      closeDialog,
-      removeSystem,
+      retrieveSystem,
+      toggleSysEnabled,
     };
   },
 });
