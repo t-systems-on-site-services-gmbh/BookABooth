@@ -11,7 +11,7 @@
             <span>{{ servicePackage.name }}</span>
           </dd>
           <dt>
-            <span>Preis</span>
+            <span>Preis in EUR</span>
           </dt>
           <dd>
             <span>{{ servicePackage.price }}</span>
@@ -20,7 +20,7 @@
             <span>Beschreibung</span>
           </dt>
           <dd>
-            <span>{{ servicePackage.description }}</span>
+            <p>{{ servicePackage.description }}</p>
           </dd>
           <dt>
             <span>Stand</span>
