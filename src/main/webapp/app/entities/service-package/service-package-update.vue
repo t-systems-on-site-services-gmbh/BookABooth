@@ -23,7 +23,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="service-package-price">Preis</label>
+            <label class="form-control-label" for="service-package-price">Preis in EUR</label>
             <input
               type="number"
               class="form-control"
@@ -36,8 +36,7 @@
           </div>
           <div class="form-group">
             <label class="form-control-label" for="service-package-description">Beschreibung</label>
-            <input
-              type="text"
+            <textarea
               class="form-control"
               name="description"
               id="service-package-description"
