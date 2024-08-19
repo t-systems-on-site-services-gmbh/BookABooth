@@ -21,7 +21,7 @@
     </h2>
     <br />
     <div class="alert alert-warning" v-if="!isFetching && servicePackages && servicePackages.length === 0">
-      <span>Keine Service Packages gefunden</span>
+      <span>Keine Service Pakete gefunden</span>
     </div>
     <div class="table-responsive" v-if="servicePackages && servicePackages.length > 0">
       <table class="table table-striped" aria-describedby="servicePackages">
@@ -29,7 +29,7 @@
           <tr>
             <th scope="row"><span>ID</span></th>
             <th scope="row"><span>Name</span></th>
-            <th scope="row"><span>Preis</span></th>
+            <th scope="row"><span>Preis in EUR</span></th>
             <th scope="row"><span>Beschreibung</span></th>
             <th scope="row"><span>Stand</span></th>
             <th scope="row"></th>

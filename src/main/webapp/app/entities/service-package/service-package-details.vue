@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <div v-if="servicePackage">
-        <h2 class="jh-entity-heading" data-cy="servicePackageDetailsHeading"><span>Service Package</span> {{ servicePackage.id }}</h2>
+        <h2 class="jh-entity-heading" data-cy="servicePackageDetailsHeading"><span>Service Paket</span> {{ servicePackage.id }}</h2>
         <dl class="row jh-entity-details">
           <dt>
             <span>Name</span>
@@ -11,19 +11,19 @@
             <span>{{ servicePackage.name }}</span>
           </dd>
           <dt>
-            <span>Price</span>
+            <span>Preis in EUR</span>
           </dt>
           <dd>
             <span>{{ servicePackage.price }}</span>
           </dd>
           <dt>
-            <span>Description</span>
+            <span>Beschreibung</span>
           </dt>
           <dd>
-            <span>{{ servicePackage.description }}</span>
+            <p>{{ servicePackage.description }}</p>
           </dd>
           <dt>
-            <span>Booth</span>
+            <span>Stand</span>
           </dt>
           <dd>
             <span v-for="(booth, i) in servicePackage.booths" :key="booth.id"
