@@ -2,14 +2,14 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <form name="editForm" role="form" novalidate v-on:submit.prevent="save()">
-        <h2 id="bookaboothApp.booth.home.createOrEditLabel" data-cy="BoothCreateUpdateHeading">Booth erstellen oder bearbeiten</h2>
+        <h2 id="bookaboothApp.booth.home.createOrEditLabel" data-cy="BoothCreateUpdateHeading">Stand erstellen oder bearbeiten</h2>
         <div>
           <div class="form-group" v-if="booth.id">
             <label for="id">ID</label>
             <input type="text" class="form-control" id="id" name="id" v-model="booth.id" readonly />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="booth-title">Title</label>
+            <label class="form-control-label" for="booth-title">Name</label>
             <input
               type="text"
               class="form-control"
@@ -25,7 +25,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="booth-ceilingHeight">Ceiling Height</label>
+            <label class="form-control-label" for="booth-ceilingHeight">Deckenhöhe</label>
             <input
               type="number"
               class="form-control"
@@ -37,7 +37,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="booth-available">Available</label>
+            <label class="form-control-label" for="booth-available">Verfügbar</label>
             <input
               type="checkbox"
               class="form-check"
@@ -53,7 +53,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="booth-location">Location</label>
+            <label class="form-control-label" for="booth-location">Ort</label>
             <select class="form-control" id="booth-location" data-cy="location" name="location" v-model="booth.location">
               <option v-bind:value="null"></option>
               <option
@@ -66,7 +66,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="booth-servicePackage">Service Package</label>
+            <label for="booth-servicePackage">Service Paket</label>
             <select
               class="form-control"
               id="booth-servicePackages"

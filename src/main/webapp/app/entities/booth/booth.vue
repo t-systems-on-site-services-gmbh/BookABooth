@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="BoothHeading">
-      <span id="booth-heading">Booths</span>
+      <span id="booth-heading">Lageplan</span>
       <div class="d-flex justify-content-end">
         <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>
@@ -14,25 +14,25 @@
             class="btn btn-primary jh-create-entity create-booth"
           >
             <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span>Booth erstellen</span>
+            <span>Stand erstellen</span>
           </button>
         </router-link>
       </div>
     </h2>
     <br />
     <div class="alert alert-warning" v-if="!isFetching && booths && booths.length === 0">
-      <span>Keine Booths gefunden</span>
+      <span>Keine Stände gefunden</span>
     </div>
     <div class="table-responsive" v-if="booths && booths.length > 0">
       <table class="table table-striped" aria-describedby="booths">
         <thead>
           <tr>
             <th scope="row"><span>ID</span></th>
-            <th scope="row"><span>Title</span></th>
-            <th scope="row"><span>Ceiling Height</span></th>
-            <th scope="row"><span>Available</span></th>
-            <th scope="row"><span>Location</span></th>
-            <th scope="row"><span>Service Package</span></th>
+            <th scope="row"><span>Name</span></th>
+            <th scope="row"><span>Deckenhöhe</span></th>
+            <th scope="row"><span>Verfügbar</span></th>
+            <th scope="row"><span>Ort</span></th>
+            <th scope="row"><span>Service Paket</span></th>
             <th scope="row"></th>
           </tr>
         </thead>
