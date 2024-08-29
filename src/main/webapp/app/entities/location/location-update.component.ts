@@ -42,6 +42,9 @@ export default defineComponent({
       location: {
         maxLength: validations.maxLength('Dieses Feld darf max. 200 Zeichen lang sein.', 200),
       },
+      imageUrl: {
+        maxLength: validations.maxLength('Dieses Feld darf max. 200 Zeichen lang sein.', 200),
+      },
     };
     const v$ = useVuelidate(validationRules, location as any);
     v$.value.$validate();

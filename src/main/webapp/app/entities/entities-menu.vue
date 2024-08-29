@@ -4,9 +4,13 @@
       <font-awesome-icon icon="asterisk" />
       <span>Anmeldung freischalten/sperren</span>
     </b-dropdown-item>
+    <b-dropdown-item to="/location">
+      <font-awesome-icon icon="asterisk" />
+      <span>Lagepläne</span>
+    </b-dropdown-item>
     <b-dropdown-item to="/booth">
       <font-awesome-icon icon="asterisk" />
-      <span>Lageplan</span>
+      <span>Messestände</span>
     </b-dropdown-item>
     <b-dropdown-item to="/service-package">
       <font-awesome-icon icon="asterisk" />

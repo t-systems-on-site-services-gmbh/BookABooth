@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="BoothHeading">
-      <span id="booth-heading">Lageplan</span>
+      <span id="booth-heading">Messestände</span>
       <div class="d-flex justify-content-end">
         <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>

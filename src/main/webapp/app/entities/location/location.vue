@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="LocationHeading">
-      <span id="location-heading">Locations</span>
+      <span id="location-heading">Lagepläne</span>
       <div class="d-flex justify-content-end">
         <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>
@@ -14,21 +14,21 @@
             class="btn btn-primary jh-create-entity create-location"
           >
             <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span>Location erstellen</span>
+            <span>Lageplan erstellen</span>
           </button>
         </router-link>
       </div>
     </h2>
     <br />
     <div class="alert alert-warning" v-if="!isFetching && locations && locations.length === 0">
-      <span>Keine Locations gefunden</span>
+      <span>Keine Lagepläne gefunden</span>
     </div>
     <div class="table-responsive" v-if="locations && locations.length > 0">
       <table class="table table-striped" aria-describedby="locations">
         <thead>
           <tr>
             <th scope="row"><span>ID</span></th>
-            <th scope="row"><span>Location</span></th>
+            <th scope="row"><span>Lokation</span></th>
             <th scope="row"></th>
           </tr>
         </thead>
@@ -77,7 +77,7 @@
         <span id="bookaboothApp.location.delete.question" data-cy="locationDeleteDialogHeading">Löschen bestätigen</span>
       </template>
       <div class="modal-body">
-        <p id="jhi-delete-location-heading">Soll Location {{ removeId }} wirklich dauerhaft gelöscht werden?</p>
+        <p id="jhi-delete-location-heading">Soll Lokation {{ removeId }} wirklich dauerhaft gelöscht werden?</p>
       </div>
       <template #modal-footer>
         <div>

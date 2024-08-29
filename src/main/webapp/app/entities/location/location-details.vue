@@ -2,13 +2,19 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <div v-if="location">
-        <h2 class="jh-entity-heading" data-cy="locationDetailsHeading"><span>Location</span> {{ location.id }}</h2>
+        <h2 class="jh-entity-heading" data-cy="locationDetailsHeading"><span>Lageplan</span> {{ location.id }}</h2>
         <dl class="row jh-entity-details">
           <dt>
-            <span>Location</span>
+            <span>Lokation</span>
           </dt>
           <dd>
             <span>{{ location.location }}</span>
+          </dd>
+          <dt>
+            <span>Grafik</span>
+          </dt>
+          <dd>
+            <span>{{ location.imageUrl }}</span>
           </dd>
         </dl>
         <button type="submit" v-on:click.prevent="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
