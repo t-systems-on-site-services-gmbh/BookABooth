@@ -30,6 +30,10 @@ public class Location implements Serializable {
     @Column(name = "location", length = 200, unique = true)
     private String location;
 
+    @Size(max = 200)
+    @Column(name = "url", length = 200, unique = true)
+    private String imageUrl;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "location", "servicePackages" }, allowSetters = true)
@@ -61,6 +65,14 @@ public class Location implements Serializable {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Set<Booth> getBooths() {
@@ -119,6 +131,7 @@ public class Location implements Serializable {
         return "Location{" +
             "id=" + getId() +
             ", location='" + getLocation() + "'" +
+            ", imageUrl='" + getImageUrl() + "'" +
             "}";
     }
 }

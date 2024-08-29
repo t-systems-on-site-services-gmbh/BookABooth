@@ -126,6 +126,9 @@ public class LocationResource {
                 if (location.getLocation() != null) {
                     existingLocation.setLocation(location.getLocation());
                 }
+                if (location.getImageUrl() != null) {
+                    existingLocation.setImageUrl(location.getImageUrl());
+                }
 
                 return existingLocation;
             })
