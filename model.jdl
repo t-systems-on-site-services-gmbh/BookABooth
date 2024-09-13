@@ -65,6 +65,9 @@ entity Booking {
     status BookingStatus
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity BoothUser {
     phone String maxlength(PHONE_MAX_LENGTH)
     note TextBlob
@@ -103,7 +106,7 @@ relationship OneToMany {
 }
 
 relationship OneToOne {
-    BoothUser{user} to @OnDelete("CASCADE") User{boothUser} with builtInEntity
+    BoothUser{user} to @OnDelete("CASCADE") @Id User with builtInEntity
 }
 
 enum BookingStatus {

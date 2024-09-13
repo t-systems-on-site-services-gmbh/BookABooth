@@ -5,10 +5,20 @@ import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CON
 
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.domain.Authority;
+import de.tsystems.onsite.bookabooth.domain.BoothUser;
+import de.tsystems.onsite.bookabooth.domain.Company;
+import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.dto.*;
+import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
+import de.tsystems.onsite.bookabooth.service.exception.*;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
@@ -41,9 +51,11 @@ public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    private final UserRepository userRepository;
+    private final CompanyService companyService;
 
     private final CompanyRepository companyRepository;
+
+    private final UserRepository userRepository;
 
     private final BoothUserRepository boothUserRepository;
 
@@ -64,6 +76,8 @@ public class UserService {
     private final CacheManager cacheManager;
 
     public UserService(
+        CompanyService companyService,
+        CompanyRepository companyRepository1,
         UserRepository userRepository,
         CompanyRepository companyRepository,
         BoothUserRepository boothUserRepository,
@@ -76,8 +90,9 @@ public class UserService {
         AuthorityRepository authorityRepository,
         CacheManager cacheManager
     ) {
-        this.userRepository = userRepository;
+        this.companyService = companyService;
         this.companyRepository = companyRepository;
+        this.userRepository = userRepository;
         this.boothUserRepository = boothUserRepository;
         this.userMapper = userMapper;
         this.companyMapper = companyMapper;
@@ -129,7 +144,73 @@ public class UserService {
             });
     }
 
-    public User registerUser(AdminUserDTO userDTO, String password) {
+    public BoothUser registerUser(UserRegistrationDTO userRegistrationDTO) {
+        if (!userRegistrationDTO.getTermsAccepted()) {
+            throw new TermsNotAcceptedException();
+        }
+
+        userRepository
+            .findOneByLogin(userRegistrationDTO.getLogin().toLowerCase())
+            .ifPresent(existingUser -> {
+                boolean removed = removeNonActivatedUser(existingUser);
+                if (!removed) {
+                    throw new UsernameAlreadyUsedException();
+                }
+            });
+        userRepository
+            .findOneByEmailIgnoreCase(userRegistrationDTO.getEmail())
+            .ifPresent(existingUser -> {
+                boolean removed = removeNonActivatedUser(existingUser);
+                if (!removed) {
+                    throw new EmailAlreadyUsedException();
+                }
+            });
+        // find user by company name
+        boothUserRepository
+            .findByCompanyName(userRegistrationDTO.getCompanyName())
+            .stream()
+            .findFirst()
+            .ifPresent(existingUser -> {
+                User user = existingUser.getUser();
+                boolean removed = removeNonActivatedUser(user);
+                if (!removed) {
+                    throw new CompanyAlreadyUsedException();
+                }
+            });
+
+        // new User
+        User newUser = new User();
+        // add Authority USER
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        newUser.setAuthorities(authorities);
+        newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
+        newUser.setActivated(false);
+        newUser.setActivationKey(RandomUtil.generateActivationKey());
+        newUser.setLogin(userRegistrationDTO.getLogin().toLowerCase());
+        newUser.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        newUser.setEmail(userRegistrationDTO.getEmail().toLowerCase());
+
+        // new Company
+        CompanyDTO companyDTO = new CompanyDTO();
+        companyDTO.setName(userRegistrationDTO.getCompanyName());
+        companyDTO = companyService.save(companyDTO);
+        Company company = companyRepository.getReferenceById(companyDTO.getId());
+
+        // new BoothUser
+        BoothUser newBoothUser = new BoothUser();
+        newBoothUser.setUser(newUser);
+        newBoothUser.setCompany(company);
+        boothUserRepository.save(newBoothUser);
+        //this.clearUserCaches(newUser);
+
+        log.debug("Created Information for User: {}", newUser);
+        log.debug("user was rigistered: {}", newUser);
+        return newBoothUser;
+    }
+
+    @Deprecated
+    public User old_registerUser(AdminUserDTO userDTO, String password) {
         userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
             .ifPresent(existingUser -> {
@@ -146,6 +227,12 @@ public class UserService {
                     throw new EmailAlreadyUsedException();
                 }
             });
+        companyRepository
+            .findOneByNameIgnoreCase(userDTO.getCompanyName())
+            .ifPresent(c -> {
+                throw new CompanyAlreadyUsedException();
+            });
+
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(userDTO.getLogin().toLowerCase());

@@ -1,6 +1,7 @@
 package de.tsystems.onsite.bookabooth.repository;
 
 import de.tsystems.onsite.bookabooth.domain.Company;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface CompanyRepository extends JpaRepository<Company, Long> {}
+public interface CompanyRepository extends JpaRepository<Company, Long> {
+    Optional<Company> findOneByNameIgnoreCase(String name);
+}
