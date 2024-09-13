@@ -52,7 +52,32 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="email">Email Adresse</label>
+            <label class="form-control-label" for="companyName">Firmenname</label>
+            <input
+              type="text"
+              class="form-control"
+              id="companyName"
+              name="companyName"
+              :class="{ valid: !v$.registerAccount.companyName.$invalid, invalid: v$.registerAccount.companyName.$invalid }"
+              v-model="v$.registerAccount.companyName.$model"
+              minlength="1"
+              maxlength="100"
+              required
+              placeholder="Ihr Firmenname"
+              data-cy="companyName"
+            />
+            <div v-if="v$.registerAccount.companyName.$anyDirty && v$.registerAccount.companyName.$invalid">
+              <small class="form-text text-danger" v-if="!v$.registerAccount.companyName.required">Ihr Firmenname wird benötigt.</small>
+              <small class="form-text text-danger" v-if="!v$.registerAccount.companyName.minLength"
+                >Ihr Firmenname muss mindestens ein Zeichen lang sein.</small
+              >
+              <small class="form-text text-danger" v-if="!v$.registerAccount.companyName.maxLength"
+                >Ihr Firmenname darf nicht länger als 100 Zeichen sein.</small
+              >
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="email">E-Mail-Adresse</label>
             <input
               type="email"
               class="form-control"
@@ -131,7 +156,27 @@
               >
             </div>
           </div>
-
+          <div class="form-group">
+            <div class="form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="termsAccepted"
+                name="termsAccepted"
+                v-model="v$.registerAccount.termsAccepted.$model"
+                required
+                data-cy="termsAccepted"
+              />
+              <label class="form-check-label" for="termsAccepted">
+                Ich habe die <a href="/terms" target="_blank">Nutzungsbedingungen</a> (DSGVO) gelesen und akzeptiert.
+              </label>
+            </div>
+            <div v-if="v$.registerAccount.termsAccepted.$anyDirty && v$.registerAccount.termsAccepted.$invalid">
+              <small class="form-text text-danger" v-if="!v$.registerAccount.termsAccepted.required"
+                >Sie müssen die Nutzungsbedingungen akzeptieren.</small
+              >
+            </div>
+          </div>
           <button type="submit" :disabled="v$.$invalid" class="btn btn-primary" data-cy="submit">Registrieren</button>
         </form>
         <p></p>

@@ -4,6 +4,7 @@ import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.Authority;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.AuthorityRepository;
+import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
@@ -17,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +39,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final CompanyRepository companyRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final PersistentTokenRepository persistentTokenRepository;
@@ -47,12 +51,14 @@ public class UserService {
 
     public UserService(
         UserRepository userRepository,
+        CompanyRepository companyRepository,
         PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager
     ) {
         this.userRepository = userRepository;
+        this.companyRepository = companyRepository;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
@@ -116,6 +122,12 @@ public class UserService {
                     throw new EmailAlreadyUsedException();
                 }
             });
+        companyRepository
+            .findOneByNameIgnoreCase(userDTO.getCompanyName())
+            .ifPresent(c -> {
+                throw new CompanyAlreadyUsedException();
+            });
+
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(userDTO.getLogin().toLowerCase());
