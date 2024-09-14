@@ -14,6 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.ServicePackage;
 import de.tsystems.onsite.bookabooth.repository.ServicePackageRepository;
+import de.tsystems.onsite.bookabooth.service.ServicePackageService;
+import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
+import de.tsystems.onsite.bookabooth.service.mapper.ServicePackageMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -67,6 +70,12 @@ class ServicePackageResourceIT {
     private ServicePackageRepository servicePackageRepositoryMock;
 
     @Autowired
+    private ServicePackageMapper servicePackageMapper;
+
+    @Mock
+    private ServicePackageService servicePackageServiceMock;
+
+    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -106,20 +115,25 @@ class ServicePackageResourceIT {
     void createServicePackage() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the ServicePackage
-        var returnedServicePackage = om.readValue(
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
+        var returnedServicePackageDTO = om.readValue(
             restServicePackageMockMvc
                 .perform(
-                    post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(servicePackage))
+                    post(ENTITY_API_URL)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(servicePackageDTO))
                 )
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
-            ServicePackage.class
+            ServicePackageDTO.class
         );
 
         // Validate the ServicePackage in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedServicePackage = servicePackageMapper.toEntity(returnedServicePackageDTO);
         assertServicePackageUpdatableFieldsEquals(returnedServicePackage, getPersistedServicePackage(returnedServicePackage));
     }
 
@@ -128,13 +142,14 @@ class ServicePackageResourceIT {
     void createServicePackageWithExistingId() throws Exception {
         // Create the ServicePackage with an existing ID
         servicePackage.setId(1L);
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restServicePackageMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(servicePackage))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(servicePackageDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -161,16 +176,16 @@ class ServicePackageResourceIT {
 
     @SuppressWarnings({ "unchecked" })
     void getAllServicePackagesWithEagerRelationshipsIsEnabled() throws Exception {
-        when(servicePackageRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+        when(servicePackageServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
         restServicePackageMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
 
-        verify(servicePackageRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+        verify(servicePackageServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @SuppressWarnings({ "unchecked" })
     void getAllServicePackagesWithEagerRelationshipsIsNotEnabled() throws Exception {
-        when(servicePackageRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+        when(servicePackageServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
         restServicePackageMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
         verify(servicePackageRepositoryMock, times(1)).findAll(any(Pageable.class));
@@ -213,13 +228,14 @@ class ServicePackageResourceIT {
         // Disconnect from session so that the updates on updatedServicePackage are not directly saved in db
         em.detach(updatedServicePackage);
         updatedServicePackage.name(UPDATED_NAME).price(UPDATED_PRICE).description(UPDATED_DESCRIPTION);
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(updatedServicePackage);
 
         restServicePackageMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedServicePackage.getId())
+                put(ENTITY_API_URL_ID, servicePackageDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(updatedServicePackage))
+                    .content(om.writeValueAsBytes(servicePackageDTO))
             )
             .andExpect(status().isOk());
 
@@ -234,13 +250,16 @@ class ServicePackageResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         servicePackage.setId(longCount.incrementAndGet());
 
+        // Create the ServicePackage
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restServicePackageMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, servicePackage.getId())
+                put(ENTITY_API_URL_ID, servicePackageDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(servicePackage))
+                    .content(om.writeValueAsBytes(servicePackageDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -254,13 +273,16 @@ class ServicePackageResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         servicePackage.setId(longCount.incrementAndGet());
 
+        // Create the ServicePackage
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restServicePackageMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(servicePackage))
+                    .content(om.writeValueAsBytes(servicePackageDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -274,9 +296,14 @@ class ServicePackageResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         servicePackage.setId(longCount.incrementAndGet());
 
+        // Create the ServicePackage
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restServicePackageMockMvc
-            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(servicePackage)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(servicePackageDTO))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ServicePackage in the database
@@ -348,13 +375,16 @@ class ServicePackageResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         servicePackage.setId(longCount.incrementAndGet());
 
+        // Create the ServicePackage
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restServicePackageMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, servicePackage.getId())
+                patch(ENTITY_API_URL_ID, servicePackageDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(servicePackage))
+                    .content(om.writeValueAsBytes(servicePackageDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -368,13 +398,16 @@ class ServicePackageResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         servicePackage.setId(longCount.incrementAndGet());
 
+        // Create the ServicePackage
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restServicePackageMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(servicePackage))
+                    .content(om.writeValueAsBytes(servicePackageDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -388,10 +421,16 @@ class ServicePackageResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         servicePackage.setId(longCount.incrementAndGet());
 
+        // Create the ServicePackage
+        ServicePackageDTO servicePackageDTO = servicePackageMapper.toDto(servicePackage);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restServicePackageMockMvc
             .perform(
-                patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(servicePackage))
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(om.writeValueAsBytes(servicePackageDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
