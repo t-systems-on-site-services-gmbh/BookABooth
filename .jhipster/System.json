@@ -1,6 +1,9 @@
 {
   "annotations": {
-    "changelogDate": "20240407201611"
+    "changelogDate": "20240407201611",
+    "dto": "mapstruct",
+    "lombok": true,
+    "service": "serviceClass"
   },
   "applications": "*",
   "entityTableName": "jhi_system",

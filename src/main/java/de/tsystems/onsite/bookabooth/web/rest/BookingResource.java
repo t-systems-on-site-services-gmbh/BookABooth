@@ -1,7 +1,8 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
-import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
+import de.tsystems.onsite.bookabooth.service.BookingService;
+import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/bookings")
-@Transactional
 public class BookingResource {
 
     private final Logger log = LoggerFactory.getLogger(BookingResource.class);
@@ -34,51 +33,54 @@ public class BookingResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final BookingService bookingService;
+
     private final BookingRepository bookingRepository;
 
-    public BookingResource(BookingRepository bookingRepository) {
+    public BookingResource(BookingService bookingService, BookingRepository bookingRepository) {
+        this.bookingService = bookingService;
         this.bookingRepository = bookingRepository;
     }
 
     /**
      * {@code POST  /bookings} : Create a new booking.
      *
-     * @param booking the booking to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new booking, or with status {@code 400 (Bad Request)} if the booking has already an ID.
+     * @param bookingDTO the bookingDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<Booking> createBooking(@Valid @RequestBody Booking booking) throws URISyntaxException {
-        log.debug("REST request to save Booking : {}", booking);
-        if (booking.getId() != null) {
+    public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingDTO bookingDTO) throws URISyntaxException {
+        log.debug("REST request to save Booking : {}", bookingDTO);
+        if (bookingDTO.getId() != null) {
             throw new BadRequestAlertException("A new booking cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        booking = bookingRepository.save(booking);
-        return ResponseEntity.created(new URI("/api/bookings/" + booking.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, booking.getId().toString()))
-            .body(booking);
+        bookingDTO = bookingService.save(bookingDTO);
+        return ResponseEntity.created(new URI("/api/bookings/" + bookingDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, bookingDTO.getId().toString()))
+            .body(bookingDTO);
     }
 
     /**
      * {@code PUT  /bookings/:id} : Updates an existing booking.
      *
-     * @param id the id of the booking to save.
-     * @param booking the booking to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated booking,
-     * or with status {@code 400 (Bad Request)} if the booking is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the booking couldn't be updated.
+     * @param id the id of the bookingDTO to save.
+     * @param bookingDTO the bookingDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated bookingDTO,
+     * or with status {@code 400 (Bad Request)} if the bookingDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the bookingDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Booking> updateBooking(
+    public ResponseEntity<BookingDTO> updateBooking(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Booking booking
+        @Valid @RequestBody BookingDTO bookingDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Booking : {}, {}", id, booking);
-        if (booking.getId() == null) {
+        log.debug("REST request to update Booking : {}, {}", id, bookingDTO);
+        if (bookingDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, booking.getId())) {
+        if (!Objects.equals(id, bookingDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -86,33 +88,33 @@ public class BookingResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        booking = bookingRepository.save(booking);
+        bookingDTO = bookingService.update(bookingDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, booking.getId().toString()))
-            .body(booking);
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, bookingDTO.getId().toString()))
+            .body(bookingDTO);
     }
 
     /**
      * {@code PATCH  /bookings/:id} : Partial updates given fields of an existing booking, field will ignore if it is null
      *
-     * @param id the id of the booking to save.
-     * @param booking the booking to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated booking,
-     * or with status {@code 400 (Bad Request)} if the booking is not valid,
-     * or with status {@code 404 (Not Found)} if the booking is not found,
-     * or with status {@code 500 (Internal Server Error)} if the booking couldn't be updated.
+     * @param id the id of the bookingDTO to save.
+     * @param bookingDTO the bookingDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated bookingDTO,
+     * or with status {@code 400 (Bad Request)} if the bookingDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the bookingDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the bookingDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<Booking> partialUpdateBooking(
+    public ResponseEntity<BookingDTO> partialUpdateBooking(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Booking booking
+        @NotNull @RequestBody BookingDTO bookingDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Booking partially : {}, {}", id, booking);
-        if (booking.getId() == null) {
+        log.debug("REST request to partial update Booking partially : {}, {}", id, bookingDTO);
+        if (bookingDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, booking.getId())) {
+        if (!Objects.equals(id, bookingDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -120,23 +122,11 @@ public class BookingResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Booking> result = bookingRepository
-            .findById(booking.getId())
-            .map(existingBooking -> {
-                if (booking.getReceived() != null) {
-                    existingBooking.setReceived(booking.getReceived());
-                }
-                if (booking.getStatus() != null) {
-                    existingBooking.setStatus(booking.getStatus());
-                }
-
-                return existingBooking;
-            })
-            .map(bookingRepository::save);
+        Optional<BookingDTO> result = bookingService.partialUpdate(bookingDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, booking.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, bookingDTO.getId().toString())
         );
     }
 
@@ -146,34 +136,34 @@ public class BookingResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of bookings in body.
      */
     @GetMapping("")
-    public List<Booking> getAllBookings() {
+    public List<BookingDTO> getAllBookings() {
         log.debug("REST request to get all Bookings");
-        return bookingRepository.findAll();
+        return bookingService.findAll();
     }
 
     /**
      * {@code GET  /bookings/:id} : get the "id" booking.
      *
-     * @param id the id of the booking to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the booking, or with status {@code 404 (Not Found)}.
+     * @param id the id of the bookingDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the bookingDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getBooking(@PathVariable("id") Long id) {
+    public ResponseEntity<BookingDTO> getBooking(@PathVariable("id") Long id) {
         log.debug("REST request to get Booking : {}", id);
-        Optional<Booking> booking = bookingRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(booking);
+        Optional<BookingDTO> bookingDTO = bookingService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(bookingDTO);
     }
 
     /**
      * {@code DELETE  /bookings/:id} : delete the "id" booking.
      *
-     * @param id the id of the booking to delete.
+     * @param id the id of the bookingDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable("id") Long id) {
         log.debug("REST request to delete Booking : {}", id);
-        bookingRepository.deleteById(id);
+        bookingService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();

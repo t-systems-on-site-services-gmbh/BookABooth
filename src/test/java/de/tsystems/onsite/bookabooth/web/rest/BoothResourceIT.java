@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.Booth;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
+import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
+import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.Random;
@@ -56,6 +58,9 @@ class BoothResourceIT {
     private BoothRepository boothRepository;
 
     @Autowired
+    private BoothMapper boothMapper;
+
+    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -95,18 +100,20 @@ class BoothResourceIT {
     void createBooth() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Booth
-        var returnedBooth = om.readValue(
+        BoothDTO boothDTO = boothMapper.toDto(booth);
+        var returnedBoothDTO = om.readValue(
             restBoothMockMvc
-                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booth)))
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boothDTO)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
-            Booth.class
+            BoothDTO.class
         );
 
         // Validate the Booth in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedBooth = boothMapper.toEntity(returnedBoothDTO);
         assertBoothUpdatableFieldsEquals(returnedBooth, getPersistedBooth(returnedBooth));
     }
 
@@ -115,12 +122,13 @@ class BoothResourceIT {
     void createBoothWithExistingId() throws Exception {
         // Create the Booth with an existing ID
         booth.setId(1L);
+        BoothDTO boothDTO = boothMapper.toDto(booth);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restBoothMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booth)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boothDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Booth in the database
@@ -135,9 +143,10 @@ class BoothResourceIT {
         booth.setTitle(null);
 
         // Create the Booth, which fails.
+        BoothDTO boothDTO = boothMapper.toDto(booth);
 
         restBoothMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booth)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boothDTO)))
             .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
@@ -151,9 +160,10 @@ class BoothResourceIT {
         booth.setAvailable(null);
 
         // Create the Booth, which fails.
+        BoothDTO boothDTO = boothMapper.toDto(booth);
 
         restBoothMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booth)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boothDTO)))
             .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
@@ -213,13 +223,14 @@ class BoothResourceIT {
         // Disconnect from session so that the updates on updatedBooth are not directly saved in db
         em.detach(updatedBooth);
         updatedBooth.title(UPDATED_TITLE).ceilingHeight(UPDATED_CEILING_HEIGHT).available(UPDATED_AVAILABLE);
+        BoothDTO boothDTO = boothMapper.toDto(updatedBooth);
 
         restBoothMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedBooth.getId())
+                put(ENTITY_API_URL_ID, boothDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(updatedBooth))
+                    .content(om.writeValueAsBytes(boothDTO))
             )
             .andExpect(status().isOk());
 
@@ -234,13 +245,16 @@ class BoothResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booth.setId(longCount.incrementAndGet());
 
+        // Create the Booth
+        BoothDTO boothDTO = boothMapper.toDto(booth);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBoothMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, booth.getId())
+                put(ENTITY_API_URL_ID, boothDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(booth))
+                    .content(om.writeValueAsBytes(boothDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -254,13 +268,16 @@ class BoothResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booth.setId(longCount.incrementAndGet());
 
+        // Create the Booth
+        BoothDTO boothDTO = boothMapper.toDto(booth);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBoothMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(booth))
+                    .content(om.writeValueAsBytes(boothDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -274,9 +291,12 @@ class BoothResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booth.setId(longCount.incrementAndGet());
 
+        // Create the Booth
+        BoothDTO boothDTO = boothMapper.toDto(booth);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBoothMockMvc
-            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booth)))
+            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boothDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Booth in the database
@@ -347,13 +367,16 @@ class BoothResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booth.setId(longCount.incrementAndGet());
 
+        // Create the Booth
+        BoothDTO boothDTO = boothMapper.toDto(booth);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBoothMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, booth.getId())
+                patch(ENTITY_API_URL_ID, boothDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(booth))
+                    .content(om.writeValueAsBytes(boothDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -367,13 +390,16 @@ class BoothResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booth.setId(longCount.incrementAndGet());
 
+        // Create the Booth
+        BoothDTO boothDTO = boothMapper.toDto(booth);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBoothMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(booth))
+                    .content(om.writeValueAsBytes(boothDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -387,9 +413,12 @@ class BoothResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booth.setId(longCount.incrementAndGet());
 
+        // Create the Booth
+        BoothDTO boothDTO = boothMapper.toDto(booth);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBoothMockMvc
-            .perform(patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(booth)))
+            .perform(patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(boothDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Booth in the database
