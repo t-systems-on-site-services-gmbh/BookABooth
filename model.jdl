@@ -1,100 +1,120 @@
 NAME_MAX_LENGTH = 200
 PHONE_MAX_LENGTH = 20
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity System {
-  enabled Boolean
-
+    enabled Boolean
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity Booth {
-  title String maxlength(NAME_MAX_LENGTH) unique required // Should be used as "Standnummer"
-  ceilingHeight BigDecimal
-  available Boolean required
-  // servicePackage
+    title String maxlength(NAME_MAX_LENGTH) unique required // Should be used as "Standnummer"
+    ceilingHeight BigDecimal
+    available Boolean required
+    // servicePackage
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity Location {
-  location String maxlength(NAME_MAX_LENGTH) unique
+    location String maxlength(NAME_MAX_LENGTH) unique
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity Company  {
-  name String maxlength(NAME_MAX_LENGTH)
-  mail String
-  billingAddress String
-  logo String
-  description String
-  waitingList Boolean
-  exhibitorList Boolean
-  // departments
-  // jobs
+    name String maxlength(NAME_MAX_LENGTH)
+    mail String
+    billingAddress String
+    logo String
+    description String
+    waitingList Boolean
+    exhibitorList Boolean
+    // departments
+    // jobs
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity Department {
-  name String
-  description String
+    name String
+    description String
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity ServicePackage {
-  name String
-  price BigDecimal
-  description String
+    name String
+    price BigDecimal
+    description String
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity Booking {
-  received ZonedDateTime
-  status BookingStatus
+    received ZonedDateTime
+    status BookingStatus
 }
 
 entity BoothUser {
-  phone String maxlength(PHONE_MAX_LENGTH)
-  note TextBlob
-  verificationCode UUID
-  verified ZonedDateTime
-  lastLogin ZonedDateTime
-  disabled Boolean
-
+    phone String maxlength(PHONE_MAX_LENGTH)
+    note TextBlob
+    verificationCode UUID
+    verified ZonedDateTime
+    lastLogin ZonedDateTime
+    disabled Boolean
 }
 
+@lombok
+@dto(mapstruct)
+@service(serviceClass)
 entity Contact {
-  firstName String maxlength(NAME_MAX_LENGTH)
-  lastName String maxlength(NAME_MAX_LENGTH)
-  mail String
-  phone String maxlength(PHONE_MAX_LENGTH)
-  responsibility ContactResponsibility
-  note TextBlob
+    firstName String maxlength(NAME_MAX_LENGTH)
+    lastName String maxlength(NAME_MAX_LENGTH)
+    mail String
+    phone String maxlength(PHONE_MAX_LENGTH)
+    responsibility ContactResponsibility
+    note TextBlob
 }
 
 relationship ManyToOne {
-//  Job to Company
-  Booking{company required} to Company{bookings}
-  Booking{booth required} to Booth
-  BoothUser{company} to Company
+    Booking{company required} to Company{bookings}
+    Booking{booth required} to Booth
+    BoothUser{company} to Company
 }
 
 relationship ManyToMany {
-  Department to Company
-  Contact to Company
-  ServicePackage to Booth
+    Department to Company
+    Contact to Company
+    ServicePackage to Booth
 }
 
 relationship OneToMany {
-  Location{booths} to Booth{location}
+    Location{booths} to Booth{location}
 }
 
 relationship OneToOne {
-  BoothUser{user} to @OnDelete("CASCADE") User{boothUser} with builtInEntity
+    BoothUser{user} to @OnDelete("CASCADE") User{boothUser} with builtInEntity
 }
 
 enum BookingStatus {
-  PREBOOKED (prebooked)
-  CONFIRMED (confirmed)
-  REJECTED (rejected)
+    PREBOOKED (prebooked)
+    CONFIRMED (confirmed)
+    REJECTED (rejected)
 }
 
 enum ContactResponsibility {
-  PRESS
-  COMPANY_ADMIN
-  GENERALLY
-  OTHER
+    PRESS
+    COMPANY_ADMIN
+    GENERALLY
+    OTHER
 }
-

@@ -1,6 +1,9 @@
 {
   "annotations": {
-    "changelogDate": "20240407201615"
+    "changelogDate": "20240407201615",
+    "dto": "mapstruct",
+    "lombok": true,
+    "service": "serviceClass"
   },
   "applications": "*",
   "fields": [
