@@ -36,10 +36,10 @@
   "relationships": [
     {
       "options": {
+        "id": true,
         "onDelete": "CASCADE"
       },
       "otherEntityName": "user",
-      "otherEntityRelationshipName": "boothUser",
       "relationshipName": "user",
       "relationshipSide": "left",
       "relationshipType": "one-to-one",

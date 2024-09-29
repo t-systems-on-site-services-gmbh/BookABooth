@@ -23,8 +23,6 @@ public class BoothUser implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
     @Column(name = "id")
     private Long id;
 
@@ -50,7 +48,8 @@ public class BoothUser implements Serializable {
     private Boolean disabled;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
+    @MapsId
+    @JoinColumn(name = "id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -103,7 +103,7 @@ relationship OneToMany {
 }
 
 relationship OneToOne {
-    BoothUser{user} to @OnDelete("CASCADE") User{boothUser} with builtInEntity
+    BoothUser{user} to @OnDelete("CASCADE") @Id User with builtInEntity
 }
 
 enum BookingStatus {

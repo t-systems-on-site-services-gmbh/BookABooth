@@ -2,6 +2,7 @@
   "generator-jhipster": {
     "applicationType": "monolith",
     "authenticationType": "session",
+    "autoCrlf": true,
     "baseName": "bookabooth",
     "buildTool": "maven",
     "cacheProvider": "ehcache",

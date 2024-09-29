@@ -12,12 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
+import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
+import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -69,6 +72,9 @@ class BoothUserResourceIT {
     private BoothUserRepository boothUserRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -90,6 +96,11 @@ class BoothUserResourceIT {
             .verified(DEFAULT_VERIFIED)
             .lastLogin(DEFAULT_LAST_LOGIN)
             .disabled(DEFAULT_DISABLED);
+        // Add required entity
+        User user = UserResourceIT.createEntity(em);
+        em.persist(user);
+        em.flush();
+        boothUser.setUser(user);
         return boothUser;
     }
 
@@ -107,6 +118,11 @@ class BoothUserResourceIT {
             .verified(UPDATED_VERIFIED)
             .lastLogin(UPDATED_LAST_LOGIN)
             .disabled(UPDATED_DISABLED);
+        // Add required entity
+        User user = UserResourceIT.createEntity(em);
+        em.persist(user);
+        em.flush();
+        boothUser.setUser(user);
         return boothUser;
     }
 
@@ -133,6 +149,8 @@ class BoothUserResourceIT {
         // Validate the BoothUser in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         assertBoothUserUpdatableFieldsEquals(returnedBoothUser, getPersistedBoothUser(returnedBoothUser));
+
+        assertBoothUserMapsIdRelationshipPersistedValue(boothUser, returnedBoothUser);
     }
 
     @Test
@@ -150,6 +168,46 @@ class BoothUserResourceIT {
 
         // Validate the BoothUser in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
+    }
+
+    @Test
+    @Transactional
+    void updateBoothUserMapsIdAssociationWithNewId() throws Exception {
+        // Initialize the database
+        boothUserRepository.saveAndFlush(boothUser);
+        long databaseSizeBeforeCreate = getRepositoryCount();
+        // Add a new parent entity
+        User user = UserResourceIT.createEntity(em);
+        em.persist(user);
+        em.flush();
+
+        // Load the boothUser
+        BoothUser updatedBoothUser = boothUserRepository.findById(boothUser.getId()).orElseThrow();
+        assertThat(updatedBoothUser).isNotNull();
+        // Disconnect from session so that the updates on updatedBoothUser are not directly saved in db
+        em.detach(updatedBoothUser);
+
+        // Update the User with new association value
+        updatedBoothUser.setUser(user);
+
+        // Update the entity
+        restBoothUserMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, updatedBoothUser.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(om.writeValueAsBytes(updatedBoothUser))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the BoothUser in the database
+        List<BoothUser> boothUserList = boothUserRepository.findAll();
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
+        BoothUser testBoothUser = boothUserList.get(boothUserList.size() - 1);
+        // Validate the id for MapsId, the ids must be same
+        // Uncomment the following line for assertion. However, please note that there is a known issue and uncommenting will fail the test.
+        // Please look at https://github.com/jhipster/generator-jhipster/issues/9100. You can modify this test as necessary.
+        // assertThat(testBoothUser.getId()).isEqualTo(testBoothUser.getUser().getId());
     }
 
     @Test

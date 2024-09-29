@@ -2,6 +2,7 @@ package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
+import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -36,8 +37,11 @@ public class BoothUserResource {
 
     private final BoothUserRepository boothUserRepository;
 
-    public BoothUserResource(BoothUserRepository boothUserRepository) {
+    private final UserRepository userRepository;
+
+    public BoothUserResource(BoothUserRepository boothUserRepository, UserRepository userRepository) {
         this.boothUserRepository = boothUserRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -53,6 +57,11 @@ public class BoothUserResource {
         if (boothUser.getId() != null) {
             throw new BadRequestAlertException("A new boothUser cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        if (Objects.isNull(boothUser.getUser())) {
+            throw new BadRequestAlertException("Invalid association value provided", ENTITY_NAME, "null");
+        }
+        Long userId = boothUser.getUser().getId();
+        userRepository.findById(userId).ifPresent(boothUser::user);
         boothUser = boothUserRepository.save(boothUser);
         return ResponseEntity.created(new URI("/api/booth-users/" + boothUser.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, boothUser.getId().toString()))
@@ -158,6 +167,7 @@ public class BoothUserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of boothUsers in body.
      */
     @GetMapping("")
+    @Transactional(readOnly = true)
     public List<BoothUser> getAllBoothUsers() {
         log.debug("REST request to get all BoothUsers");
         return boothUserRepository.findAll();
@@ -170,6 +180,7 @@ public class BoothUserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the boothUser, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public ResponseEntity<BoothUser> getBoothUser(@PathVariable("id") Long id) {
         log.debug("REST request to get BoothUser : {}", id);
         Optional<BoothUser> boothUser = boothUserRepository.findById(id);
