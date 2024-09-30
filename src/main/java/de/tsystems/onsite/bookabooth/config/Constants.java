@@ -10,6 +10,8 @@ public final class Constants {
 
     public static final String SYSTEM = "system";
     public static final String DEFAULT_LANGUAGE = "de";
+    public static final String BASEDIR_UPLOADS = "uploads";
+    public static final String EMPTY_STRING = "";
 
     private Constants() {}
 }

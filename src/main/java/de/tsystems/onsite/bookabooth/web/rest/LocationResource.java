@@ -2,9 +2,11 @@ package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.Location;
 import de.tsystems.onsite.bookabooth.repository.LocationRepository;
+import de.tsystems.onsite.bookabooth.service.FileUploadService;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -36,8 +38,11 @@ public class LocationResource {
 
     private final LocationRepository locationRepository;
 
-    public LocationResource(LocationRepository locationRepository) {
+    private final FileUploadService fileUploadService;
+
+    public LocationResource(LocationRepository locationRepository, FileUploadService fileUploadService) {
         this.locationRepository = locationRepository;
+        this.fileUploadService = fileUploadService;
     }
 
     /**
@@ -138,6 +143,31 @@ public class LocationResource {
             result,
             HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, location.getId().toString())
         );
+    }
+
+    // Add method addImageToLocation which takes the location's id as parameter and a Base64 encoded image in the request body
+    @PostMapping("/{id}/image")
+    public ResponseEntity<Location> addImageToLocation(
+        @PathVariable(value = "id", required = false) final Long id,
+        @RequestBody String imageBase64
+    ) throws URISyntaxException, UnsupportedEncodingException {
+        log.debug("REST request to add image to Location : {}, {}", id, imageBase64);
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        Optional<Location> location = locationRepository.findById(id);
+        if (location.isEmpty()) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        if (imageBase64 == null || !imageBase64.matches("([a-zA-Z0-9+/=]*)")) {
+            throw new BadRequestAlertException("Invalid image", ENTITY_NAME, "invalidimage");
+        }
+
+        var filePath = fileUploadService.saveFile("locations", id, imageBase64);
+        location.get().setImageUrl(filePath);
+        locationRepository.save(location.get());
+
+        return ResponseEntity.ok().body(location.get());
     }
 
     /**

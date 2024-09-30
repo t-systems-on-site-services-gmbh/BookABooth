@@ -33,10 +33,23 @@
               data-cy="imageUrl"
               :class="{ valid: !v$.imageUrl.$invalid, invalid: v$.imageUrl.$invalid }"
               v-model="v$.imageUrl.$model"
+              readonly
             />
             <div v-if="v$.location.$anyDirty && v$.location.$invalid">
               <small class="form-text text-danger" v-for="error of v$.location.$errors" :key="error.$uid">{{ error.$message }}</small>
             </div>
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="location-imageUpload">Bild hochladen</label>
+            <input
+              type="file"
+              class="form-control"
+              name="imageUpload"
+              id="location-imageUpload"
+              data-cy="imageUpload"
+              accept=".png, .jpg, .jpeg, .svg"
+              @change="handleImageUpload"
+            />
           </div>
         </div>
         <div>

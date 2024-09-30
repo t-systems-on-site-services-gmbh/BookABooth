@@ -89,5 +89,37 @@ export default defineComponent({
           });
       }
     },
+    handleImageUpload(event: Event): void {
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        console.log('Hochgeladene Datei:', file);
+
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const fileContent = e.target?.result;
+
+          // convert to base64 string;
+          const contentBase64 = btoa(fileContent as string);
+
+          console.log('Dateiinhalt:', contentBase64);
+
+          // send file to server
+          this.isSaving = true;
+          this.locationService()
+            .uploadImage(this.location, contentBase64)
+            .then(param => {
+              this.isSaving = false;
+              this.previousState();
+              this.alertService.showInfo('Updated image of Location ' + param.id);
+            })
+            .catch(error => {
+              this.isSaving = false;
+              this.alertService.showHttpError(error.response);
+            });
+        };
+        reader.readAsBinaryString(file);
+      }
+    },
   },
 });

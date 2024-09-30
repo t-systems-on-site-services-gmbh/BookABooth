@@ -82,4 +82,19 @@ export default class LocationService {
         });
     });
   }
+
+  public uploadImage(entity: ILocation, contentBase64: any): Promise<ILocation> {
+    return new Promise<ILocation>((resolve, reject) => {
+      axios
+        .post(`${baseApiUrl}/${entity.id}/image`, contentBase64, {
+          headers: { 'Content-Type': 'text/plain; charset=x-user-defined-binary' },
+        })
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
 }
