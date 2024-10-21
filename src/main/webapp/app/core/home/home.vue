@@ -2,6 +2,10 @@
   <div class="home row">
     <div class="col-md-3">
       <span><img class="logo" src="https://www.jade-hs.de/typo3conf/ext/jhs_site/Resources/Public/Images/jadehs-logo.png" /></span>
+      <div class="news">
+        ++ Jade Karrieretag 2024 ++ <br />
+        Nächster Termin: Mittwoch, 20. November 2024 <br />
+      </div>
     </div>
     <div class="col-md-9">
       <h1 class="display-4">Willkommen!</h1>
@@ -23,6 +27,49 @@
           <span v-if="username">Sie sind als Benutzer "{{ username }}" angemeldet.</span>
         </div>
       </div>
+      <div v-if="!hasAnyAuthority('ROLE_ADMIN') && authenticated">
+        <div>
+          <h4 class="mb-2 mt-4">Checkliste und Status:</h4>
+          <div class="list-group w-50">
+            <a href="#" class="list-group-item list-group-item-action list-group-item-success">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Registrierung</h5>
+                <small>erledigt</small>
+              </div>
+              <p class="mb-1 font-weight-normal">Account wurde erstellt.</p>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action list-group-item-danger">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Verifizierung</h5>
+                <small class="text-body-secondary">offen</small>
+              </div>
+              <p class="mb-1 font-weight-normal">Bestätigen Sie Ihre E-Mail-Adresse.</p>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action list-group-item-warning">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Kontaktdaten vervollständigt</h5>
+                <small class="text-body-secondary">offen</small>
+              </div>
+              <p class="list-group-item list-group-item-danger mb-1 font-weight-normal">Rechnungsanschrift</p>
+              <p class="list-group-item list-group-item-warning mb-1 font-weight-normal">Logo des Unternehmens</p>
+              <p class="list-group-item list-group-item-warning mb-1 font-weight-normal">Pressekontakt</p>
+              <p class="list-group-item list-group-item-warning mb-1 font-weight-normal">Firmenkurzbeschreibung</p>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action list-group-item-danger">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Buchung getätigt</h5>
+                <small class="text-body-secondary">offen</small>
+              </div>
+              <p class="mb-1 font-weight-normal"></p>
+            </a>
+          </div>
+          <p class="mt-4">
+            <small class="mr-2" style="background-color: #c3e6cb">Grün: erledigt</small>
+            <small class="mr-2" style="background-color: #f5c6cb">Rot: ausstehende Pflichtangabe</small>
+            <small class="mr-2" style="background-color: #ffeeba">Gelb: ausstehend, aber optional</small>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -33,6 +80,12 @@
   height: auto;
   display: block;
   margin: auto;
+}
+.news {
+  font-size: 11pt;
+  font-weight: 600;
+  margin-top: 50px;
+  margin-left: 20px;
 }
 </style>
 
