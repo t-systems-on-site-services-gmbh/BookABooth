@@ -210,4 +210,5 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  upload-folder: /app/uploads/ # The folder where the uploaded files are stored. Needs to end with '/uploads/'

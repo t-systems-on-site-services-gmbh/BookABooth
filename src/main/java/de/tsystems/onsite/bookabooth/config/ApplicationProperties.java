@@ -33,5 +33,16 @@ public class ApplicationProperties {
             this.asyncStart = asyncStart;
         }
     }
+
     // jhipster-needle-application-properties-property-class
+
+    private String uploadFolder;
+
+    public String getUploadFolder() {
+        return uploadFolder;
+    }
+
+    public void setUploadFolder(String uploadFolder) {
+        this.uploadFolder = uploadFolder;
+    }
 }

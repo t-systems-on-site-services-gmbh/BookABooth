@@ -1,6 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
-import de.tsystems.onsite.bookabooth.config.Constants;
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -22,6 +22,11 @@ import org.springframework.stereotype.Service;
 public class FileUploadService {
 
     private final Logger log = LoggerFactory.getLogger(FileUploadService.class);
+    private final ApplicationProperties applicationProperties;
+
+    public FileUploadService(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
+    }
 
     public String saveFile(String directory, Long id, String contentBase64) throws RuntimeException {
         try {
@@ -33,7 +38,7 @@ public class FileUploadService {
                 throw new RuntimeException("Could not determine file suffix");
             }
 
-            var path = Paths.get(Constants.BASEDIR_UPLOADS, directory, id + suffix);
+            var path = Paths.get(applicationProperties.getUploadFolder(), directory, id + suffix);
             Files.write(path, content);
             removeFiles(directory, id, path);
             return path.toString();
@@ -46,7 +51,7 @@ public class FileUploadService {
     // Create directory inside BASEDIR_UPLOADS if it does not exist
     private void ensureDirectoryExists(String directory) throws IOException {
         // Create directory if it does not exist
-        var path = Paths.get(Constants.BASEDIR_UPLOADS, directory);
+        var path = Paths.get(applicationProperties.getUploadFolder(), directory);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
         }
@@ -65,7 +70,7 @@ public class FileUploadService {
     private void removeFiles(String directory, Long id, Path excludePath) {
         try {
             String filePattern = String.format("%d.*", id);
-            var path = Paths.get(Constants.BASEDIR_UPLOADS, directory);
+            var path = Paths.get(applicationProperties.getUploadFolder(), directory);
             var files = getFilesMatchingPattern(path.toString(), filePattern);
             files.removeIf(p -> p.equals(excludePath));
 

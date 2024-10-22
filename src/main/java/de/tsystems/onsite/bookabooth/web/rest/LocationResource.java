@@ -6,7 +6,6 @@ import de.tsystems.onsite.bookabooth.service.FileUploadService;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -150,7 +149,7 @@ public class LocationResource {
     public ResponseEntity<Location> addImageToLocation(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody String imageBase64
-    ) throws URISyntaxException, UnsupportedEncodingException {
+    ) throws URISyntaxException {
         log.debug("REST request to add image to Location : {}, {}", id, imageBase64);
         if (id == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");

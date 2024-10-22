@@ -11,16 +11,27 @@ import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.JHipsterProperties;
 
 @Configuration
-@Profile({ JHipsterConstants.SPRING_PROFILE_PRODUCTION })
+@Profile({ JHipsterConstants.SPRING_PROFILE_PRODUCTION, JHipsterConstants.SPRING_PROFILE_DEVELOPMENT })
 public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
     protected static final String[] RESOURCE_LOCATIONS = { "classpath:/static/", "classpath:/static/content/", "classpath:/static/i18n/" };
-    protected static final String[] RESOURCE_PATHS = { "/*.js", "/*.css", "/*.svg", "/*.png", "*.ico", "/content/**", "/i18n/*" };
+    protected static final String[] RESOURCE_PATHS = {
+        "/*.js",
+        "/*.css",
+        "/*.svg",
+        "/*.png",
+        "*.ico",
+        "/content/**",
+        "/i18n/*",
+        "/uploads/**",
+    };
 
     private final JHipsterProperties jhipsterProperties;
+    private final ApplicationProperties applicationProperties;
 
-    public StaticResourcesWebConfiguration(JHipsterProperties jHipsterProperties) {
+    public StaticResourcesWebConfiguration(JHipsterProperties jHipsterProperties, ApplicationProperties applicationProperties) {
         this.jhipsterProperties = jHipsterProperties;
+        this.applicationProperties = applicationProperties;
     }
 
     @Override
@@ -34,7 +45,10 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
     }
 
     protected void initializeResourceHandler(ResourceHandlerRegistration resourceHandlerRegistration) {
-        resourceHandlerRegistration.addResourceLocations(RESOURCE_LOCATIONS).setCacheControl(getCacheControl());
+        String[] locations = applicationProperties.getUploadFolder() != null
+            ? new String[] { "file:" + applicationProperties.getUploadFolder() }
+            : RESOURCE_LOCATIONS;
+        resourceHandlerRegistration.addResourceLocations(locations).setCacheControl(getCacheControl());
     }
 
     protected CacheControl getCacheControl() {
