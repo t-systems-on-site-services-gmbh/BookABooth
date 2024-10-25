@@ -14,7 +14,7 @@
             <span>Grafik</span>
           </dt>
           <dd>
-            <span>{{ location.imageUrl }}</span>
+            <img v-if="location.imageUrl" :src="absoluteImageUrl" alt="Grafik Lageplan" style="max-width: 100%; height: auto" />
           </dd>
         </dl>
         <button type="submit" v-on:click.prevent="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

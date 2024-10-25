@@ -1,4 +1,4 @@
-import { defineComponent, inject, ref, type Ref } from 'vue';
+import { computed, defineComponent, inject, ref, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import LocationService from './location.service';
@@ -11,6 +11,8 @@ export default defineComponent({
   setup() {
     const locationService = inject('locationService', () => new LocationService());
     const alertService = inject('alertService', () => useAlertService(), true);
+
+    const siteUrl = inject('siteUrl', () => computed(() => window.location.origin), true);
 
     const route = useRoute();
     const router = useRouter();
@@ -36,6 +38,12 @@ export default defineComponent({
       location,
 
       previousState,
+      siteUrl,
     };
+  },
+  computed: {
+    absoluteImageUrl(): string {
+      return this.location.imageUrl ? this.siteUrl + '/' + this.location.imageUrl.replace(/\\/g, '/') : '';
+    },
   },
 });
