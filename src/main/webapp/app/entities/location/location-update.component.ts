@@ -19,6 +19,8 @@ export default defineComponent({
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'de'), true);
 
+    const siteUrl = inject('siteUrl', () => computed(() => window.location.origin), true);
+
     const route = useRoute();
     const router = useRouter();
 
@@ -57,7 +59,13 @@ export default defineComponent({
       isSaving,
       currentLanguage,
       v$,
+      siteUrl,
     };
+  },
+  computed: {
+    absoluteImageUrl(): string {
+      return this.location.imageUrl ? this.siteUrl + '/' + this.location.imageUrl.replace(/\\/g, '/') : '';
+    },
   },
   created(): void {},
   methods: {

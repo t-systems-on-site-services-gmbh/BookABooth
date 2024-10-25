@@ -35,6 +35,7 @@
               v-model="v$.imageUrl.$model"
               readonly
             />
+            <img v-if="location.imageUrl" :src="absoluteImageUrl" alt="Grafik Lageplan" style="max-width: 100%; height: auto" />
             <div v-if="v$.location.$anyDirty && v$.location.$invalid">
               <small class="form-text text-danger" v-for="error of v$.location.$errors" :key="error.$uid">{{ error.$message }}</small>
             </div>
