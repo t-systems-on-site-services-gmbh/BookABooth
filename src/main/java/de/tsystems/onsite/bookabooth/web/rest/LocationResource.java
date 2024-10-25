@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.domain.Location;
 import de.tsystems.onsite.bookabooth.repository.LocationRepository;
 import de.tsystems.onsite.bookabooth.service.FileUploadService;
@@ -36,12 +37,17 @@ public class LocationResource {
     private String applicationName;
 
     private final LocationRepository locationRepository;
-
     private final FileUploadService fileUploadService;
+    private final ApplicationProperties applicationProperties;
 
-    public LocationResource(LocationRepository locationRepository, FileUploadService fileUploadService) {
+    public LocationResource(
+        LocationRepository locationRepository,
+        FileUploadService fileUploadService,
+        ApplicationProperties applicationProperties
+    ) {
         this.locationRepository = locationRepository;
         this.fileUploadService = fileUploadService;
+        this.applicationProperties = applicationProperties;
     }
 
     /**
@@ -163,10 +169,15 @@ public class LocationResource {
         }
 
         var filePath = fileUploadService.saveFile("locations", id, imageBase64);
-        location.get().setImageUrl(filePath);
+        location.get().setImageUrl(getRelativeImagePath(filePath));
         locationRepository.save(location.get());
 
         return ResponseEntity.ok().body(location.get());
+    }
+
+    private String getRelativeImagePath(String filePath) {
+        int idx = applicationProperties.getUploadFolder().lastIndexOf("uploads/");
+        return filePath.substring(idx);
     }
 
     /**

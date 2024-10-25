@@ -48,9 +48,8 @@ public class FileUploadService {
         }
     }
 
-    // Create directory inside BASEDIR_UPLOADS if it does not exist
+    // Create directory inside upload-folder if it does not exist
     private void ensureDirectoryExists(String directory) throws IOException {
-        // Create directory if it does not exist
         var path = Paths.get(applicationProperties.getUploadFolder(), directory);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
@@ -82,7 +81,7 @@ public class FileUploadService {
         }
     }
 
-    public static List<Path> getFilesMatchingPattern(String directory, String globPattern) throws IOException {
+    private static List<Path> getFilesMatchingPattern(String directory, String globPattern) throws IOException {
         List<Path> matchingFiles = new ArrayList<>();
         Path dirPath = Paths.get(directory);
 
