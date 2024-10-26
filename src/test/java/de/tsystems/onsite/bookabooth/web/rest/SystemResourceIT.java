@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.System;
 import de.tsystems.onsite.bookabooth.repository.SystemRepository;
+import de.tsystems.onsite.bookabooth.service.dto.SystemDTO;
+import de.tsystems.onsite.bookabooth.service.mapper.SystemMapper;
 import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,6 +48,9 @@ class SystemResourceIT {
 
     @Autowired
     private SystemRepository systemRepository;
+
+    @Autowired
+    private SystemMapper systemMapper;
 
     @Autowired
     private EntityManager em;
@@ -87,18 +92,20 @@ class SystemResourceIT {
     void createSystem() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the System
-        var returnedSystem = om.readValue(
+        SystemDTO systemDTO = systemMapper.toDto(system);
+        var returnedSystemDTO = om.readValue(
             restSystemMockMvc
-                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(system)))
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(systemDTO)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
-            System.class
+            SystemDTO.class
         );
 
         // Validate the System in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedSystem = systemMapper.toEntity(returnedSystemDTO);
         assertSystemUpdatableFieldsEquals(returnedSystem, getPersistedSystem(returnedSystem));
     }
 
@@ -107,12 +114,13 @@ class SystemResourceIT {
     void createSystemWithExistingId() throws Exception {
         // Create the System with an existing ID
         system.setId(1L);
+        SystemDTO systemDTO = systemMapper.toDto(system);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSystemMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(system)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(systemDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the System in the database
@@ -169,13 +177,14 @@ class SystemResourceIT {
         // Disconnect from session so that the updates on updatedSystem are not directly saved in db
         em.detach(updatedSystem);
         updatedSystem.enabled(UPDATED_ENABLED);
+        SystemDTO systemDTO = systemMapper.toDto(updatedSystem);
 
         restSystemMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedSystem.getId())
+                put(ENTITY_API_URL_ID, systemDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(updatedSystem))
+                    .content(om.writeValueAsBytes(systemDTO))
             )
             .andExpect(status().isOk());
 
@@ -190,13 +199,16 @@ class SystemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         system.setId(longCount.incrementAndGet());
 
+        // Create the System
+        SystemDTO systemDTO = systemMapper.toDto(system);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSystemMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, system.getId())
+                put(ENTITY_API_URL_ID, systemDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(system))
+                    .content(om.writeValueAsBytes(systemDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -210,13 +222,16 @@ class SystemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         system.setId(longCount.incrementAndGet());
 
+        // Create the System
+        SystemDTO systemDTO = systemMapper.toDto(system);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSystemMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(system))
+                    .content(om.writeValueAsBytes(systemDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -230,9 +245,12 @@ class SystemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         system.setId(longCount.incrementAndGet());
 
+        // Create the System
+        SystemDTO systemDTO = systemMapper.toDto(system);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSystemMockMvc
-            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(system)))
+            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(systemDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the System in the database
@@ -301,13 +319,16 @@ class SystemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         system.setId(longCount.incrementAndGet());
 
+        // Create the System
+        SystemDTO systemDTO = systemMapper.toDto(system);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSystemMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, system.getId())
+                patch(ENTITY_API_URL_ID, systemDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(system))
+                    .content(om.writeValueAsBytes(systemDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -321,13 +342,16 @@ class SystemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         system.setId(longCount.incrementAndGet());
 
+        // Create the System
+        SystemDTO systemDTO = systemMapper.toDto(system);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSystemMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(system))
+                    .content(om.writeValueAsBytes(systemDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -341,9 +365,14 @@ class SystemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         system.setId(longCount.incrementAndGet());
 
+        // Create the System
+        SystemDTO systemDTO = systemMapper.toDto(system);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSystemMockMvc
-            .perform(patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(system)))
+            .perform(
+                patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(systemDTO))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the System in the database

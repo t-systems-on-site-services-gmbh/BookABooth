@@ -1,7 +1,8 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
-import de.tsystems.onsite.bookabooth.domain.ServicePackage;
 import de.tsystems.onsite.bookabooth.repository.ServicePackageRepository;
+import de.tsystems.onsite.bookabooth.service.ServicePackageService;
+import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,7 +25,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/service-packages")
-@Transactional
 public class ServicePackageResource {
 
     private final Logger log = LoggerFactory.getLogger(ServicePackageResource.class);
@@ -34,53 +34,57 @@ public class ServicePackageResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ServicePackageService servicePackageService;
+
     private final ServicePackageRepository servicePackageRepository;
 
-    public ServicePackageResource(ServicePackageRepository servicePackageRepository) {
+    public ServicePackageResource(ServicePackageService servicePackageService, ServicePackageRepository servicePackageRepository) {
+        this.servicePackageService = servicePackageService;
         this.servicePackageRepository = servicePackageRepository;
     }
 
     /**
      * {@code POST  /service-packages} : Create a new servicePackage.
      *
-     * @param servicePackage the servicePackage to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new servicePackage, or with status {@code 400 (Bad Request)} if the servicePackage has already an ID.
+     * @param servicePackageDTO the servicePackageDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new servicePackageDTO, or with status {@code 400 (Bad Request)} if the servicePackage has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ServicePackage> createServicePackage(@RequestBody ServicePackage servicePackage) throws URISyntaxException {
-        log.debug("REST request to save ServicePackage : {}", servicePackage);
-        if (servicePackage.getId() != null) {
+    public ResponseEntity<ServicePackageDTO> createServicePackage(@RequestBody ServicePackageDTO servicePackageDTO)
+        throws URISyntaxException {
+        log.debug("REST request to save ServicePackage : {}", servicePackageDTO);
+        if (servicePackageDTO.getId() != null) {
             throw new BadRequestAlertException("A new servicePackage cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        servicePackage = servicePackageRepository.save(servicePackage);
-        return ResponseEntity.created(new URI("/api/service-packages/" + servicePackage.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, servicePackage.getId().toString()))
-            .body(servicePackage);
+        servicePackageDTO = servicePackageService.save(servicePackageDTO);
+        return ResponseEntity.created(new URI("/api/service-packages/" + servicePackageDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, servicePackageDTO.getId().toString()))
+            .body(servicePackageDTO);
     }
 
     /**
      * {@code PUT  /service-packages/:id} : Updates an existing servicePackage.
      *
-     * @param id the id of the servicePackage to save.
-     * @param servicePackage the servicePackage to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated servicePackage,
-     * or with status {@code 400 (Bad Request)} if the servicePackage is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the servicePackage couldn't be updated.
+     * @param id the id of the servicePackageDTO to save.
+     * @param servicePackageDTO the servicePackageDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated servicePackageDTO,
+     * or with status {@code 400 (Bad Request)} if the servicePackageDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the servicePackageDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ServicePackage> updateServicePackage(
+    public ResponseEntity<ServicePackageDTO> updateServicePackage(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody ServicePackage servicePackage
+        @RequestBody ServicePackageDTO servicePackageDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update ServicePackage : {}, {}", id, servicePackage);
-        if (servicePackage.getId() == null) {
+        log.debug("REST request to update ServicePackage : {}, {}", id, servicePackageDTO);
+        if (servicePackageDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, servicePackage.getId())) {
+        if (!Objects.equals(id, servicePackageDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -88,34 +92,34 @@ public class ServicePackageResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        servicePackage = servicePackageRepository.save(servicePackage);
+        servicePackageDTO = servicePackageService.update(servicePackageDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, servicePackage.getId().toString()))
-            .body(servicePackage);
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, servicePackageDTO.getId().toString()))
+            .body(servicePackageDTO);
     }
 
     /**
      * {@code PATCH  /service-packages/:id} : Partial updates given fields of an existing servicePackage, field will ignore if it is null
      *
-     * @param id the id of the servicePackage to save.
-     * @param servicePackage the servicePackage to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated servicePackage,
-     * or with status {@code 400 (Bad Request)} if the servicePackage is not valid,
-     * or with status {@code 404 (Not Found)} if the servicePackage is not found,
-     * or with status {@code 500 (Internal Server Error)} if the servicePackage couldn't be updated.
+     * @param id the id of the servicePackageDTO to save.
+     * @param servicePackageDTO the servicePackageDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated servicePackageDTO,
+     * or with status {@code 400 (Bad Request)} if the servicePackageDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the servicePackageDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the servicePackageDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ServicePackage> partialUpdateServicePackage(
+    public ResponseEntity<ServicePackageDTO> partialUpdateServicePackage(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody ServicePackage servicePackage
+        @RequestBody ServicePackageDTO servicePackageDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update ServicePackage partially : {}, {}", id, servicePackage);
-        if (servicePackage.getId() == null) {
+        log.debug("REST request to partial update ServicePackage partially : {}, {}", id, servicePackageDTO);
+        if (servicePackageDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, servicePackage.getId())) {
+        if (!Objects.equals(id, servicePackageDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -123,26 +127,11 @@ public class ServicePackageResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<ServicePackage> result = servicePackageRepository
-            .findById(servicePackage.getId())
-            .map(existingServicePackage -> {
-                if (servicePackage.getName() != null) {
-                    existingServicePackage.setName(servicePackage.getName());
-                }
-                if (servicePackage.getPrice() != null) {
-                    existingServicePackage.setPrice(servicePackage.getPrice());
-                }
-                if (servicePackage.getDescription() != null) {
-                    existingServicePackage.setDescription(servicePackage.getDescription());
-                }
-
-                return existingServicePackage;
-            })
-            .map(servicePackageRepository::save);
+        Optional<ServicePackageDTO> result = servicePackageService.partialUpdate(servicePackageDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, servicePackage.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, servicePackageDTO.getId().toString())
         );
     }
 
@@ -153,41 +142,37 @@ public class ServicePackageResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of servicePackages in body.
      */
     @GetMapping("")
-    public List<ServicePackage> getAllServicePackages(
+    public List<ServicePackageDTO> getAllServicePackages(
         @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
     ) {
         log.debug("REST request to get all ServicePackages");
-        if (eagerload) {
-            return servicePackageRepository.findAllWithEagerRelationships();
-        } else {
-            return servicePackageRepository.findAll();
-        }
+        return servicePackageService.findAll();
     }
 
     /**
      * {@code GET  /service-packages/:id} : get the "id" servicePackage.
      *
-     * @param id the id of the servicePackage to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the servicePackage, or with status {@code 404 (Not Found)}.
+     * @param id the id of the servicePackageDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the servicePackageDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ServicePackage> getServicePackage(@PathVariable("id") Long id) {
+    public ResponseEntity<ServicePackageDTO> getServicePackage(@PathVariable("id") Long id) {
         log.debug("REST request to get ServicePackage : {}", id);
-        Optional<ServicePackage> servicePackage = servicePackageRepository.findOneWithEagerRelationships(id);
-        return ResponseUtil.wrapOrNotFound(servicePackage);
+        Optional<ServicePackageDTO> servicePackageDTO = servicePackageService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(servicePackageDTO);
     }
 
     /**
      * {@code DELETE  /service-packages/:id} : delete the "id" servicePackage.
      *
-     * @param id the id of the servicePackage to delete.
+     * @param id the id of the servicePackageDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteServicePackage(@PathVariable("id") Long id) {
         log.debug("REST request to delete ServicePackage : {}", id);
-        servicePackageRepository.deleteById(id);
+        servicePackageService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();

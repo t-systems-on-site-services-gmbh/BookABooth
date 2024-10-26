@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SystemRepository extends JpaRepository<System, Long> {}
+public interface SystemRepository extends JpaRepository<System, Long> {
+    // find first entry as Optional
+    System findFirstByOrderById();
+}

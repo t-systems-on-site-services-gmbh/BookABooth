@@ -16,6 +16,8 @@ import de.tsystems.onsite.bookabooth.domain.Booth;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
+import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
+import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -57,6 +59,9 @@ class BookingResourceIT {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private BookingMapper bookingMapper;
 
     @Autowired
     private EntityManager em;
@@ -138,18 +143,22 @@ class BookingResourceIT {
     void createBooking() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Booking
-        var returnedBooking = om.readValue(
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
+        var returnedBookingDTO = om.readValue(
             restBookingMockMvc
-                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booking)))
+                .perform(
+                    post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(bookingDTO))
+                )
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
-            Booking.class
+            BookingDTO.class
         );
 
         // Validate the Booking in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedBooking = bookingMapper.toEntity(returnedBookingDTO);
         assertBookingUpdatableFieldsEquals(returnedBooking, getPersistedBooking(returnedBooking));
     }
 
@@ -158,12 +167,13 @@ class BookingResourceIT {
     void createBookingWithExistingId() throws Exception {
         // Create the Booking with an existing ID
         booking.setId(1L);
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restBookingMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booking)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(bookingDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Booking in the database
@@ -222,13 +232,14 @@ class BookingResourceIT {
         // Disconnect from session so that the updates on updatedBooking are not directly saved in db
         em.detach(updatedBooking);
         updatedBooking.received(UPDATED_RECEIVED).status(UPDATED_STATUS);
+        BookingDTO bookingDTO = bookingMapper.toDto(updatedBooking);
 
         restBookingMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedBooking.getId())
+                put(ENTITY_API_URL_ID, bookingDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(updatedBooking))
+                    .content(om.writeValueAsBytes(bookingDTO))
             )
             .andExpect(status().isOk());
 
@@ -243,13 +254,16 @@ class BookingResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booking.setId(longCount.incrementAndGet());
 
+        // Create the Booking
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBookingMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, booking.getId())
+                put(ENTITY_API_URL_ID, bookingDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(booking))
+                    .content(om.writeValueAsBytes(bookingDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -263,13 +277,16 @@ class BookingResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booking.setId(longCount.incrementAndGet());
 
+        // Create the Booking
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBookingMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(booking))
+                    .content(om.writeValueAsBytes(bookingDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -283,9 +300,12 @@ class BookingResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booking.setId(longCount.incrementAndGet());
 
+        // Create the Booking
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBookingMockMvc
-            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(booking)))
+            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(bookingDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Booking in the database
@@ -356,13 +376,16 @@ class BookingResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booking.setId(longCount.incrementAndGet());
 
+        // Create the Booking
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBookingMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, booking.getId())
+                patch(ENTITY_API_URL_ID, bookingDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(booking))
+                    .content(om.writeValueAsBytes(bookingDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -376,13 +399,16 @@ class BookingResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booking.setId(longCount.incrementAndGet());
 
+        // Create the Booking
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBookingMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(booking))
+                    .content(om.writeValueAsBytes(bookingDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -396,9 +422,14 @@ class BookingResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         booking.setId(longCount.incrementAndGet());
 
+        // Create the Booking
+        BookingDTO bookingDTO = bookingMapper.toDto(booking);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBookingMockMvc
-            .perform(patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(booking)))
+            .perform(
+                patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(bookingDTO))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Booking in the database
