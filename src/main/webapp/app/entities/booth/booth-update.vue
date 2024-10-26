@@ -61,7 +61,7 @@
                 v-for="locationOption in locations"
                 :key="locationOption.id"
               >
-                {{ locationOption.id }}
+                {{ locationOption.location }}
               </option>
             </select>
           </div>
@@ -81,7 +81,7 @@
                 v-for="servicePackageOption in servicePackages"
                 :key="servicePackageOption.id"
               >
-                {{ servicePackageOption.id }}
+                {{ servicePackageOption.name }}
               </option>
             </select>
           </div>

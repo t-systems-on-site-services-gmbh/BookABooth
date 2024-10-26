@@ -46,7 +46,9 @@
             <td>{{ booth.available }}</td>
             <td>
               <div v-if="booth.location">
-                <router-link :to="{ name: 'LocationView', params: { locationId: booth.location.id } }">{{ booth.location.id }}</router-link>
+                <router-link :to="{ name: 'LocationView', params: { locationId: booth.location.id } }">{{
+                  locations.find(l => l.id == booth.location.id)?.location
+                }}</router-link>
               </div>
             </td>
             <td>
@@ -55,7 +57,7 @@
                 <router-link
                   class="form-control-static"
                   :to="{ name: 'ServicePackageView', params: { servicePackageId: servicePackage.id } }"
-                  >{{ servicePackage.id }}</router-link
+                  >{{ servicePackages.find(sp => sp.id == servicePackage.id)?.name }}</router-link
                 >
               </span>
             </td>

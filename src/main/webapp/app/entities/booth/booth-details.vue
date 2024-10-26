@@ -27,7 +27,9 @@
           </dt>
           <dd>
             <div v-if="booth.location">
-              <router-link :to="{ name: 'LocationView', params: { locationId: booth.location.id } }">{{ booth.location.id }}</router-link>
+              <router-link :to="{ name: 'LocationView', params: { locationId: booth.location.id } }">{{
+                locations.find(l => l.id == booth.location.id)?.location
+              }}</router-link>
             </div>
           </dd>
           <dt>
@@ -37,7 +39,7 @@
             <span v-for="(servicePackage, i) in booth.servicePackages" :key="servicePackage.id"
               >{{ i > 0 ? ', ' : '' }}
               <router-link :to="{ name: 'ServicePackageView', params: { servicePackageId: servicePackage.id } }">{{
-                servicePackage.id
+                servicePackages.find(sp => sp.id == servicePackage.id)?.name
               }}</router-link>
             </span>
           </dd>
