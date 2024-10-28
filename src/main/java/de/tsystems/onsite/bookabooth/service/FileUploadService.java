@@ -30,7 +30,8 @@ public class FileUploadService {
 
     public String saveFile(String directory, Long id, String contentBase64) throws RuntimeException {
         try {
-            ensureDirectoryExists(directory);
+            String dir = sanitizeName(directory);
+            ensureDirectoryExists(dir);
             var content = convertToByteArray(contentBase64);
 
             var suffix = getFileSuffix(content);
@@ -38,9 +39,9 @@ public class FileUploadService {
                 throw new RuntimeException("Could not determine file suffix");
             }
 
-            var path = Paths.get(applicationProperties.getUploadFolder(), directory, id + suffix);
+            var path = Paths.get(applicationProperties.getUploadFolder(), dir, id + suffix);
             Files.write(path, content);
-            removeFiles(directory, id, path);
+            removeFiles(dir, id, path);
             return path.toString();
         } catch (IOException e) {
             log.error("Could not save file", e);
@@ -50,7 +51,13 @@ public class FileUploadService {
 
     // Create directory inside upload-folder if it does not exist
     private void ensureDirectoryExists(String directory) throws IOException {
-        var path = Paths.get(applicationProperties.getUploadFolder(), directory);
+        var basePath = Paths.get(applicationProperties.getUploadFolder());
+        var path = basePath.resolve(directory).normalize();
+
+        if (!path.startsWith(basePath)) {
+            throw new IOException("Invalid directory path");
+        }
+
         if (!Files.exists(path)) {
             Files.createDirectories(path);
         }
@@ -58,6 +65,13 @@ public class FileUploadService {
 
     private byte[] convertToByteArray(String contentBase64) {
         return Base64.getDecoder().decode(contentBase64);
+    }
+
+    private String sanitizeName(String directory) {
+        if ((directory == null) || directory.contains("..") || directory.contains("/") || directory.contains("\\")) {
+            throw new IllegalArgumentException("Invalid directory name");
+        }
+        return directory;
     }
 
     private String getFileSuffix(byte[] imageBytes) throws IOException {
