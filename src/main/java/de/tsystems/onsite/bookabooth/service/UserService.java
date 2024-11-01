@@ -1,15 +1,16 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CANCELED;
+import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CONFIRMED;
+
 import de.tsystems.onsite.bookabooth.config.Constants;
-import de.tsystems.onsite.bookabooth.domain.Authority;
-import de.tsystems.onsite.bookabooth.domain.User;
-import de.tsystems.onsite.bookabooth.repository.AuthorityRepository;
-import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
-import de.tsystems.onsite.bookabooth.repository.UserRepository;
+import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -37,6 +38,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final CompanyRepository companyRepository;
+
+    private final BoothUserRepository boothUserRepository;
+
+    private final BookingRepository bookingRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final PersistentTokenRepository persistentTokenRepository;
@@ -47,12 +54,18 @@ public class UserService {
 
     public UserService(
         UserRepository userRepository,
+        CompanyRepository companyRepository,
+        BoothUserRepository boothUserRepository,
+        BookingRepository bookingRepository,
         PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager
     ) {
         this.userRepository = userRepository;
+        this.companyRepository = companyRepository;
+        this.boothUserRepository = boothUserRepository;
+        this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
@@ -260,6 +273,132 @@ public class UserService {
             });
     }
 
+    // Aktuelle Update-Methode, um UserProfile zu aktualisieren
+    public void updateUserProfile(UserProfileDTO userProfileDTO) {
+        Optional.of(userRepository.findById(userProfileDTO.getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(user -> {
+                this.clearUserCaches(user);
+                user.setLogin(userProfileDTO.getLogin().toLowerCase());
+                user.setFirstName(userProfileDTO.getFirstName());
+                user.setLastName(userProfileDTO.getLastName());
+                if (userProfileDTO.getEmail() != null) {
+                    user.setEmail(userProfileDTO.getEmail().toLowerCase());
+                }
+                Set<Authority> managedAuthorities = user.getAuthorities();
+                managedAuthorities.clear();
+                userRepository.save(user);
+
+                boothUserRepository
+                    .findById(userProfileDTO.getId())
+                    .flatMap(boothUser -> companyRepository.findById(boothUser.getCompany().getId()))
+                    .ifPresent(company -> {
+                        company.setName(userProfileDTO.getCompanyName());
+                        company.setBillingAddress(userProfileDTO.getBillingAddress());
+                        company.setDescription(userProfileDTO.getDescription());
+                        company.setLogo(userProfileDTO.getLogo());
+                        company.setExhibitorList(userProfileDTO.getExhibitorList());
+                        companyRepository.save(company);
+                    });
+                userProfileDTO
+                    .getAuthorities()
+                    .stream()
+                    .map(authorityRepository::findById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(managedAuthorities::add);
+                this.clearUserCaches(user);
+                log.debug("Changed Information for User: {}", user);
+                return userProfileDTO;
+            });
+    }
+
+    // Methode, um sich von der Warteliste zu entfernen
+    public void updateWaitingList(UserProfileDTO userProfileDTO) {
+        Optional.of(userRepository.findById(userProfileDTO.getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(user -> {
+                this.clearUserCaches(user);
+                user.setLogin(userProfileDTO.getLogin().toLowerCase());
+                Set<Authority> managedAuthorities = user.getAuthorities();
+                userRepository.save(user);
+                boothUserRepository
+                    .findById(userProfileDTO.getId())
+                    .flatMap(boothUser -> companyRepository.findById(boothUser.getCompany().getId()))
+                    .ifPresent(company -> {
+                        company.setWaitingList(false);
+                        companyRepository.save(company);
+                    });
+                userProfileDTO
+                    .getAuthorities()
+                    .stream()
+                    .map(authorityRepository::findById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(managedAuthorities::add);
+                this.clearUserCaches(user);
+                return userProfileDTO;
+            });
+    }
+
+    public void cancelBooking(UserProfileDTO userProfileDTO) {
+        Optional.of(bookingRepository.findById(userProfileDTO.getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(booking -> {
+                booking.setStatus(CANCELED);
+                bookingRepository.save(booking);
+                return userProfileDTO;
+            });
+    }
+
+    public void confirmBooking(UserProfileDTO userProfileDTO) {
+        Optional.of(bookingRepository.findById(userProfileDTO.getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(booking -> {
+                booking.setStatus(CONFIRMED);
+                bookingRepository.save(booking);
+                return userProfileDTO;
+            });
+    }
+
+    //    public Boolean checkPassword(String currentClearTextPassword) {
+    //        Optional<String> currentUserLogin = SecurityUtils.getCurrentUserLogin();
+    //        if (currentUserLogin.isEmpty()) {
+    //            return false;
+    //        }
+    //        Optional<User> optionalUser = userRepository.findOneByLogin(currentUserLogin.get());
+    //        if (optionalUser.isEmpty()) {
+    //            return false;
+    //        }
+    //        User user = optionalUser.get();
+    //        String currentEncryptedPassword = user.getPassword();
+    //        if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
+    //            return false;
+    //        }
+    //        log.debug("Password is correct");
+    //        return true;
+    //    }
+
+    public Boolean checkPassword(String currentClearTextPassword) {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(user -> {
+                String currentEncryptedPassword = user.getPassword();
+                if (passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
+                    log.debug("Password is correct");
+                    return true;
+                } else {
+                    log.debug("Password is incorrect");
+                    return false;
+                }
+            })
+            .orElse(false);
+    }
+
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
         SecurityUtils.getCurrentUserLogin()
@@ -294,6 +433,30 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
+    }
+
+    /**
+     * Method to get User and Company from the database to display on the profile
+     * Boothuser is used to join the tables
+     * Booking is needed to display the booking status on the profile
+     *
+     * @param login to identify the user
+     * @return DTO with necessary infos to build the Userprofile
+     */
+    @Transactional
+    public UserProfileDTO getUserProfile(String login) {
+        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new RuntimeException("User not found"));
+        BoothUser boothUser = boothUserRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("BoothUser not found"));
+        Company company = companyRepository
+            .findById(boothUser.getCompany().getId())
+            .orElseThrow(() -> new RuntimeException("Company not found"));
+        Booking booking = bookingRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        return new UserProfileDTO(user, company, booking);
+    }
+
+    public User findByLogin(String login) {
+        return userRepository.findOneWithAuthoritiesByLogin(login).orElse(null);
     }
 
     /**
