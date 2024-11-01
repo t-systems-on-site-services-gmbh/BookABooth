@@ -28,6 +28,7 @@
     <include file="config/liquibase/changelog/20240407201618_added_entity_constraints_BoothUser.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240407201619_added_entity_constraints_Contact.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240819153600_update_jhi_system.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20241028132300_update_booking.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
