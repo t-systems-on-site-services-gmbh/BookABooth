@@ -32,6 +32,17 @@ export const createRouter = () =>
       ...admin,
       entities,
       ...pages,
+      {
+        path: '/uploads/:pathMatch(.*)*',
+        beforeEnter: (to, from, next) => {
+          // Let the browser handle this request and bypass the Vue router
+          window.location.href = to.fullPath;
+        },
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        redirect: '/not-found',
+      },
     ],
   });
 

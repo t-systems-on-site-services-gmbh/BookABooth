@@ -23,6 +23,7 @@ class StaticResourcesWebConfigurerTest {
     private MockServletContext servletContext;
     private WebApplicationContext applicationContext;
     private JHipsterProperties props;
+    private ApplicationProperties appProps;
 
     @BeforeEach
     void setUp() {
@@ -30,7 +31,8 @@ class StaticResourcesWebConfigurerTest {
         applicationContext = mock(WebApplicationContext.class);
         resourceHandlerRegistry = spy(new ResourceHandlerRegistry(applicationContext, servletContext));
         props = new JHipsterProperties();
-        staticResourcesWebConfiguration = spy(new StaticResourcesWebConfiguration(props));
+        appProps = new ApplicationProperties();
+        staticResourcesWebConfiguration = spy(new StaticResourcesWebConfiguration(props, appProps));
     }
 
     @Test
