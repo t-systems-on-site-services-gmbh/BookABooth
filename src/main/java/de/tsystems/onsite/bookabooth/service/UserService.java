@@ -8,9 +8,10 @@ import de.tsystems.onsite.bookabooth.domain.*;
 import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
-import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
-import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
-import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
+import de.tsystems.onsite.bookabooth.service.dto.*;
+import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -22,6 +23,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,12 @@ public class UserService {
 
     private final BoothUserRepository boothUserRepository;
 
+    private final UserMapper userMapper;
+
+    private final CompanyMapper companyMapper;
+
+    private final BookingMapper bookingMapper;
+
     private final BookingRepository bookingRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -56,6 +65,9 @@ public class UserService {
         UserRepository userRepository,
         CompanyRepository companyRepository,
         BoothUserRepository boothUserRepository,
+        UserMapper userMapper,
+        CompanyMapper companyMapper,
+        BookingMapper bookingMapper,
         BookingRepository bookingRepository,
         PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
@@ -65,6 +77,9 @@ public class UserService {
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
         this.boothUserRepository = boothUserRepository;
+        this.userMapper = userMapper;
+        this.companyMapper = companyMapper;
+        this.bookingMapper = bookingMapper;
         this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
@@ -275,58 +290,65 @@ public class UserService {
 
     // Aktuelle Update-Methode, um UserProfile zu aktualisieren
     public void updateUserProfile(UserProfileDTO userProfileDTO) {
-        Optional.of(userRepository.findById(userProfileDTO.getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(user -> {
-                this.clearUserCaches(user);
-                user.setLogin(userProfileDTO.getLogin().toLowerCase());
-                user.setFirstName(userProfileDTO.getFirstName());
-                user.setLastName(userProfileDTO.getLastName());
-                if (userProfileDTO.getEmail() != null) {
-                    user.setEmail(userProfileDTO.getEmail().toLowerCase());
+        boolean isAdmin = SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
+        Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            this.clearUserCaches(user);
+            user.setLogin(userProfileDTO.getUser().getLogin().toLowerCase());
+            user.setFirstName(userProfileDTO.getUser().getFirstName());
+            user.setLastName(userProfileDTO.getUser().getLastName());
+            if (userProfileDTO.getUser().getEmail() != null) {
+                user.setEmail(userProfileDTO.getUser().getEmail().toLowerCase());
+            }
+            Set<Authority> managedAuthorities = user.getAuthorities();
+            managedAuthorities.clear();
+            userProfileDTO
+                .getAuthorities()
+                .stream()
+                .map(authorityRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(managedAuthorities::add);
+            userRepository.save(user);
+            if (!isAdmin) {
+                if (userProfileDTO.getCompany() != null) {
+                    companyRepository
+                        .findById(userProfileDTO.getCompany().getId())
+                        .ifPresent(company -> {
+                            company.setName(userProfileDTO.getCompany().getName());
+                            company.setBillingAddress(userProfileDTO.getCompany().getBillingAddress());
+                            company.setDescription(userProfileDTO.getCompany().getDescription());
+                            company.setLogo(userProfileDTO.getCompany().getLogo());
+                            company.setExhibitorList(userProfileDTO.getCompany().getExhibitorList());
+                            companyRepository.save(company);
+                        });
                 }
-                Set<Authority> managedAuthorities = user.getAuthorities();
-                managedAuthorities.clear();
-                userRepository.save(user);
-
-                boothUserRepository
-                    .findById(userProfileDTO.getId())
-                    .flatMap(boothUser -> companyRepository.findById(boothUser.getCompany().getId()))
-                    .ifPresent(company -> {
-                        company.setName(userProfileDTO.getCompanyName());
-                        company.setBillingAddress(userProfileDTO.getBillingAddress());
-                        company.setDescription(userProfileDTO.getDescription());
-                        company.setLogo(userProfileDTO.getLogo());
-                        company.setExhibitorList(userProfileDTO.getExhibitorList());
-                        companyRepository.save(company);
-                    });
-                userProfileDTO
-                    .getAuthorities()
-                    .stream()
-                    .map(authorityRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(managedAuthorities::add);
-                this.clearUserCaches(user);
-                log.debug("Changed Information for User: {}", user);
-                return userProfileDTO;
-            });
+            }
+            this.clearUserCaches(user);
+            log.debug("Changed Information for User: {}", user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
     }
 
     // Methode, um sich von der Warteliste zu entfernen
     public void updateWaitingList(UserProfileDTO userProfileDTO) {
-        Optional.of(userRepository.findById(userProfileDTO.getId()))
+        Optional.of(userRepository.findById(userProfileDTO.getUser().getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(user -> {
                 this.clearUserCaches(user);
-                user.setLogin(userProfileDTO.getLogin().toLowerCase());
+                user.setLogin(userProfileDTO.getUser().getLogin().toLowerCase());
                 Set<Authority> managedAuthorities = user.getAuthorities();
                 userRepository.save(user);
-                boothUserRepository
-                    .findById(userProfileDTO.getId())
-                    .flatMap(boothUser -> companyRepository.findById(boothUser.getCompany().getId()))
+                companyRepository
+                    .findById(userProfileDTO.getCompany().getId())
                     .ifPresent(company -> {
                         company.setWaitingList(false);
                         companyRepository.save(company);
@@ -344,7 +366,7 @@ public class UserService {
     }
 
     public void cancelBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getId()))
+        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(booking -> {
@@ -355,7 +377,7 @@ public class UserService {
     }
 
     public void confirmBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getId()))
+        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(booking -> {
@@ -364,24 +386,6 @@ public class UserService {
                 return userProfileDTO;
             });
     }
-
-    //    public Boolean checkPassword(String currentClearTextPassword) {
-    //        Optional<String> currentUserLogin = SecurityUtils.getCurrentUserLogin();
-    //        if (currentUserLogin.isEmpty()) {
-    //            return false;
-    //        }
-    //        Optional<User> optionalUser = userRepository.findOneByLogin(currentUserLogin.get());
-    //        if (optionalUser.isEmpty()) {
-    //            return false;
-    //        }
-    //        User user = optionalUser.get();
-    //        String currentEncryptedPassword = user.getPassword();
-    //        if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
-    //            return false;
-    //        }
-    //        log.debug("Password is correct");
-    //        return true;
-    //    }
 
     public Boolean checkPassword(String currentClearTextPassword) {
         return SecurityUtils.getCurrentUserLogin()
@@ -446,17 +450,41 @@ public class UserService {
     @Transactional
     public UserProfileDTO getUserProfile(String login) {
         User user = userRepository.findOneByLogin(login).orElseThrow(() -> new RuntimeException("User not found"));
-        BoothUser boothUser = boothUserRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("BoothUser not found"));
-        Company company = companyRepository
-            .findById(boothUser.getCompany().getId())
-            .orElseThrow(() -> new RuntimeException("Company not found"));
-        Booking booking = bookingRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        return new UserProfileDTO(user, company, booking);
-    }
+        boolean isAdmin = SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
 
-    public User findByLogin(String login) {
-        return userRepository.findOneWithAuthoritiesByLogin(login).orElse(null);
+        UserDTO userDTO = userMapper.userToUserDTO(user);
+
+        if (isAdmin) {
+            return new UserProfileDTO(
+                userDTO,
+                null,
+                null,
+                user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
+            );
+        } else {
+            BoothUser boothUser = boothUserRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("BoothUser not found"));
+
+            Company company = companyRepository
+                .findById(boothUser.getCompany().getId())
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+
+            Booking booking = bookingRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+
+            CompanyDTO companyDTO = companyMapper.toDto(company);
+            BookingDTO bookingDTO = bookingMapper.toDto(booking);
+            return new UserProfileDTO(
+                userDTO,
+                companyDTO,
+                bookingDTO,
+                user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
+            );
+        }
     }
 
     /**
