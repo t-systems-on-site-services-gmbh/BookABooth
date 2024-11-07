@@ -1,7 +1,9 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.CompanyService;
+import de.tsystems.onsite.bookabooth.service.FileUploadService;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -37,9 +39,20 @@ public class CompanyResource {
 
     private final CompanyRepository companyRepository;
 
-    public CompanyResource(CompanyService companyService, CompanyRepository companyRepository) {
+    private final FileUploadService fileUploadService;
+
+    private final ApplicationProperties applicationProperties;
+
+    public CompanyResource(
+        CompanyService companyService,
+        CompanyRepository companyRepository,
+        FileUploadService fileUploadService,
+        ApplicationProperties applicationProperties
+    ) {
         this.companyService = companyService;
         this.companyRepository = companyRepository;
+        this.fileUploadService = fileUploadService;
+        this.applicationProperties = applicationProperties;
     }
 
     /**
@@ -92,6 +105,45 @@ public class CompanyResource {
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, companyDTO.getId().toString()))
             .body(companyDTO);
+    }
+
+    /**
+     * {@code POST /companies/:id/image} : Upload an image of the company logo
+     *
+     * @param id the id of the companyDTO
+     * @param imageBase64 the image of the Company logo
+     * @return
+     * @throws URISyntaxException
+     */
+    @PostMapping("/{id}/image")
+    public ResponseEntity<CompanyDTO> addLogo(@PathVariable(value = "id", required = false) final Long id, @RequestBody String imageBase64)
+        throws URISyntaxException {
+        log.debug("REST request to add image as logo to company: {}, {}", id, imageBase64);
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!companyRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        Optional<CompanyDTO> companyDTO = companyService.findOne(id);
+        if (companyDTO.isEmpty()) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        if (imageBase64 == null || !imageBase64.matches("([a-zA-Z0-9+/=]*)")) {
+            throw new BadRequestAlertException("Invalid image", ENTITY_NAME, "invalidimage");
+        }
+
+        var filePath = fileUploadService.saveFile("companies", id, imageBase64);
+
+        companyDTO.get().setLogo(getRelativeImagePath(filePath));
+        var resultDTO = companyService.update(companyDTO.get());
+
+        return ResponseEntity.ok().body(resultDTO);
+    }
+
+    private String getRelativeImagePath(String filePath) {
+        int idx = applicationProperties.getUploadFolder().lastIndexOf("/uploads/");
+        return filePath.substring(idx);
     }
 
     /**

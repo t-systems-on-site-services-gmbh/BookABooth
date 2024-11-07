@@ -1,58 +1,25 @@
 import { computed, type ComputedRef, defineComponent, inject, ref, type Ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { email, maxLength, minLength, required } from '@vuelidate/validators';
+import { email, maxLength, minLength, required, requiredUnless } from '@vuelidate/validators';
 import axios from 'axios';
 import { EMAIL_ALREADY_USED_TYPE } from '@/constants';
 import { useStore } from '@/store';
-
-const validations = {
-  settingsAccount: {
-    companyName: {
-      required,
-      minLength: minLength(1),
-      maxLength: maxLength(100),
-    },
-    billingAddress: {
-      required,
-      minLength: minLength(1),
-      maxLength: maxLength(254),
-    },
-    firstName: {
-      required,
-      minLength: minLength(1),
-      maxLength: maxLength(50),
-    },
-    lastName: {
-      required,
-      minLength: minLength(1),
-      maxLength: maxLength(50),
-    },
-    email: {
-      required,
-      email,
-      minLength: minLength(5),
-      maxLength: maxLength(254),
-    },
-    description: {
-      maxLength: maxLength(254),
-    },
-    logoUpload: {},
-    exhibitorList: {},
-  },
-  deleteAccount: {
-    passwordConfirm: {
-      required,
-    },
-  },
-};
+import { useAlertService } from '@/shared/alert/alert.service';
+import { type ICompany, Company } from '@/shared/model/company.model';
+import CompanyService from '@/entities/company/company.service';
+import type AccountService from 'account/account.service';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Settings',
-  validations,
   setup() {
     const store = useStore();
 
+    const siteUrl = inject('siteUrl', () => computed(() => window.location.origin), true);
+    const alertService = inject('alertService', () => useAlertService(), true);
+    const company: Ref<ICompany> = ref(new Company());
+    const companyService = inject('companyService', () => new CompanyService());
+    const accountService = inject<AccountService>('accountService');
     const success: Ref<string> = ref(null);
     const error: Ref<string> = ref(null);
     const errorEmailExists: Ref<string> = ref(null);
@@ -60,20 +27,77 @@ export default defineComponent({
     const settingsAccount = computed(() => store.account);
     const waitingList = ref(null);
     const username = inject<ComputedRef<string>>('currentUsername', () => computed(() => store.account?.login), true);
-    const exhibitorList = inject<ComputedRef<Boolean>>('exhibitorList', () => computed(() => store.account?.exhibitorList), true);
+    const exhibitorList = inject<ComputedRef<Boolean>>('exhibitorList', () => computed(() => store.account.company?.exhibitorList), true);
+    const authorities = inject<ComputedRef<Set<String>>>('authorities', () => computed(() => store.account?.authorities), true);
     const preview = ref(null);
     const image = ref(false);
     const bookingStatus = ref(null);
     const deleteAccount = ref(null);
     const passwordConfirm = ref('');
     const deleteError: Ref<boolean> = ref(false);
+    const hasAnyAuthorityValues: Ref<any> = ref({});
+    const componentKey = ref(new Date().getTime());
 
     const isChecked = computed(() => {
       return exhibitorList.value ? 'Sie befinden sich in der Ausstellerliste' : 'Sie befinden sich nicht in der Ausstellerliste';
     });
 
+    const isAdmin = computed(() => {
+      if (authorities.value && Array.isArray(authorities.value)) {
+        return authorities.value.includes('ROLE_ADMIN');
+      }
+      return false;
+    });
+
+    const validations = {
+      settingsAccount: {
+        company: {
+          name: {
+            required: requiredUnless(isAdmin),
+            minLength: minLength(1),
+            maxLength: maxLength(100),
+          },
+          billingAddress: {
+            required: requiredUnless(isAdmin),
+            minLength: minLength(1),
+            maxLength: maxLength(254),
+          },
+          description: {
+            maxLength: maxLength(254),
+          },
+          logoUpload: {
+            maxLength: maxLength(200),
+          },
+          exhibitorList: {},
+        },
+        user: {
+          firstName: {
+            required,
+            minLength: minLength(1),
+            maxLength: maxLength(50),
+          },
+          lastName: {
+            required,
+            minLength: minLength(1),
+            maxLength: maxLength(50),
+          },
+          email: {
+            required,
+            email,
+            minLength: minLength(5),
+            maxLength: maxLength(254),
+          },
+        },
+      },
+      deleteAccount: {
+        passwordConfirm: {
+          required,
+        },
+      },
+    };
+
     return {
-      v$: useVuelidate(),
+      v$: useVuelidate(validations, { settingsAccount: settingsAccount.value, deleteAccount: deleteAccount.value }),
       success,
       error,
       errorEmailExists,
@@ -84,11 +108,25 @@ export default defineComponent({
       waitingList,
       bookingStatus,
       exhibitorList,
+      authorities,
       isChecked,
       passwordConfirm,
       deleteAccount,
       deleteError,
+      siteUrl,
+      alertService,
+      company,
+      companyService,
+      hasAnyAuthorityValues,
+      accountService,
+      componentKey,
     };
+  },
+  computed: {
+    absoluteImageUrl(): string {
+      const logoPath = this.settingsAccount.company?.logo ? this.settingsAccount.company?.logo.replace(/\\/g, '/') : '';
+      return logoPath ? `${this.siteUrl}${logoPath}?key=${this.componentKey}` : '';
+    },
   },
   methods: {
     save() {
@@ -110,10 +148,42 @@ export default defineComponent({
           }
         });
     },
-    previewImage: function (event: { target: any }) {
-      this.logo = this.$refs.file.files[0];
-      this.image = true;
-      this.preview = URL.createObjectURL(this.logo);
+    forceRender() {
+      this.componentKey = new Date().getTime();
+    },
+    logoUpload(event: Event): void {
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        console.log('Hochgeladene Datei: ', file);
+
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const fileContent = e.target?.result;
+
+          // convert to base64 string
+          const contentBase64 = btoa(fileContent as string);
+
+          console.log('Dateiinhalt:', contentBase64);
+
+          // send file to server
+          this.isSaving = true;
+          this.companyService()
+            .uploadImage(this.settingsAccount.company.id, contentBase64)
+            .then(param => {
+              this.isSaving = false;
+              this.alertService.showInfo('Updated logo ' + param.id);
+              this.settingsAccount.company.logo = param.logo;
+              this.forceRender();
+            })
+            .catch(error => {
+              this.isSaving = false;
+              console.log(error.response);
+              this.alertService.showHttpError(error.response);
+            });
+        };
+        reader.readAsBinaryString(file);
+      }
     },
     showModal() {
       this.$refs['deleteAcc-modal'].show();
@@ -125,6 +195,14 @@ export default defineComponent({
       this.passwordConfirm = '';
       this.deleteError = false;
     },
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
     async confirmDelete() {
       try {
         const response = await axios.delete('api/account/delete-account', {
@@ -135,7 +213,6 @@ export default defineComponent({
             'Content-Type': 'application/json',
           },
         });
-        console.log(response);
         if (response.status === 200) {
           this.deleteError = false;
           console.log('Account wurde gelöscht');

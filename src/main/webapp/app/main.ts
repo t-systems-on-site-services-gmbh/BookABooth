@@ -111,7 +111,7 @@ const app = createApp({
     );
     provide(
       'currentUsername',
-      computed(() => store.account?.login),
+      computed(() => store.account?.user.login),
     );
 
     provide('accountService', accountService);
