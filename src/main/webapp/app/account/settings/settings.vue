@@ -9,225 +9,261 @@
           </span>
         </h2>
 
-        <div class="alert alert-success" role="alert" v-if="success"><strong>Einstellungen wurden gespeichert!</strong></div>
+        <div class="alert alert-success" role="alert" v-if="success">
+          <strong>Einstellungen wurden gespeichert!</strong>
+        </div>
 
         <div class="alert alert-danger" role="alert" v-if="errorEmailExists">
           <strong>E-Mail-Adresse wird bereits verwendet!</strong> Bitte wählen Sie eine andere aus.
         </div>
 
         <form name="form" id="settings-form" role="form" @submit.prevent="save()" v-if="settingsAccount" novalidate>
-          <div class="form-group" v-if="!hasAnyAuthority('ROLE_ADMIN')">
-            <h4>Unternehmensdaten</h4>
-            <!--- Unternehmenslogo Previewfenster -->
-            <div class="form-group">
-              <img
-                v-if="settingsAccount.company?.logo"
-                alt="Unternehmenslogo"
-                :key="componentKey"
-                :src="absoluteImageUrl"
-                style="width: 150px; height: auto"
-              />
-            </div>
-            <!--- Name des Unternehmens -->
-            <div class="form-group">
-              <label class="form-control-label" for="company.name">Firmenname</label>
-              <input
-                type="text"
-                class="form-control"
-                id="company.name"
-                name="company.name"
-                placeholder="Name Ihres Unternehmens"
-                :class="{ valid: !v$.settingsAccount.company.name.$invalid, invalid: v$.settingsAccount.company.name.$invalid }"
-                v-model="v$.settingsAccount.company.name.$model"
-                minlength="1"
-                maxlength="100"
-                required
-                data-cy="company.name"
-              />
-              <div v-if="v$.settingsAccount.company.name.$anyDirty && v$.settingsAccount.company.name.$invalid">
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.required">Ein Firmenname wird benötigt.</small>
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.minLength"
-                  >Ihr Firmenname muss mindestens 1 Zeichen lang sein.</small
-                >
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.maxLength"
-                  >Ihr Firmenname darf nicht länger als 100 Zeichen sein.</small
-                >
+          <div class="accordion" id="accordionProfile">
+            <div class="card" v-if="!hasAnyAuthority('ROLE_ADMIN')">
+              <div class="card-header" Id="headingOne">
+                <h4 class="mb-0">
+                  <!--- <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></button> -->
+                  Unternehmensdaten
+                </h4>
+              </div>
+              <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionProfile">
+                <div class="card-body">
+                  <!--- Unternehmenslogo Previewfenster -->
+                  <div class="form-group">
+                    <img
+                      v-if="settingsAccount.company?.logo"
+                      alt="Unternehmenslogo"
+                      :key="componentKey"
+                      :src="absoluteImageUrl"
+                      style="width: 150px; height: auto"
+                    />
+                  </div>
+                  <!--- Name des Unternehmens -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.name">Firmenname</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="company.name"
+                      name="company.name"
+                      placeholder="Name Ihres Unternehmens"
+                      :class="{ valid: !v$.settingsAccount.company.name.$invalid, invalid: v$.settingsAccount.company.name.$invalid }"
+                      v-model="v$.settingsAccount.company.name.$model"
+                      minlength="1"
+                      maxlength="100"
+                      required
+                      data-cy="company.name"
+                    />
+                    <div v-if="v$.settingsAccount.company.name.$anyDirty && v$.settingsAccount.company.name.$invalid">
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.required"
+                        >Ein Firmenname wird benötigt.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.minLength"
+                        >Ihr Firmenname muss mindestens 1 Zeichen lang sein.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.maxLength"
+                        >Ihr Firmenname darf nicht länger als 100 Zeichen sein.</small
+                      >
+                    </div>
+                  </div>
+                  <!--- Adresse des Unternehmens -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.billingAddress">Rechnungsanschrift</label>
+                    <textarea
+                      id="company.billingAddress"
+                      name="company.billingAddress"
+                      class="form-control"
+                      placeholder="Rechnungsanschrift Ihres Unternehmens"
+                      :class="{
+                        valid: !v$.settingsAccount.company.billingAddress.$invalid,
+                        invalid: v$.settingsAccount.company.billingAddress.$invalid,
+                      }"
+                      v-model="v$.settingsAccount.company.billingAddress.$model"
+                      minlength="1"
+                      maxlength="254"
+                      required
+                      data-cy="company.billingaddress"
+                    >
+                    </textarea>
+                    <div v-if="v$.settingsAccount.company.billingAddress.$anyDirty && v$.settingsAccount.company.billingAddress.$invalid">
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.required"
+                        >Eine Rechnungsanschrift wird benötigt.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.minLength"
+                        >Ihre Rechnungsanschrift muss mindestens 1 Zeichen lang sein.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.maxLength"
+                        >Ihre Rechnungsanschrift darf nicht länger als 254 Zeichen sein.</small
+                      >
+                    </div>
+                  </div>
+                  <!--- Kurzbeschreibung des Unternehmens -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.description"
+                      >Kurze Beschreibung Ihres Unternehmens (max. 254 Zeichen)</label
+                    >
+                    <textarea
+                      id="company.description"
+                      name="company.description"
+                      class="form-control"
+                      placeholder="Beschreibung Ihres Unternehmens"
+                      :class="{
+                        valid: !v$.settingsAccount.company.description.$invalid,
+                        invalid: v$.settingsAccount.company.description.$invalid,
+                      }"
+                      v-model="v$.settingsAccount.company.description.$model"
+                      minlength="0"
+                      maxlength="254"
+                      data-cy="company.description"
+                    >
+                    </textarea>
+                    <div v-if="v$.settingsAccount.company.description.$invalid">
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.maxLength"
+                        >Ihre Firmenbeschreibung darf nicht länger als 254 Zeichen sein.</small
+                      >
+                    </div>
+                  </div>
+                  <!--- Unternehmenslogo hochladen / aktualisieren -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.logoUpload">
+                      <p v-if="settingsAccount.company?.logo">Aktualisieren Sie hier Ihr Unternehmenslogo</p>
+                      <p v-else>Laden Sie hier Ihr Unternehmenslogo hoch</p>
+                    </label>
+                    <input
+                      type="file"
+                      ref="file"
+                      class="form-control-file"
+                      id="company.logoUpload"
+                      name="company.logoUpload"
+                      :class="{
+                        valid: !v$.settingsAccount.company.logoUpload.$invalid,
+                        invalid: v$.settingsAccount.company.logoUpload.$invalid,
+                      }"
+                      data-cy="company.logoupload"
+                      accept="image/*"
+                      @change="logoUpload"
+                    />
+                  </div>
+                  <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.exhibitorList"
+                      >Hier können Sie Ihre Freigabe in der Austellerliste verwalten</label
+                    >
+                    <br />
+                    <input
+                      type="checkbox"
+                      id="company.exhibitorList"
+                      name="company.exhibitorList"
+                      :class="{
+                        valid: !v$.settingsAccount.company.exhibitorList.$invalid,
+                        invalid: v$.settingsAccount.company.exhibitorList.$invalid,
+                      }"
+                      v-model="v$.settingsAccount.company.exhibitorList.$model"
+                      data-cy="exhibitorlist"
+                    />
+                    {{ isChecked }}
+                  </div>
+                </div>
               </div>
             </div>
-            <!--- Adresse des Unternehmens -->
-            <div class="form-group">
-              <label class="form-control-label" for="company.billingAddress">Rechnungsanschrift</label>
-              <textarea
-                id="company.billingAddress"
-                name="company.billingAddress"
-                class="form-control"
-                placeholder="Rechnungsanschrift Ihres Unternehmens"
-                :class="{
-                  valid: !v$.settingsAccount.company.billingAddress.$invalid,
-                  invalid: v$.settingsAccount.company.billingAddress.$invalid,
-                }"
-                v-model="v$.settingsAccount.company.billingAddress.$model"
-                minlength="1"
-                maxlength="254"
-                required
-                data-cy="company.billingaddress"
-              >
-              </textarea>
-              <div v-if="v$.settingsAccount.company.billingAddress.$anyDirty && v$.settingsAccount.company.billingAddress.$invalid">
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.required"
-                  >Eine Rechnungsanschrift wird benötigt.</small
-                >
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.minLength"
-                  >Ihre Rechnungsanschrift muss mindestens 1 Zeichen lang sein.</small
-                >
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.maxLength"
-                  >Ihre Rechnungsanschrift darf nicht länger als 254 Zeichen sein.</small
-                >
+            <div class="card">
+              <div class="card-header" id="headingTwo">
+                <h4 class="mb-0">
+                  <!--- <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo"></button> -->
+                  Benutzerdaten
+                </h4>
               </div>
-            </div>
-            <!--- Kurzbeschreibung des Unternehmens -->
-            <div class="form-group">
-              <label class="form-control-label" for="company.description">Kurze Beschreibung Ihres Unternehmens (max. 254 Zeichen)</label>
-              <textarea
-                id="company.description"
-                name="company.description"
-                class="form-control"
-                placeholder="Beschreibung Ihres Unternehmens"
-                :class="{
-                  valid: !v$.settingsAccount.company.description.$invalid,
-                  invalid: v$.settingsAccount.company.description.$invalid,
-                }"
-                v-model="v$.settingsAccount.company.description.$model"
-                minlength="0"
-                maxlength="254"
-                data-cy="company.description"
-              ></textarea>
-              <div v-if="v$.settingsAccount.company.description.$invalid">
-                <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.maxLength">
-                  Ihre Firmenbeschreibung darf nicht länger als 254 Zeichen sein.
-                </small>
-              </div>
-            </div>
-            <!--- Unternehmenslogo hochladen / aktualisieren -->
-            <div class="form-group">
-              <label class="form-control-label" for="company.logoUpload"
-                ><p v-if="settingsAccount.company?.logo">Aktualisieren Sie hier Ihr Unternehmenslogo</p>
-                <p v-else>Laden Sie hier Ihr Unternehmenslogo hoch</p></label
-              >
-              <input
-                type="file"
-                ref="file"
-                class="form-control-file"
-                id="company.logoUpload"
-                name="company.logoUpload"
-                :class="{ valid: !v$.settingsAccount.company.logoUpload.$invalid, invalid: v$.settingsAccount.company.logoUpload.$invalid }"
-                data-cy="company.logoupload"
-                accept="image/*"
-                @change="logoUpload"
-              />
-            </div>
-            <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
-            <div class="form-group">
-              <label class="form-control-label" for="company.exhibitorList"
-                >Hier können Sie Ihre Freigabe in der Austellerliste verwalten</label
-              >
-              <br />
-              <input
-                type="checkbox"
-                id="company.exhibitorList"
-                name="company.exhibitorList"
-                :class="{
-                  valid: !v$.settingsAccount.company.exhibitorList.$invalid,
-                  invalid: v$.settingsAccount.company.exhibitorList.$invalid,
-                }"
-                v-model="v$.settingsAccount.company.exhibitorList.$model"
-                data-cy="exhibitorlist"
-              />
-              {{ isChecked }}
-            </div>
-          </div>
-          <div class="form-group">
-            <h4>Benutzerdaten</h4>
-            <!--- Vorname des Ansprechpartners / Accountbesitzers -->
-            <div class="form-group">
-              <label class="form-control-label" for="user.firstName">Vorname Ansprechpartner</label>
-              <input
-                type="text"
-                class="form-control"
-                id="user.firstName"
-                name="user.firstName"
-                placeholder="Ihr Vorname"
-                :class="{ valid: !v$.settingsAccount.user.firstName.$invalid, invalid: v$.settingsAccount.user.firstName.$invalid }"
-                v-model="v$.settingsAccount.user.firstName.$model"
-                minlength="1"
-                maxlength="50"
-                required
-                data-cy="user.firstname"
-              />
-              <div v-if="v$.settingsAccount.user.firstName.$anyDirty && v$.settingsAccount.user.firstName.$invalid">
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.required">Ihr Vorname wird benötigt.</small>
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.minLength">
-                  Ihr Vorname muss mindestens 1 Zeichen lang sein</small
-                >
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.maxLength">
-                  Ihr Vorname darf nicht länger als 50 Zeichen sein</small
-                >
-              </div>
-            </div>
-            <!--- Nachname des Ansprechpartners / Accountbesitzers -->
-            <div class="form-group">
-              <label class="form-control-label" for="user.lastName">Nachname Ansprechpartner</label>
-              <input
-                type="text"
-                class="form-control"
-                id="user.lastName"
-                name="user.lastName"
-                placeholder="Ihr Nachname"
-                :class="{ valid: !v$.settingsAccount.user.lastName.$invalid, invalid: v$.settingsAccount.user.lastName.$invalid }"
-                v-model="v$.settingsAccount.user.lastName.$model"
-                minlength="1"
-                maxlength="50"
-                required
-                data-cy="user.lastname"
-              />
-              <div v-if="v$.settingsAccount.user.lastName.$anyDirty && v$.settingsAccount.user.lastName.$invalid">
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.required">Ihr Nachname wird benötigt.</small>
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.minLength">
-                  Ihr Nachname muss mindestens 1 Zeichen lang sein</small
-                >
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.maxLength">
-                  Ihr Nachname darf nicht länger als 50 Zeichen sein</small
-                >
-              </div>
-            </div>
-            <!--- E-Mail-Adresse des Ansprechpartners -->
-            <div class="form-group">
-              <label class="form-control-label" for="user.email">E-Mail-Adresse</label>
-              <input
-                type="email"
-                class="form-control"
-                id="user.email"
-                name="user.email"
-                placeholder="Ihre E-Mail-Adresse"
-                :class="{ valid: !v$.settingsAccount.user.email.$invalid, invalid: v$.settingsAccount.user.email.$invalid }"
-                v-model="v$.settingsAccount.user.email.$model"
-                minlength="5"
-                maxlength="254"
-                email
-                required
-                data-cy="user.email"
-              />
-              <div v-if="v$.settingsAccount.user.email.$anyDirty && v$.settingsAccount.user.email.$invalid">
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.required"
-                  >Ihre E-Mail-Adresse wird benötigt.</small
-                >
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.email">Ihre E-Mail-Adresse ist ungültig.</small>
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.minLength">
-                  Ihre E-Mail-Adresse muss mindestens 5 Zeichen lang sein</small
-                >
-                <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.maxLength">
-                  Ihre E-Mail-Adresse darf nicht länger als 50 Zeichen sein</small
-                >
+              <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionProfile">
+                <div class="card-body">
+                  <!--- Vorname des Ansprechpartners / Accountbesitzers -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="user.firstName">Vorname Ansprechpartner</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="user.firstName"
+                      name="user.firstName"
+                      placeholder="Ihr Vorname"
+                      :class="{ valid: !v$.settingsAccount.user.firstName.$invalid, invalid: v$.settingsAccount.user.firstName.$invalid }"
+                      v-model="v$.settingsAccount.user.firstName.$model"
+                      minlength="1"
+                      maxlength="50"
+                      required
+                      data-cy="user.firstname"
+                    />
+                    <div v-if="v$.settingsAccount.user.firstName.$anyDirty && v$.settingsAccount.user.firstName.$invalid">
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.required"
+                        >Ihr Vorname wird benötigt.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.minLength"
+                        >Ihr Vorname muss mindestens 1 Zeichen lang sein</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.maxLength"
+                        >Ihr Vorname darf nicht länger als 50 Zeichen sein</small
+                      >
+                    </div>
+                  </div>
+                  <!--- Nachname des Ansprechpartners / Accountbesitzers -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="user.lastName">Nachname Ansprechpartner</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="user.lastName"
+                      name="user.lastName"
+                      placeholder="Ihr Nachname"
+                      :class="{ valid: !v$.settingsAccount.user.lastName.$invalid, invalid: v$.settingsAccount.user.lastName.$invalid }"
+                      v-model="v$.settingsAccount.user.lastName.$model"
+                      minlength="1"
+                      maxlength="50"
+                      required
+                      data-cy="user.lastname"
+                    />
+                    <div v-if="v$.settingsAccount.user.lastName.$anyDirty && v$.settingsAccount.user.lastName.$invalid">
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.required"
+                        >Ihr Nachname wird benötigt.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.minLength"
+                        >Ihr Nachname muss mindestens 1 Zeichen lang sein</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.maxLength"
+                        >Ihr Nachname darf nicht länger als 50 Zeichen sein</small
+                      >
+                    </div>
+                  </div>
+                  <!--- E-Mail-Adresse des Ansprechpartners -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="user.email">E-Mail-Adresse</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="user.email"
+                      name="user.email"
+                      placeholder="Ihre E-Mail-Adresse"
+                      :class="{ valid: !v$.settingsAccount.user.email.$invalid, invalid: v$.settingsAccount.user.email.$invalid }"
+                      v-model="v$.settingsAccount.user.email.$model"
+                      minlength="5"
+                      maxlength="254"
+                      email
+                      required
+                      data-cy="user.email"
+                    />
+                    <div v-if="v$.settingsAccount.user.email.$anyDirty && v$.settingsAccount.user.email.$invalid">
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.required"
+                        >Ihre E-Mail-Adressewird benötigt.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.email"
+                        >Ihre E-Mail-Adresse istungültig.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.minLength">
+                        Ihre E-Mail-Adresse muss mindestens 5 Zeichen lang sein</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.maxLength"
+                        >Ihre E-Mail-Adresse darf nicht länger als 50 Zeichen sein</small
+                      >
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -307,7 +343,8 @@
           <div class="d-block text-left">
             <div class="w-100">
               <b-alert show data-cy="deleteError" variant="danger" v-if="deleteError"
-                ><strong>Ungültiges Passwort!</strong> Bitte überprüfen Sie Ihr Passwort und versuchen Sie es erneut.
+                ><strong>Ungültiges Passwort!</strong>
+                Bitte überprüfen Sie Ihr Passwort und versuchen Sie es erneut.
               </b-alert>
             </div>
             <h4>Sind Sie sich sicher, dass Sie Ihr Konto löschen wollen?</h4>

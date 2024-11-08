@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, defineComponent, inject, ref, type Ref } from 'vue';
+import { computed, type ComputedRef, defineComponent, inject, onMounted, ref, type Ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { email, maxLength, minLength, required, requiredUnless } from '@vuelidate/validators';
 import axios from 'axios';
@@ -138,6 +138,7 @@ export default defineComponent({
           this.error = null;
           this.success = 'OK';
           this.errorEmailExists = null;
+          window.scrollTo(0, 0);
         })
         .catch(ex => {
           this.success = null;
@@ -172,7 +173,7 @@ export default defineComponent({
             .uploadImage(this.settingsAccount.company.id, contentBase64)
             .then(param => {
               this.isSaving = false;
-              this.alertService.showInfo('Updated logo ' + param.id);
+              this.alertService.showInfo('Unternehmenslogo aktualisiert');
               this.settingsAccount.company.logo = param.logo;
               this.forceRender();
             })
