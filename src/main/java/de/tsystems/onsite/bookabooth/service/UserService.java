@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.security.auth.login.AccountNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -288,83 +289,61 @@ public class UserService {
             });
     }
 
-    // Aktuelle Update-Methode, um UserProfile zu aktualisieren
-    public void updateUserProfile(UserProfileDTO userProfileDTO) {
+    // Method to update the Userprofile with user- and companydata
+    public void updateUserProfile(UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+        Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
+        if (optionalUser.isEmpty()) {
+            throw new AccountNotFoundException("User could not be found");
+        }
         boolean isAdmin = SecurityContextHolder.getContext()
             .getAuthentication()
             .getAuthorities()
             .stream()
             .map(GrantedAuthority::getAuthority)
             .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
-        Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            this.clearUserCaches(user);
-            user.setLogin(userProfileDTO.getUser().getLogin().toLowerCase());
-            user.setFirstName(userProfileDTO.getUser().getFirstName());
-            user.setLastName(userProfileDTO.getUser().getLastName());
-            if (userProfileDTO.getUser().getEmail() != null) {
-                user.setEmail(userProfileDTO.getUser().getEmail().toLowerCase());
+
+        User user = optionalUser.get();
+        this.clearUserCaches(user);
+        User updateUser = userMapper.toEntity(userProfileDTO);
+
+        user.setLogin(updateUser.getLogin());
+        user.setFirstName(updateUser.getFirstName());
+        user.setLastName(updateUser.getLastName());
+        user.setEmail(updateUser.getEmail());
+        user.setAuthorities(updateUser.getAuthorities());
+        userRepository.save(user);
+
+        if (!isAdmin && userProfileDTO.getCompany() != null) {
+            Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
+            if (optionalCompany.isPresent()) {
+                Company updatedCompany = companyMapper.toEntity(userProfileDTO.getCompany());
+                Company company = optionalCompany.get();
+
+                company.setName(updatedCompany.getName());
+                company.setBillingAddress(updatedCompany.getBillingAddress());
+                company.setDescription(updatedCompany.getDescription());
+                company.setLogo(updatedCompany.getLogo());
+                company.setExhibitorList(updatedCompany.getExhibitorList());
+                companyRepository.save(company);
             }
-            Set<Authority> managedAuthorities = user.getAuthorities();
-            managedAuthorities.clear();
-            userProfileDTO
-                .getAuthorities()
-                .stream()
-                .map(authorityRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(managedAuthorities::add);
-            userRepository.save(user);
-            if (!isAdmin) {
-                if (userProfileDTO.getCompany() != null) {
-                    companyRepository
-                        .findById(userProfileDTO.getCompany().getId())
-                        .ifPresent(company -> {
-                            company.setName(userProfileDTO.getCompany().getName());
-                            company.setBillingAddress(userProfileDTO.getCompany().getBillingAddress());
-                            company.setDescription(userProfileDTO.getCompany().getDescription());
-                            company.setLogo(userProfileDTO.getCompany().getLogo());
-                            company.setExhibitorList(userProfileDTO.getCompany().getExhibitorList());
-                            companyRepository.save(company);
-                        });
-                }
-            }
-            this.clearUserCaches(user);
-            log.debug("Changed Information for User: {}", user);
-        } else {
-            throw new RuntimeException("User not found");
         }
+        this.clearUserCaches(user);
+        log.debug("Changed Information for User: {}", user);
     }
 
-    // Methode, um sich von der Warteliste zu entfernen
+    // Removes the user from the waiting list
     public void updateWaitingList(UserProfileDTO userProfileDTO) {
-        Optional.of(userRepository.findById(userProfileDTO.getUser().getId()))
+        Optional.of(companyRepository.findById(userProfileDTO.getCompany().getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .map(user -> {
-                this.clearUserCaches(user);
-                user.setLogin(userProfileDTO.getUser().getLogin().toLowerCase());
-                Set<Authority> managedAuthorities = user.getAuthorities();
-                userRepository.save(user);
-                companyRepository
-                    .findById(userProfileDTO.getCompany().getId())
-                    .ifPresent(company -> {
-                        company.setWaitingList(false);
-                        companyRepository.save(company);
-                    });
-                userProfileDTO
-                    .getAuthorities()
-                    .stream()
-                    .map(authorityRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(managedAuthorities::add);
-                this.clearUserCaches(user);
+            .map(company -> {
+                company.setWaitingList(false);
+                companyRepository.save(company);
                 return userProfileDTO;
             });
     }
 
+    // Set the booking status to canceled (from prebooked or confirmed)
     public void cancelBooking(UserProfileDTO userProfileDTO) {
         Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
             .filter(Optional::isPresent)
@@ -376,6 +355,7 @@ public class UserService {
             });
     }
 
+    // Set the booking status from prebooked to confirmed
     public void confirmBooking(UserProfileDTO userProfileDTO) {
         Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
             .filter(Optional::isPresent)
@@ -387,6 +367,7 @@ public class UserService {
             });
     }
 
+    // Checks the password of the current user
     public Boolean checkPassword(String currentClearTextPassword) {
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)

@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import javax.security.auth.login.AccountNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,11 +112,10 @@ public class AccountResource {
      * @return the data for the current user
      */
     @GetMapping("/account")
-    public ResponseEntity<?> getUserProfile(Authentication authentication) {
+    public ResponseEntity<UserProfileDTO> getUserProfile(Authentication authentication) {
         String login = authentication.getName();
-        Optional<User> user = userRepository.findOneByLogin(login);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
+        if (userRepository.findOneByLogin(login).isEmpty()) {
+            throw new AccountResourceException("User could not be found");
         }
         UserProfileDTO userProfileDTO = userService.getUserProfile(login);
         return ResponseEntity.ok(userProfileDTO);
@@ -127,7 +127,7 @@ public class AccountResource {
      * @return the profile with its new values
      */
     @PostMapping("/account")
-    public ResponseEntity<Void> updateUserProfile(@Valid @RequestBody UserProfileDTO userProfileDTO) {
+    public ResponseEntity<Void> updateUserProfile(@Valid @RequestBody UserProfileDTO userProfileDTO) throws AccountNotFoundException {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         Optional<User> user = userRepository.findOneByLogin(userLogin);
@@ -151,13 +151,9 @@ public class AccountResource {
     public ResponseEntity<Void> updateWaitingList(@RequestBody UserProfileDTO userProfileDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        Optional<User> user = userRepository.findOneByLogin(userLogin);
-        if (user.isEmpty()) {
-            throw new AccountResourceException("User could not be found");
-        }
-        Optional<User> exisitingUser = userRepository.findOneByEmailIgnoreCase(userProfileDTO.getUser().getEmail());
-        if (exisitingUser.isPresent() && (!exisitingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
-            throw new EmailAlreadyUsedException();
+        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
+        if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
+            throw new InvalidEmailException("Provided email does not match the existing email");
         }
         userService.updateWaitingList(userProfileDTO);
         return ResponseEntity.ok().build();
@@ -172,13 +168,9 @@ public class AccountResource {
     public ResponseEntity<Void> cancelBooking(@RequestBody UserProfileDTO userProfileDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        Optional<User> user = userRepository.findOneByLogin(userLogin);
-        if (user.isEmpty()) {
-            throw new AccountResourceException("User could not be found");
-        }
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userProfileDTO.getUser().getEmail());
-        if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
-            throw new EmailAlreadyUsedException();
+        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
+        if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
+            throw new InvalidEmailException("Provided email does not match the existing email");
         }
         userService.cancelBooking(userProfileDTO);
         return ResponseEntity.ok().build();
@@ -191,14 +183,11 @@ public class AccountResource {
      */
     @PutMapping("/account/confirm-booking")
     public ResponseEntity<Void> confirmBooking(@RequestBody UserProfileDTO userProfileDTO) {
-        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new AccountResourceException("User could not be found"));
-        Optional<User> user = userRepository.findOneByLogin(userLogin);
-        if (user.isEmpty()) {
-            throw new AccountResourceException("User could not be found");
-        }
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userProfileDTO.getUser().getEmail());
-        if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
-            throw new EmailAlreadyUsedException();
+        String userLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
+        if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
+            throw new InvalidEmailException("Provided email does not match the existing email");
         }
         userService.confirmBooking(userProfileDTO);
         return ResponseEntity.ok().build();
@@ -267,15 +256,14 @@ public class AccountResource {
             );
     }
 
-    // Checks, if the password of the user matches with the password input and deletes the account.
+    // Checks, if the password of the user matches with the password input and deletes the account
     @DeleteMapping("/account/delete-account")
     public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO) {
         if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
-            System.out.println("Das Passwort stimmt überein.");
-            // Hier die Delete-Methoden aufrufen
+            // Hier später die Delete-Methoden aufrufen
             return ResponseEntity.status(HttpStatus.OK).build();
         } else {
             return ResponseEntity.badRequest().build();

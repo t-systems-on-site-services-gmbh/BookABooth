@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, defineComponent, inject, onMounted, ref, type Ref } from 'vue';
+import { computed, type ComputedRef, defineComponent, inject, ref, type Ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { email, maxLength, minLength, required, requiredUnless } from '@vuelidate/validators';
 import axios from 'axios';
@@ -38,7 +38,7 @@ export default defineComponent({
     const hasAnyAuthorityValues: Ref<any> = ref({});
     const componentKey = ref(new Date().getTime());
 
-    const isChecked = computed(() => {
+    const onExhibitionList = computed(() => {
       return exhibitorList.value ? 'Sie befinden sich in der Ausstellerliste' : 'Sie befinden sich nicht in der Ausstellerliste';
     });
 
@@ -109,7 +109,7 @@ export default defineComponent({
       bookingStatus,
       exhibitorList,
       authorities,
-      isChecked,
+      onExhibitionList,
       passwordConfirm,
       deleteAccount,
       deleteError,

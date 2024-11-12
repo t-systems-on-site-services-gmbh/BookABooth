@@ -161,7 +161,7 @@
                       v-model="v$.settingsAccount.company.exhibitorList.$model"
                       data-cy="exhibitorlist"
                     />
-                    {{ isChecked }}
+                    {{ onExhibitionList }}
                   </div>
                 </div>
               </div>
