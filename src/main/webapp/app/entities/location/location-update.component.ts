@@ -19,6 +19,8 @@ export default defineComponent({
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'de'), true);
 
+    const siteUrl = inject('siteUrl', () => computed(() => window.location.origin), true);
+
     const route = useRoute();
     const router = useRouter();
 
@@ -42,6 +44,9 @@ export default defineComponent({
       location: {
         maxLength: validations.maxLength('Dieses Feld darf max. 200 Zeichen lang sein.', 200),
       },
+      imageUrl: {
+        maxLength: validations.maxLength('Dieses Feld darf max. 200 Zeichen lang sein.', 200),
+      },
     };
     const v$ = useVuelidate(validationRules, location as any);
     v$.value.$validate();
@@ -54,7 +59,13 @@ export default defineComponent({
       isSaving,
       currentLanguage,
       v$,
+      siteUrl,
     };
+  },
+  computed: {
+    absoluteImageUrl(): string {
+      return this.location.imageUrl ? this.siteUrl + '/' + this.location.imageUrl.replace(/\\/g, '/') : '';
+    },
   },
   created(): void {},
   methods: {
@@ -84,6 +95,38 @@ export default defineComponent({
             this.isSaving = false;
             this.alertService.showHttpError(error.response);
           });
+      }
+    },
+    handleImageUpload(event: Event): void {
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        console.log('Hochgeladene Datei:', file);
+
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const fileContent = e.target?.result;
+
+          // convert to base64 string;
+          const contentBase64 = btoa(fileContent as string);
+
+          console.log('Dateiinhalt:', contentBase64);
+
+          // send file to server
+          this.isSaving = true;
+          this.locationService()
+            .uploadImage(this.location, contentBase64)
+            .then(param => {
+              this.isSaving = false;
+              this.previousState();
+              this.alertService.showInfo('Updated image of Location ' + param.id);
+            })
+            .catch(error => {
+              this.isSaving = false;
+              this.alertService.showHttpError(error.response);
+            });
+        };
+        reader.readAsBinaryString(file);
       }
     },
   },

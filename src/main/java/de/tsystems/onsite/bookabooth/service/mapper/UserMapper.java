@@ -4,10 +4,12 @@ import de.tsystems.onsite.bookabooth.domain.Authority;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +56,21 @@ public class UserMapper {
             user.setActivated(userDTO.isActivated());
             user.setLangKey(userDTO.getLangKey());
             Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
+            user.setAuthorities(authorities);
+            return user;
+        }
+    }
+
+    public User profileDTOtoUserEntity(UserProfileDTO userProfileDTO, @MappingTarget User user) {
+        if (userProfileDTO == null) {
+            return null;
+        } else {
+            user.setId(userProfileDTO.getUser().getId());
+            user.setLogin(userProfileDTO.getUser().getLogin());
+            user.setFirstName(userProfileDTO.getUser().getFirstName());
+            user.setLastName(userProfileDTO.getUser().getLastName());
+            user.setEmail(userProfileDTO.getUser().getEmail());
+            Set<Authority> authorities = this.authoritiesFromStrings(userProfileDTO.getAuthorities());
             user.setAuthorities(authorities);
             return user;
         }

@@ -6,6 +6,7 @@ import de.tsystems.onsite.bookabooth.domain.Department;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.service.dto.ContactDTO;
 import de.tsystems.onsite.bookabooth.service.dto.DepartmentDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.*;
@@ -23,7 +24,7 @@ public interface CompanyMapper extends EntityMapper<CompanyDTO, Company> {
     @Mapping(target = "removeDepartment", ignore = true)
     @Mapping(target = "contacts", ignore = true)
     @Mapping(target = "removeContact", ignore = true)
-    Company toEntity(CompanyDTO companyDTO);
+    Company toEntity(CompanyDTO companyDTO, @MappingTarget Company company);
 
     @Named("departmentId")
     @BeanMapping(ignoreByDefault = true)

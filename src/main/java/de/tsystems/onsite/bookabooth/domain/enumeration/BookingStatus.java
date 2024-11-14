@@ -4,9 +4,10 @@ package de.tsystems.onsite.bookabooth.domain.enumeration;
  * The BookingStatus enumeration.
  */
 public enum BookingStatus {
+    BLOCKED("blocked"),
     PREBOOKED("prebooked"),
     CONFIRMED("confirmed"),
-    REJECTED("rejected");
+    CANCELED("canceled");
 
     private final String value;
 

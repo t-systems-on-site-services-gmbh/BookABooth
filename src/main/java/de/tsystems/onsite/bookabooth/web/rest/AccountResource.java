@@ -7,8 +7,8 @@ import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
-import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
 import de.tsystems.onsite.bookabooth.service.dto.PasswordChangeDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.*;
 import de.tsystems.onsite.bookabooth.web.rest.vm.KeyAndPasswordVM;
 import de.tsystems.onsite.bookabooth.web.rest.vm.ManagedUserVM;
@@ -17,10 +17,13 @@ import jakarta.validation.Valid;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import javax.security.auth.login.AccountNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -104,45 +107,90 @@ public class AccountResource {
     }
 
     /**
-     * {@code GET  /account} : get the current user.
      *
-     * @return the current user.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
+     * @param authentication authenticate the user
+     * @return the data for the current user
      */
     @GetMapping("/account")
-    public AdminUserDTO getAccount() {
-        return userService
-            .getUserWithAuthorities()
-            .map(AdminUserDTO::new)
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+    public ResponseEntity<UserProfileDTO> getUserProfile(Authentication authentication) {
+        String login = authentication.getName();
+        if (userRepository.findOneByLogin(login).isEmpty()) {
+            throw new AccountResourceException("User could not be found");
+        }
+        UserProfileDTO userProfileDTO = userService.getUserProfile(login);
+        return ResponseEntity.ok(userProfileDTO);
     }
 
     /**
-     * {@code POST  /account} : update the current user information.
      *
-     * @param userDTO the current user information.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
+     * @param userProfileDTO profile of the current user
+     * @return the profile with its new values
      */
     @PostMapping("/account")
-    public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
+    public ResponseEntity<Void> updateUserProfile(@Valid @RequestBody UserProfileDTO userProfileDTO) throws AccountNotFoundException {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
+        Optional<User> user = userRepository.findOneByLogin(userLogin);
+        if (user.isEmpty()) {
+            throw new AccountResourceException("User could not be found");
+        }
+        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userProfileDTO.getUser().getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
         }
-        Optional<User> user = userRepository.findOneByLogin(userLogin);
-        if (!user.isPresent()) {
-            throw new AccountResourceException("User could not be found");
+        userService.updateUserProfile(userProfileDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     *
+     * @param userProfileDTO profile of the current user
+     * @return profile without the check for waitingList
+     */
+    @PutMapping("/account/remove-waitinglist")
+    public ResponseEntity<Void> removeFromWaitingList(@RequestBody UserProfileDTO userProfileDTO) {
+        String userLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
+        if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
+            throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.updateUser(
-            userDTO.getFirstName(),
-            userDTO.getLastName(),
-            userDTO.getEmail(),
-            userDTO.getLangKey(),
-            userDTO.getImageUrl()
-        );
+        userService.removeFromWaitingList(userProfileDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     *
+     * @param userProfileDTO profile of the current user
+     * @return profiled with canceled booking
+     */
+    @PutMapping("/account/cancel-booking")
+    public ResponseEntity<Void> cancelBooking(@RequestBody UserProfileDTO userProfileDTO) {
+        String userLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
+        if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
+            throw new InvalidEmailException("Provided email does not match the existing email");
+        }
+        userService.cancelBooking(userProfileDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     *
+     * @param userProfileDTO profile of the current user
+     * @return profile with confirmed booking
+     */
+    @PutMapping("/account/confirm-booking")
+    public ResponseEntity<Void> confirmBooking(@RequestBody UserProfileDTO userProfileDTO) {
+        String userLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
+        if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
+            throw new InvalidEmailException("Provided email does not match the existing email");
+        }
+        userService.confirmBooking(userProfileDTO);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -206,6 +254,20 @@ public class AccountResource {
                         .findAny()
                         .ifPresent(t -> persistentTokenRepository.deleteById(decodedSeries))
             );
+    }
+
+    // Checks, if the password of the user matches with the password input and deletes the account
+    @DeleteMapping("/account/delete-account")
+    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO) {
+        if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
+            // Hier später die Delete-Methoden aufrufen
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

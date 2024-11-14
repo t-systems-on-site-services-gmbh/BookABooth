@@ -2,14 +2,14 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <form name="editForm" role="form" novalidate v-on:submit.prevent="save()">
-        <h2 id="bookaboothApp.location.home.createOrEditLabel" data-cy="LocationCreateUpdateHeading">Location erstellen oder bearbeiten</h2>
+        <h2 id="bookaboothApp.location.home.createOrEditLabel" data-cy="LocationCreateUpdateHeading">Lageplan erstellen oder bearbeiten</h2>
         <div>
           <div class="form-group" v-if="location.id">
             <label for="id">ID</label>
             <input type="text" class="form-control" id="id" name="id" v-model="location.id" readonly />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="location-location">Location</label>
+            <label class="form-control-label" for="location-location">Lokation</label>
             <input
               type="text"
               class="form-control"
@@ -22,6 +22,35 @@
             <div v-if="v$.location.$anyDirty && v$.location.$invalid">
               <small class="form-text text-danger" v-for="error of v$.location.$errors" :key="error.$uid">{{ error.$message }}</small>
             </div>
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="location-imageUrl">Grafik</label>
+            <input
+              type="text"
+              class="form-control"
+              name="imageUrl"
+              id="location-imageUrl"
+              data-cy="imageUrl"
+              :class="{ valid: !v$.imageUrl.$invalid, invalid: v$.imageUrl.$invalid }"
+              v-model="v$.imageUrl.$model"
+              readonly
+            />
+            <img v-if="location.imageUrl" :src="absoluteImageUrl" alt="Grafik Lageplan" style="max-width: 100%; height: auto" />
+            <div v-if="v$.location.$anyDirty && v$.location.$invalid">
+              <small class="form-text text-danger" v-for="error of v$.location.$errors" :key="error.$uid">{{ error.$message }}</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="location-imageUpload">Bild hochladen</label>
+            <input
+              type="file"
+              class="form-control"
+              name="imageUpload"
+              id="location-imageUpload"
+              data-cy="imageUpload"
+              accept=".png, .jpg, .jpeg, .svg"
+              @change="handleImageUpload"
+            />
           </div>
         </div>
         <div>

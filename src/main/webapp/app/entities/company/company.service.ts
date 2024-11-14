@@ -82,4 +82,19 @@ export default class CompanyService {
         });
     });
   }
+
+  public uploadImage(entity: String, contentBase64: any): Promise<ICompany> {
+    return new Promise<ICompany>((resolve, reject) => {
+      axios
+        .post(`${baseApiUrl}/${entity}/image`, contentBase64, {
+          headers: { 'Content-Type': 'text/plain; charset=x-user-defined-binary' },
+        })
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
 }

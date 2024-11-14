@@ -1,6 +1,9 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
+import de.tsystems.onsite.bookabooth.domain.Location;
 import de.tsystems.onsite.bookabooth.repository.LocationRepository;
+import de.tsystems.onsite.bookabooth.service.FileUploadService;
 import de.tsystems.onsite.bookabooth.service.LocationService;
 import de.tsystems.onsite.bookabooth.service.dto.LocationDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
@@ -15,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -36,10 +40,19 @@ public class LocationResource {
     private final LocationService locationService;
 
     private final LocationRepository locationRepository;
+    private final FileUploadService fileUploadService;
+    private final ApplicationProperties applicationProperties;
 
-    public LocationResource(LocationService locationService, LocationRepository locationRepository) {
+    public LocationResource(
+        LocationService locationService,
+        LocationRepository locationRepository,
+        FileUploadService fileUploadService,
+        ApplicationProperties applicationProperties
+    ) {
         this.locationService = locationService;
         this.locationRepository = locationRepository;
+        this.fileUploadService = fileUploadService;
+        this.applicationProperties = applicationProperties;
     }
 
     /**
@@ -128,6 +141,40 @@ public class LocationResource {
             result,
             HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, locationDTO.getId().toString())
         );
+    }
+
+    // Add method addImageToLocation which takes the location's id as parameter and a Base64 encoded image in the request body
+    @PostMapping("/{id}/image")
+    public ResponseEntity<LocationDTO> addImageToLocation(
+        @PathVariable(value = "id", required = false) final Long id,
+        @RequestBody String imageBase64
+    ) throws URISyntaxException {
+        log.debug("REST request to add image to Location : {}, {}", id, imageBase64);
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!locationRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        Optional<LocationDTO> locationDTO = locationService.findOne(id);
+        if (locationDTO.isEmpty()) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        if (imageBase64 == null || !imageBase64.matches("([a-zA-Z0-9+/=]*)")) {
+            throw new BadRequestAlertException("Invalid image", ENTITY_NAME, "invalidimage");
+        }
+
+        var filePath = fileUploadService.saveFile("locations", id, imageBase64);
+
+        locationDTO.get().setImageUrl(getRelativeImagePath(filePath));
+        var resultDTO = locationService.update(locationDTO.get());
+
+        return ResponseEntity.ok().body(resultDTO);
+    }
+
+    private String getRelativeImagePath(String filePath) {
+        int idx = applicationProperties.getUploadFolder().lastIndexOf("uploads/");
+        return filePath.substring(idx);
     }
 
     /**

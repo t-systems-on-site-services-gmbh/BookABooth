@@ -1,26 +1,31 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CANCELED;
+import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CONFIRMED;
+
 import de.tsystems.onsite.bookabooth.config.Constants;
-import de.tsystems.onsite.bookabooth.domain.Authority;
-import de.tsystems.onsite.bookabooth.domain.User;
-import de.tsystems.onsite.bookabooth.repository.AuthorityRepository;
-import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
-import de.tsystems.onsite.bookabooth.repository.UserRepository;
+import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
-import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
-import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.*;
+import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.security.auth.login.AccountNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +42,18 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final CompanyRepository companyRepository;
+
+    private final BoothUserRepository boothUserRepository;
+
+    private final UserMapper userMapper;
+
+    private final CompanyMapper companyMapper;
+
+    private final BookingMapper bookingMapper;
+
+    private final BookingRepository bookingRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final PersistentTokenRepository persistentTokenRepository;
@@ -47,12 +64,24 @@ public class UserService {
 
     public UserService(
         UserRepository userRepository,
+        CompanyRepository companyRepository,
+        BoothUserRepository boothUserRepository,
+        UserMapper userMapper,
+        CompanyMapper companyMapper,
+        BookingMapper bookingMapper,
+        BookingRepository bookingRepository,
         PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager
     ) {
         this.userRepository = userRepository;
+        this.companyRepository = companyRepository;
+        this.boothUserRepository = boothUserRepository;
+        this.userMapper = userMapper;
+        this.companyMapper = companyMapper;
+        this.bookingMapper = bookingMapper;
+        this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
@@ -260,6 +289,89 @@ public class UserService {
             });
     }
 
+    // Method to update the Userprofile with user- and companydata
+    public void updateUserProfile(UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+        Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
+        if (optionalUser.isEmpty()) {
+            throw new AccountNotFoundException("User could not be found");
+        }
+        boolean isAdmin = SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
+
+        User user = optionalUser.get();
+        this.clearUserCaches(user);
+        userMapper.profileDTOtoUserEntity(userProfileDTO, user);
+        userRepository.save(user);
+
+        if (!isAdmin && userProfileDTO.getCompany() != null) {
+            Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
+            if (optionalCompany.isPresent()) {
+                Company company = optionalCompany.get();
+                companyMapper.toEntity(userProfileDTO.getCompany(), company);
+                companyRepository.save(company);
+            }
+        }
+        this.clearUserCaches(user);
+        log.debug("Changed Information for User: {}", user);
+    }
+
+    // Removes the user from the waiting list
+    public void removeFromWaitingList(UserProfileDTO userProfileDTO) {
+        Optional.of(companyRepository.findById(userProfileDTO.getCompany().getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(company -> {
+                company.setWaitingList(false);
+                companyRepository.save(company);
+                return userProfileDTO;
+            });
+    }
+
+    // Set the booking status to canceled (from prebooked or confirmed)
+    public void cancelBooking(UserProfileDTO userProfileDTO) {
+        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(booking -> {
+                booking.setStatus(CANCELED);
+                bookingRepository.save(booking);
+                return userProfileDTO;
+            });
+    }
+
+    // Set the booking status from prebooked to confirmed
+    public void confirmBooking(UserProfileDTO userProfileDTO) {
+        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(booking -> {
+                booking.setStatus(CONFIRMED);
+                bookingRepository.save(booking);
+                return userProfileDTO;
+            });
+    }
+
+    // Checks the password of the current user
+    public Boolean checkPassword(String currentClearTextPassword) {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(user -> {
+                String currentEncryptedPassword = user.getPassword();
+                if (passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
+                    log.debug("Password is correct");
+                    return true;
+                } else {
+                    log.debug("Password is incorrect");
+                    return false;
+                }
+            })
+            .orElse(false);
+    }
+
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
         SecurityUtils.getCurrentUserLogin()
@@ -294,6 +406,54 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
+    }
+
+    /**
+     * Method to get User and Company from the database to display on the profile
+     * Boothuser is used to join the tables
+     * Booking is needed to display the booking status on the profile
+     *
+     * @param login to identify the user
+     * @return DTO with necessary infos to build the Userprofile
+     */
+    @Transactional
+    public UserProfileDTO getUserProfile(String login) {
+        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isAdmin = SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
+
+        UserDTO userDTO = userMapper.userToUserDTO(user);
+
+        if (isAdmin) {
+            return new UserProfileDTO(
+                userDTO,
+                null,
+                null,
+                user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
+            );
+        } else {
+            BoothUser boothUser = boothUserRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("BoothUser not found"));
+
+            Company company = companyRepository
+                .findById(boothUser.getCompany().getId())
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+
+            Booking booking = bookingRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+
+            CompanyDTO companyDTO = companyMapper.toDto(company);
+            BookingDTO bookingDTO = bookingMapper.toDto(booking);
+            return new UserProfileDTO(
+                userDTO,
+                companyDTO,
+                bookingDTO,
+                user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
+            );
+        }
     }
 
     /**
