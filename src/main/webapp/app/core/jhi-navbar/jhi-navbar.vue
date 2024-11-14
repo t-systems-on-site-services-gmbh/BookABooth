@@ -58,7 +58,7 @@
           </template>
           <b-dropdown-item data-cy="settings" to="/account/settings" v-if="authenticated" active-class="active">
             <font-awesome-icon icon="wrench" />
-            <span>Einstellungen</span>
+            <span>Profil</span>
           </b-dropdown-item>
           <b-dropdown-item data-cy="passwordItem" to="/account/password" v-if="authenticated" active-class="active">
             <font-awesome-icon icon="lock" />
