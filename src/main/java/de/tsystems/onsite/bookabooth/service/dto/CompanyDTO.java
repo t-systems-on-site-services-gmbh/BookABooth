@@ -139,4 +139,12 @@ public class CompanyDTO implements Serializable {
             ", departments=" + getDepartments() +
             "}";
     }
+
+    public boolean isWaitingList() {
+        return waitingList != null && waitingList;
+    }
+
+    public String getEmail() {
+        return mail;
+    }
 }
