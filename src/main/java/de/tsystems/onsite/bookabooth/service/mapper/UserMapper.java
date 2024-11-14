@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
@@ -60,11 +61,10 @@ public class UserMapper {
         }
     }
 
-    public User toEntity(UserProfileDTO userProfileDTO) {
+    public User profileDTOtoUserEntity(UserProfileDTO userProfileDTO, @MappingTarget User user) {
         if (userProfileDTO == null) {
             return null;
         } else {
-            User user = new User();
             user.setId(userProfileDTO.getUser().getId());
             user.setLogin(userProfileDTO.getUser().getLogin());
             user.setFirstName(userProfileDTO.getUser().getFirstName());

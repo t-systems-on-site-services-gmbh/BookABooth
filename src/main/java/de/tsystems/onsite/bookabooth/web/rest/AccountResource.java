@@ -147,15 +147,15 @@ public class AccountResource {
      * @param userProfileDTO profile of the current user
      * @return profile without the check for waitingList
      */
-    @PutMapping("/account/update-waitinglist")
-    public ResponseEntity<Void> updateWaitingList(@RequestBody UserProfileDTO userProfileDTO) {
+    @PutMapping("/account/remove-waitinglist")
+    public ResponseEntity<Void> removeFromWaitingList(@RequestBody UserProfileDTO userProfileDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.updateWaitingList(userProfileDTO);
+        userService.removeFromWaitingList(userProfileDTO);
         return ResponseEntity.ok().build();
     }
 

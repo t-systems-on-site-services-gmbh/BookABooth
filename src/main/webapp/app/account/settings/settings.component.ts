@@ -38,7 +38,7 @@ export default defineComponent({
     const hasAnyAuthorityValues: Ref<any> = ref({});
     const componentKey = ref(new Date().getTime());
 
-    const onExhibitionList = computed(() => {
+    const onExhibitorList = computed(() => {
       return exhibitorList.value ? 'Sie befinden sich in der Ausstellerliste' : 'Sie befinden sich nicht in der Ausstellerliste';
     });
 
@@ -109,7 +109,7 @@ export default defineComponent({
       bookingStatus,
       exhibitorList,
       authorities,
-      onExhibitionList,
+      onExhibitorList,
       passwordConfirm,
       deleteAccount,
       deleteError,
@@ -173,7 +173,7 @@ export default defineComponent({
             .uploadImage(this.settingsAccount.company.id, contentBase64)
             .then(param => {
               this.isSaving = false;
-              this.alertService.showInfo('Unternehmenslogo aktualisiert');
+              //this.alertService.showInfo('Unternehmenslogo aktualisiert'); Führt aktuell zu Problemen
               this.settingsAccount.company.logo = param.logo;
               this.forceRender();
             })
@@ -235,7 +235,7 @@ export default defineComponent({
       }
     },
     async removeWaitingList() {
-      const response = await axios.put('api/account/update-waitinglist', this.settingsAccount);
+      const response = await axios.put('api/account/remove-waitinglist', this.settingsAccount);
       console.log(response);
       if (response && response.status === 200) {
         console.log('Erfolgreich von der Warteliste entfernt');

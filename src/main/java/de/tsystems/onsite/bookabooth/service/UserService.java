@@ -304,26 +304,14 @@ public class UserService {
 
         User user = optionalUser.get();
         this.clearUserCaches(user);
-        User updateUser = userMapper.toEntity(userProfileDTO);
-
-        user.setLogin(updateUser.getLogin());
-        user.setFirstName(updateUser.getFirstName());
-        user.setLastName(updateUser.getLastName());
-        user.setEmail(updateUser.getEmail());
-        user.setAuthorities(updateUser.getAuthorities());
+        userMapper.profileDTOtoUserEntity(userProfileDTO, user);
         userRepository.save(user);
 
         if (!isAdmin && userProfileDTO.getCompany() != null) {
             Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
             if (optionalCompany.isPresent()) {
-                Company updatedCompany = companyMapper.toEntity(userProfileDTO.getCompany());
                 Company company = optionalCompany.get();
-
-                company.setName(updatedCompany.getName());
-                company.setBillingAddress(updatedCompany.getBillingAddress());
-                company.setDescription(updatedCompany.getDescription());
-                company.setLogo(updatedCompany.getLogo());
-                company.setExhibitorList(updatedCompany.getExhibitorList());
+                companyMapper.toEntity(userProfileDTO.getCompany(), company);
                 companyRepository.save(company);
             }
         }
@@ -332,7 +320,7 @@ public class UserService {
     }
 
     // Removes the user from the waiting list
-    public void updateWaitingList(UserProfileDTO userProfileDTO) {
+    public void removeFromWaitingList(UserProfileDTO userProfileDTO) {
         Optional.of(companyRepository.findById(userProfileDTO.getCompany().getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
