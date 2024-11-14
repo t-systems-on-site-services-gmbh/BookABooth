@@ -1,0 +1,24 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="de">
+  <head>
+    <title th:text="#{email.waitinglist.title}">Jade Karrieretag Benachrichtigung</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+  </head>
+  <body>
+    <p th:text="#{email.waitinglist.greeting}">Sehr geehrte Damen und Herren,</p>
+    <p th:text="#{email.waitinglist.text1}">
+      Sie stehen für den diesjährigen Jade Karrieretag auf der Warteliste. Soeben sind wieder Stände zur Buchung frei geworden. Eine
+      Reservierung kann über erfolgen.
+    </p>
+    <a th:with="url=(@{|${baseUrl}|})" th:href="${url}" th:text="${url}">Activation link</a>
+    <p th:text="#{email.waitinglist.text2}">
+      Sollten Sie diese Benachrichtigungen nicht mehr empfangen wollen, können Sie sich selbst über Ihr Benutzerprofil von der Warteliste
+      entfernen. Alternativ melden Sie sich bitte telefonisch oder per E-Mail bei uns.
+    </p>
+    <p>
+      <br />
+      <em th:text="#{email.signature}">Ihre Jade Hochschule</em>
+    </p>
+  </body>
+</html>

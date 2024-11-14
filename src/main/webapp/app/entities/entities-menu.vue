@@ -24,6 +24,10 @@
       <font-awesome-icon icon="asterisk" />
       <span>Benutzerverwaltung</span>
     </b-dropdown-item>
+    <b-dropdown-item to="/waitinglist">
+      <font-awesome-icon icon="asterisk" />
+      <span>Warteliste</span>
+    </b-dropdown-item>
     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
   </div>
 </template>
