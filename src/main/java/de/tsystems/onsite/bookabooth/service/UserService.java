@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -418,7 +419,7 @@ public class UserService {
      */
     @Transactional
     public UserProfileDTO getUserProfile(String login) {
-        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         boolean isAdmin = SecurityContextHolder.getContext()
             .getAuthentication()
@@ -437,20 +438,21 @@ public class UserService {
                 user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
             );
         } else {
-            BoothUser boothUser = boothUserRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("BoothUser not found"));
+            BoothUser boothUser = boothUserRepository
+                .findById(user.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("BoothUser not found"));
 
             Company company = companyRepository
                 .findById(boothUser.getCompany().getId())
                 .orElseThrow(() -> new RuntimeException("Company not found"));
 
-            Booking booking = bookingRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
-
             CompanyDTO companyDTO = companyMapper.toDto(company);
-            BookingDTO bookingDTO = bookingMapper.toDto(booking);
+            Optional<Booking> booking = bookingRepository.findById(user.getId());
+
             return new UserProfileDTO(
                 userDTO,
                 companyDTO,
-                bookingDTO,
+                booking.map(bookingMapper::toDto).orElse(null),
                 user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
             );
         }
