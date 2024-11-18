@@ -24,6 +24,12 @@
             <span>Startseite</span>
           </span>
         </b-nav-item>
+        <b-nav-item to="/bookabooth" exact>
+          <span>
+            <font-awesome-icon icon="receipt" />
+            <span>Stand buchen</span>
+          </span>
+        </b-nav-item>
         <b-nav-item-dropdown
           right
           id="entity-menu"

@@ -7,6 +7,8 @@ const System = () => import('@/entities/system/system.vue');
 const SystemUpdate = () => import('@/entities/system/system-update.vue');
 const SystemDetails = () => import('@/entities/system/system-details.vue');
 
+const BookABooth = () => import('@/entities/bookabooth/bookabooth.vue');
+
 const Booth = () => import('@/entities/booth/booth.vue');
 const BoothUpdate = () => import('@/entities/booth/booth-update.vue');
 const BoothDetails = () => import('@/entities/booth/booth-details.vue');
@@ -67,6 +69,12 @@ export default {
       path: 'system/:systemId/view',
       name: 'SystemView',
       component: SystemDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'bookabooth',
+      name: 'BookABooth',
+      component: BookABooth,
       meta: { authorities: [Authority.USER] },
     },
     {
