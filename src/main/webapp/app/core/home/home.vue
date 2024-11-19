@@ -31,34 +31,109 @@
         <div>
           <h4 class="mb-2 mt-4">Checkliste und Status:</h4>
           <div class="list-group w-50">
-            <a href="#" class="list-group-item list-group-item-action list-group-item-success">
+            <a
+              href="#"
+              v-bind:class="{
+                'list-group-item': true,
+                'list-group-item-action': true,
+                'list-group-item-success': authenticated,
+                'list-group-item-danger': !authenticated,
+              }"
+            >
               <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Registrierung</h5>
-                <small>erledigt</small>
+                <small class="text-body-secondary" v-text="authenticated ? 'erledigt' : 'offen'"></small>
               </div>
               <p class="mb-1 font-weight-normal">Account wurde erstellt.</p>
             </a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-danger">
+            <a
+              href="#"
+              v-bind:class="{
+                'list-group-item': true,
+                'list-group-item-action': true,
+                'list-group-item-success': verifiedEmail,
+                'list-group-item-danger': !verifiedEmail,
+              }"
+            >
               <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Verifizierung</h5>
-                <small class="text-body-secondary">offen</small>
+                <small class="text-body-secondary" v-text="verifiedEmail ? 'erledigt' : 'offen'"></small>
               </div>
               <p class="mb-1 font-weight-normal">Bestätigen Sie Ihre E-Mail-Adresse.</p>
             </a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-warning">
+            <a
+              href="#"
+              v-bind:class="{
+                'list-group-item': true,
+                'list-group-item-action': true,
+                'list-group-item-success': address && logo && pressContact && companyDescription,
+                'list-group-item-warning': !(address && logo && pressContact && companyDescription),
+              }"
+            >
               <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Kontaktdaten vervollständigt</h5>
-                <small class="text-body-secondary">offen</small>
+                <small
+                  class="text-body-secondary"
+                  v-text="address && logo && pressContact && companyDescription ? 'erledigt' : 'offen'"
+                ></small>
               </div>
-              <p class="list-group-item list-group-item-danger mb-1 font-weight-normal">Rechnungsanschrift</p>
-              <p class="list-group-item list-group-item-warning mb-1 font-weight-normal">Logo des Unternehmens</p>
-              <p class="list-group-item list-group-item-warning mb-1 font-weight-normal">Pressekontakt</p>
-              <p class="list-group-item list-group-item-warning mb-1 font-weight-normal">Firmenkurzbeschreibung</p>
+              <p
+                :class="{
+                  'list-group-item': true,
+                  'list-group-item-danger': !address,
+                  'list-group-item-success': address,
+                  'mb-1': true,
+                  'font-weight-normal': true,
+                }"
+              >
+                Rechnungsanschrift
+              </p>
+              <p
+                :class="{
+                  'list-group-item': true,
+                  'list-group-item-warning': !logo,
+                  'list-group-item-success': logo,
+                  'mb-1': true,
+                  'font-weight-normal': true,
+                }"
+              >
+                Logo des Unternehmens
+              </p>
+              <p
+                :class="{
+                  'list-group-item': true,
+                  'list-group-item-warning': !pressContact,
+                  'list-group-item-success': pressContact,
+                  'mb-1': true,
+                  'font-weight-normal': true,
+                }"
+              >
+                Pressekontakt
+              </p>
+              <p
+                :class="{
+                  'list-group-item': true,
+                  'list-group-item-warning': !companyDescription,
+                  'list-group-item-success': companyDescription,
+                  'mb-1': true,
+                  'font-weight-normal': true,
+                }"
+              >
+                Firmenkurzbeschreibung
+              </p>
             </a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-danger">
+            <a
+              href="#"
+              v-bind:class="{
+                'list-group-item': true,
+                'list-group-item-action': true,
+                'list-group-item-success': concludedBooking,
+                'list-group-item-danger': !concludedBooking,
+              }"
+            >
               <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Buchung getätigt</h5>
-                <small class="text-body-secondary">offen</small>
+                <small class="text-body-secondary" v-text="concludedBooking ? 'erledigt' : 'offen'"></small>
               </div>
               <p class="mb-1 font-weight-normal"></p>
             </a>

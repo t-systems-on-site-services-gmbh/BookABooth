@@ -13,6 +13,12 @@ export default defineComponent({
     const username = inject<ComputedRef<string>>('currentUsername');
 
     const hasAnyAuthorityValues: Ref<any> = ref({});
+    const verifiedEmail = ref(false); // Beispielwert, anpassen nach Bedarf
+    const address = ref(true); // Beispielwert, anpassen nach Bedarf
+    const logo = ref(true); // Beispielwert, anpassen nach Bedarf
+    const pressContact = ref(true); // Beispielwert, anpassen nach Bedarf
+    const companyDescription = ref(true); // Beispielwert, anpassen nach Bedarf
+    const concludedBooking = ref(false); // Beispielwert, anpassen nach Bedarf
 
     const openLogin = () => {
       loginService.openLogin();
@@ -21,6 +27,12 @@ export default defineComponent({
     return {
       authenticated,
       accountService,
+      verifiedEmail,
+      concludedBooking,
+      address,
+      logo,
+      pressContact,
+      companyDescription,
       openLogin,
       username,
       hasAnyAuthorityValues,
