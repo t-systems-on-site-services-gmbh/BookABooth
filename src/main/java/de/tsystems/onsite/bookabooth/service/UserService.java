@@ -51,11 +51,11 @@ public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
+    private final UserRepository userRepository;
+
     private final CompanyService companyService;
 
     private final CompanyRepository companyRepository;
-
-    private final UserRepository userRepository;
 
     private final BoothUserRepository boothUserRepository;
 
@@ -77,7 +77,6 @@ public class UserService {
 
     public UserService(
         CompanyService companyService,
-        CompanyRepository companyRepository1,
         UserRepository userRepository,
         CompanyRepository companyRepository,
         BoothUserRepository boothUserRepository,
@@ -351,6 +350,17 @@ public class UserService {
             });
     }
 
+    // Deletes user and associated company over BoothUser entity
+    @Transactional
+    public void deleteBoothUser(Long boothUserId) {
+        boothUserRepository
+            .findById(boothUserId)
+            .ifPresent(boothUser -> {
+                boothUserRepository.delete(boothUser);
+                log.debug("Deleted BoothUser: {}", boothUser);
+            });
+    }
+
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
@@ -420,27 +430,23 @@ public class UserService {
     }
 
     // Set the booking status to canceled (from prebooked or confirmed)
-    public void cancelBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(booking -> {
-                booking.setStatus(CANCELED);
-                bookingRepository.save(booking);
-                return userProfileDTO;
-            });
+    public void cancelBooking(UserProfileDTO userProfileDTO, Long bookingId) {
+        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        optionalBooking.stream().filter(booking -> booking.getId().equals(bookingId)).findFirst();
+        optionalBooking.ifPresent(booking -> {
+            booking.setStatus(CANCELED);
+            bookingRepository.save(booking);
+        });
     }
 
     // Set the booking status from prebooked to confirmed
-    public void confirmBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(booking -> {
-                booking.setStatus(CONFIRMED);
-                bookingRepository.save(booking);
-                return userProfileDTO;
-            });
+    public void confirmBooking(UserProfileDTO userProfileDTO, Long bookingId) {
+        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        optionalBooking.stream().filter(booking -> booking.getId().equals(bookingId)).findFirst();
+        optionalBooking.ifPresent(booking -> {
+            booking.setStatus(CONFIRMED);
+            bookingRepository.save(booking);
+        });
     }
 
     // Checks the password of the current user
@@ -534,12 +540,16 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Company not found"));
 
             CompanyDTO companyDTO = companyMapper.toDto(company);
-            Optional<Booking> booking = bookingRepository.findById(user.getId());
 
+            Optional<Booking> booking = bookingRepository.findByCompanyId(company.getId());
+            BookingDTO bookingDTO = null;
+            if (booking.isPresent()) {
+                bookingDTO = bookingMapper.toDto(booking.get());
+            }
             return new UserProfileDTO(
                 userDTO,
                 companyDTO,
-                booking.map(bookingMapper::toDto).orElse(null),
+                bookingDTO,
                 user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
             );
         }

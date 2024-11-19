@@ -204,9 +204,9 @@ export default defineComponent({
       });
       return this.hasAnyAuthorityValues[authorities] ?? false;
     },
-    async confirmDelete() {
+    async confirmDelete(id: number) {
       try {
-        const response = await axios.delete('api/account/delete-account', {
+        const response = await axios.delete(`api/account/delete-account/${id}`, {
           data: {
             currentPassword: this.passwordConfirm,
           },

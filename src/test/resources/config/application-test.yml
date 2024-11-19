@@ -19,8 +19,6 @@ logging:
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
     de.tsystems.onsite.bookabooth: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 
 spring:
   devtools:
@@ -57,9 +55,6 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
-  web:
-    resources:
-      static-locations: file:///C:/Projekte/BookABooth/BookABooth/uploads/,classpath:/static/,classpath:/static/content/,classpath:/static/i18n/
 
 server:
   port: 8080
@@ -108,6 +103,4 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# Nicht mergen!
-application:
-  upload-folder: C:/fg/repo/BookABooth/uploads/
+# application:

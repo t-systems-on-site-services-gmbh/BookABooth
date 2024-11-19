@@ -1,6 +1,8 @@
 package de.tsystems.onsite.bookabooth.repository;
 
 import de.tsystems.onsite.bookabooth.domain.Booking;
+import de.tsystems.onsite.bookabooth.domain.Company;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +11,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, Long> {}
+public interface BookingRepository extends JpaRepository<Booking, Long> {
+    Optional<Booking> findByCompanyId(Long companyId);
+}

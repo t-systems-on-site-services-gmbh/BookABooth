@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.Contact;
 import de.tsystems.onsite.bookabooth.domain.enumeration.ContactResponsibility;
 import de.tsystems.onsite.bookabooth.repository.ContactRepository;
@@ -28,17 +27,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integration tests for the {@link ContactResource} REST controller.
  */
-@IntegrationTest
+@SpringBootTest
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser

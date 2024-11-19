@@ -3,6 +3,7 @@ package de.tsystems.onsite.bookabooth.web.rest;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.PersistentToken;
 import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
@@ -182,7 +183,7 @@ public class AccountResource {
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.cancelBooking(userProfileDTO);
+        userService.cancelBooking(userProfileDTO, userProfileDTO.getBooking().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -199,7 +200,7 @@ public class AccountResource {
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.confirmBooking(userProfileDTO);
+        userService.confirmBooking(userProfileDTO, userProfileDTO.getBooking().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -267,13 +268,14 @@ public class AccountResource {
     }
 
     // Checks, if the password of the user matches with the password input and deletes the account
-    @DeleteMapping("/account/delete-account")
-    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO) {
+    // Deletes the boothUser to get the user and the company
+    @DeleteMapping("/account/delete-account/{id}")
+    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO, @PathVariable Long id) {
         if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
-            // Hier später die Delete-Methoden aufrufen
+            userService.deleteBoothUser(id);
             return ResponseEntity.status(HttpStatus.OK).build();
         } else {
             return ResponseEntity.badRequest().build();
