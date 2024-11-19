@@ -3,16 +3,18 @@ package de.tsystems.onsite.bookabooth.web.rest;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.PersistentToken;
 import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
-import de.tsystems.onsite.bookabooth.service.dto.*;
-import de.tsystems.onsite.bookabooth.service.exception.CompanyAlreadyUsedException;
+import de.tsystems.onsite.bookabooth.service.dto.ChecklistDTO;
 import de.tsystems.onsite.bookabooth.service.dto.PasswordChangeDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
+import de.tsystems.onsite.bookabooth.service.exception.CompanyAlreadyUsedException;
 import de.tsystems.onsite.bookabooth.web.rest.errors.*;
 import de.tsystems.onsite.bookabooth.web.rest.vm.KeyAndPasswordVM;
 import de.tsystems.onsite.bookabooth.web.rest.vm.ManagedUserVM;
@@ -322,5 +324,44 @@ public class AccountResource {
             password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
+    }
+
+    /**
+     *
+     * @param authentication authenticate the user
+     * @return the data for the current user
+     */
+    @GetMapping("/checklist")
+    public ResponseEntity<ChecklistDTO> getUserChecklist(Authentication authentication) {
+        ChecklistDTO cl = new ChecklistDTO();
+
+        // todo: delete dummy data after implementation
+        // dummy data
+        cl.setVerified(true);
+        cl.setAddress(true);
+        cl.setLogo(false);
+        cl.setPressContact(false);
+        cl.setCompanyDescription(true);
+        cl.setBookingStatus(BookingStatus.BLOCKED);
+        // dummy data
+
+        // BoothUser bUser = boothUserService.getBoothUserByLogin(authentication.getName());
+
+        // Check if the user has a verified email
+        // cl.set bUser.isVerified()
+
+        // Check if the user has an address (company)
+        // bUser.getCompany().getAddress()
+
+        // Check if the user has a logo
+
+        // Check if the user has a press contact
+
+        // Check if the user has a company description
+
+        // Check if the user has concluded a booking
+
+        // Return the checklist
+        return ResponseEntity.ok(cl);
     }
 }
