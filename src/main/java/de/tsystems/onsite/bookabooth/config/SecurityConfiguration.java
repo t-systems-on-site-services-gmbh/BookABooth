@@ -49,11 +49,12 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
             .cors(withDefaults())
-            .csrf(csrf ->
-                csrf
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    // See https://stackoverflow.com/q/74447118/65681
-                    .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+            .csrf(
+                csrf ->
+                    csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+            )
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
             .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
             .headers(
@@ -74,26 +75,27 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(
                 authz ->
                     // prettier-ignore
-                authz
-                    .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
-                    .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
-                    .requestMatchers(mvc.pattern("/assets/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/content/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/uploads/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/authenticate")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/register")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/activate")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-                    .requestMatchers(mvc.pattern("/api/**")).authenticated()
-                    .requestMatchers(mvc.pattern("/v3/api-docs/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-                    .requestMatchers(mvc.pattern("/management/health")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/info")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/**")).hasAuthority(AuthoritiesConstants.ADMIN)
+                    authz
+                        .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
+                        .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
+                        .requestMatchers(mvc.pattern("/assets/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/content/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/uploads/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/authenticate")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/register")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/activate")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/ausstellerliste")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
+                        .requestMatchers(mvc.pattern("/api/**")).authenticated()
+                        .requestMatchers(mvc.pattern("/v3/api-docs/**")).hasAuthority(AuthoritiesConstants.ADMIN)
+                        .requestMatchers(mvc.pattern("/management/health")).permitAll()
+                        .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/management/info")).permitAll()
+                        .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
+                        .requestMatchers(mvc.pattern("/management/**")).hasAuthority(AuthoritiesConstants.ADMIN)
             )
             .rememberMe(
                 rememberMe ->

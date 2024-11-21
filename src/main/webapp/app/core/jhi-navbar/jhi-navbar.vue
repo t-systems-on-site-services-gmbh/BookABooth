@@ -24,6 +24,13 @@
             <span>Startseite</span>
           </span>
         </b-nav-item>
+        <b-nav-item to="/ausstellerliste" exact>
+          <span>
+            <font-awesome-icon icon="building" />
+            <span>Ausstellerliste</span>
+          </span>
+        </b-nav-item>
+
         <b-nav-item-dropdown
           right
           id="entity-menu"
