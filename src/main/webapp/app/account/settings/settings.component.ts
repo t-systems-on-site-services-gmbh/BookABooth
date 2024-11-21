@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, defineComponent, inject, ref, type Ref } from 'vue';
+import { computed, type ComputedRef, defineComponent, inject, onMounted, ref, type Ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { email, maxLength, minLength, required, requiredUnless } from '@vuelidate/validators';
 import axios from 'axios';
@@ -37,6 +37,8 @@ export default defineComponent({
     const deleteError: Ref<boolean> = ref(false);
     const hasAnyAuthorityValues: Ref<any> = ref({});
     const componentKey = ref(new Date().getTime());
+    const adminCount = ref<number>(0);
+    const onlyOneAdmin = ref<boolean>(true);
 
     const onExhibitorList = computed(() => {
       return exhibitorList.value ? 'Sie befinden sich in der Ausstellerliste' : 'Sie befinden sich nicht in der Ausstellerliste';
@@ -47,6 +49,24 @@ export default defineComponent({
         return authorities.value.includes('ROLE_ADMIN');
       }
       return false;
+    });
+
+    const canDeleteAdmin = () => {
+      onlyOneAdmin.value = adminCount.value <= 1;
+    };
+
+    const fetchAdminCount = async () => {
+      try {
+        const response = await axios.get('api/authorities/countAuthorities');
+        adminCount.value = response.data;
+        canDeleteAdmin();
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Admin-Anzahl:', error);
+      }
+    };
+
+    onMounted(() => {
+      fetchAdminCount();
     });
 
     const validations = {
@@ -120,6 +140,8 @@ export default defineComponent({
       hasAnyAuthorityValues,
       accountService,
       componentKey,
+      adminCount,
+      onlyOneAdmin,
     };
   },
   computed: {

@@ -1,18 +1,14 @@
 package de.tsystems.onsite.bookabooth.web.rest.onsite;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import de.tsystems.onsite.bookabooth.domain.BoothUser;
-import de.tsystems.onsite.bookabooth.domain.Company;
-import de.tsystems.onsite.bookabooth.domain.User;
-import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
-import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
-import de.tsystems.onsite.bookabooth.repository.UserRepository;
+import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.web.rest.AccountResource;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +46,19 @@ public class AccountResourceTest {
     private BoothUserRepository boothUserRepository;
 
     @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private BoothRepository boothRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private User testUser;
     private Company testCompany;
     private BoothUser testBoothUser;
+    private Booking testBooking;
+    private Booth testBooth;
 
     @BeforeEach
     public void setup() {
@@ -73,42 +77,75 @@ public class AccountResourceTest {
         testBoothUser.setUser(testUser);
         testBoothUser.setCompany(testCompany);
         boothUserRepository.saveAndFlush(testBoothUser);
+
+        testBooth = new Booth(); // Booth muss vorhanden sein, damit kein Fehler auftritt
+        testBooth.setTitle("testBooth");
+        testBooth.setAvailable(true);
+        boothRepository.saveAndFlush(testBooth);
+
+        testBooking = new Booking();
+        testBooking.setCompany(testCompany);
+        testBooking.setBooth(testBooth);
+        bookingRepository.saveAndFlush(testBooking);
     }
 
     @Test
     @Transactional
-    public void deletesUserBoothUserAndCompany() {
+    @WithMockUser(authorities = "ROLE_USER")
+    public void deleteUserCompanyBookingAndBoothUserAsUser() {
         // Verifizieren, dass Entities gespeichert wurden
-        assertNotNull(testBoothUser.getId());
-        assertNotNull(testUser.getId());
-        assertNotNull(testCompany.getId());
+        Assertions.assertNotNull(testBoothUser.getId());
+        Assertions.assertNotNull(testUser.getId());
+        Assertions.assertNotNull(testCompany.getId());
+        Assertions.assertNotNull(testBooking.getId());
 
-        // Löschen des BoothUsers
-        userService.deleteBoothUser(testBoothUser.getId());
+        // Löschen des Users, mitsamt der Dependencies
+        userService.deleteAccount(testUser.getId());
 
-        // Verifizieren, dass BoothUser, User und Company gelöscht wurden
-        assertFalse(boothUserRepository.findById(testBoothUser.getId()).isPresent());
-        assertFalse(userRepository.findById(testUser.getId()).isPresent());
-        assertFalse(companyRepository.findById(testCompany.getId()).isPresent());
+        // Verifizieren, dass User, Company, BoothUser und Booking gelöscht wurden
+        Assertions.assertFalse(boothUserRepository.findById(testBoothUser.getId()).isPresent());
+        Assertions.assertFalse(userRepository.findById(testUser.getId()).isPresent());
+        Assertions.assertFalse(companyRepository.findById(testCompany.getId()).isPresent());
+        Assertions.assertFalse(bookingRepository.findById(testBooking.getId()).isPresent());
     }
 
     @Test
     @Transactional
-    @WithMockUser(username = "testUser", password = "user", authorities = "ROLE_USER")
-    public void deleteBoothUserOverAPI() throws Exception {
+    @WithMockUser(password = "user", authorities = "ROLE_USER")
+    public void deleteOverApiAndSucceed() throws Exception {
         // JSON für die Anfrage
-        String requestJson = "{currentPassword: \"user\"}";
+        String requestJson = "{\"currentPassword\": \"user\"}";
 
         // API-Endpunkt aufrufen
         mockMvc
             .perform(
-                delete("/api/account/delete-account/" + testBoothUser.getId()).contentType(MediaType.APPLICATION_JSON).content(requestJson)
+                delete("/api/account/delete-account/" + testUser.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestJson)
+                    .with(csrf())
             )
-            .andExpect(status().isNoContent());
+            .andExpect(status().isOk());
 
         // Überprüfen, dass Einträge geleert wurden
-        assertFalse(boothUserRepository.findById(testBoothUser.getId()).isPresent());
-        assertFalse(userRepository.findById(testUser.getId()).isPresent());
-        assertFalse(companyRepository.findById(testCompany.getId()).isPresent());
+        Assertions.assertFalse(boothUserRepository.findById(testBoothUser.getId()).isPresent());
+        Assertions.assertFalse(userRepository.findById(testUser.getId()).isPresent());
+        Assertions.assertFalse(companyRepository.findById(testCompany.getId()).isPresent());
+        Assertions.assertFalse(bookingRepository.findById(testBooking.getId()).isPresent());
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(password = "user", authorities = "ROLE_ADMIN")
+    public void deleteOnlyAdminOverApiAndFail() throws Exception {
+        String requestJson = "{\"currentPassword\": \"user\"}";
+
+        mockMvc
+            .perform(
+                delete("/api/account/delete-account/" + testUser.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestJson)
+                    .with(csrf())
+            )
+            .andExpect(status().isInternalServerError()); // Der einzige Admin kann nicht gelöscht werden
     }
 }

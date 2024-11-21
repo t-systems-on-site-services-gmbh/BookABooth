@@ -350,15 +350,51 @@ public class UserService {
             });
     }
 
-    // Deletes user and associated company over BoothUser entity
+    // Deletes an account over boothUser, also goes over the dependencies
     @Transactional
-    public void deleteBoothUser(Long boothUserId) {
-        boothUserRepository
-            .findById(boothUserId)
-            .ifPresent(boothUser -> {
-                boothUserRepository.delete(boothUser);
-                log.debug("Deleted BoothUser: {}", boothUser);
+    public void deleteAccount(Long userId) {
+        log.debug("Request to delete Account with userId: {}", userId);
+
+        if (isAdmin()) {
+            long adminCount = userRepository.countAdmins();
+            if (adminCount <= 1) {
+                throw new IllegalStateException("Cannot delete the last admin user");
+            }
+            log.debug("User is an admin, only deleting user");
+            userRepository.findById(userId).ifPresent(userRepository::delete);
+        }
+        userRepository
+            .findById(userId)
+            .ifPresent(user -> {
+                Optional<BoothUser> boothUser = boothUserRepository.findByUserId(userId);
+
+                if (boothUser.isPresent()) {
+                    Long boothUserId = boothUser.get().getId();
+                    Long companyId = boothUser.get().getCompany().getId();
+
+                    removeDependencies(userId, companyId);
+
+                    log.debug("Removing boothUser with ID: {}", boothUserId);
+                    boothUserRepository.delete(boothUser.get());
+                } else {
+                    log.debug("No boothUser found for User ID: {}", userId);
+                }
             });
+    }
+
+    private void removeDependencies(Long userId, Long companyId) {
+        log.debug("Removing dependecies for user: {} and company: {}", userId, companyId);
+        bookingRepository
+            .findByCompanyId(companyId)
+            .ifPresent(booking -> {
+                log.debug("Removing booking with ID: {}", booking.getId());
+                bookingRepository.delete(booking);
+            });
+        log.debug("Removing user with ID: {}", userId);
+        userRepository.deleteById(userId);
+
+        log.debug("Removing company with ID: {}", companyId);
+        companyRepository.deleteById(companyId);
     }
 
     /**
@@ -393,19 +429,13 @@ public class UserService {
         if (optionalUser.isEmpty()) {
             throw new AccountNotFoundException("User could not be found");
         }
-        boolean isAdmin = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
 
         User user = optionalUser.get();
         this.clearUserCaches(user);
         userMapper.profileDTOtoUserEntity(userProfileDTO, user);
         userRepository.save(user);
 
-        if (!isAdmin && userProfileDTO.getCompany() != null) {
+        if (!isAdmin() && userProfileDTO.getCompany() != null) {
             Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
             if (optionalCompany.isPresent()) {
                 Company company = optionalCompany.get();
@@ -415,6 +445,15 @@ public class UserService {
         }
         this.clearUserCaches(user);
         log.debug("Changed Information for User: {}", user);
+    }
+
+    public static boolean isAdmin() {
+        return SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
     }
 
     // Removes the user from the waiting list
@@ -514,16 +553,9 @@ public class UserService {
     public UserProfileDTO getUserProfile(String login) {
         User user = userRepository.findOneByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        boolean isAdmin = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
-
         UserDTO userDTO = userMapper.userToUserDTO(user);
 
-        if (isAdmin) {
+        if (isAdmin()) {
             return new UserProfileDTO(
                 userDTO,
                 null,
@@ -534,6 +566,9 @@ public class UserService {
             BoothUser boothUser = boothUserRepository
                 .findById(user.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("BoothUser not found"));
+            BoothUser boothUser = boothUserRepository
+                .findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("BoothUser not found"));
 
             Company company = companyRepository
                 .findById(boothUser.getCompany().getId())

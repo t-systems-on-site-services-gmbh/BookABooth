@@ -1,9 +1,7 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
-import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.PersistentToken;
 import de.tsystems.onsite.bookabooth.domain.User;
-import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
@@ -267,15 +265,19 @@ public class AccountResource {
             );
     }
 
-    // Checks, if the password of the user matches with the password input and deletes the account
-    // Deletes the boothUser to get the user and the company
+    /**
+     *
+     * @param passwordChangeDTO is used to check the password in the db with password input
+     * @param id is given in the url to identify the user
+     * @return bad request, if the password is incorrect, otherwise it returns ok
+     */
     @DeleteMapping("/account/delete-account/{id}")
     public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO, @PathVariable Long id) {
         if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
-            userService.deleteBoothUser(id);
+            userService.deleteAccount(id);
             return ResponseEntity.status(HttpStatus.OK).build();
         } else {
             return ResponseEntity.badRequest().build();

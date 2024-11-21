@@ -19,4 +19,5 @@ public interface BoothUserRepository extends JpaRepository<BoothUser, Long> {
     List<BoothUser> findByCompanyName(String companyName);
 
     Optional<BoothUser> findByUser(User user);
+    Optional<BoothUser> findByUserId(Long userId);
 }

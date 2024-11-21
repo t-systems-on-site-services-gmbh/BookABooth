@@ -342,12 +342,19 @@
           Solange Sie eine bestätigte Standbuchung haben, können Sie Ihr Konto nicht löschen. Stonieren Sie Ihre Standbuchung, falls Sie Ihr
           Konto löschen wollen.
         </p>
+        <p v-else-if="hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin">
+          Sie sind der einzige Admin im System. Es ist nicht möglich, den einzigen Admin zu löschen.
+        </p>
         <p v-else>Hier können Sie Ihr Konto löschen. Wenn Sie Ihr Konto löschen, kann es nicht wiederhergestellt werden.</p>
         <button
           type="button"
           class="btn btn-danger"
           id="show-btn"
-          :disabled="settingsAccount?.booking?.status === 'PREBOOKED' || settingsAccount?.booking?.status === 'CONFIRMED'"
+          :disabled="
+            settingsAccount?.booking?.status === 'PREBOOKED' ||
+            settingsAccount?.booking?.status === 'CONFIRMED' ||
+            (hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin)
+          "
           @click="showModal"
         >
           Konto löschen
