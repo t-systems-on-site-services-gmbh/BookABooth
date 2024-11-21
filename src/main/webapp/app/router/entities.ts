@@ -40,7 +40,6 @@ const ContactUpdate = () => import('@/entities/contact/contact-update.vue');
 const ContactDetails = () => import('@/entities/contact/contact-details.vue');
 
 const Waitinglist = () => import('@/entities/waitinglist/waitinglist.vue');
-const WaitinglistUpdate = () => import('@/entities/waitinglist/waitinglist-update.vue');
 // jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
 
 export default {
@@ -267,18 +266,6 @@ export default {
       path: 'Waitinglist',
       name: 'Waitinglist',
       component: Waitinglist,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'waitinglist/new',
-      name: 'WaitinglistCreate',
-      component: WaitinglistUpdate,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'waitinglist/:waitinglist/edit',
-      name: 'WaitinglistEdit',
-      component: WaitinglistUpdate,
       meta: { authorities: [Authority.USER] },
     },
 

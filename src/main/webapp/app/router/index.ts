@@ -1,6 +1,7 @@
 import { createRouter as createVueRouter, createWebHistory } from 'vue-router';
 
 const Home = () => import('@/core/home/home.vue');
+const Ausstellerliste = () => import('@/core/ausstellerliste/ausstellerliste.vue');
 const Error = () => import('@/core/error/error.vue');
 import account from '@/router/account';
 import admin from '@/router/admin';
@@ -15,6 +16,11 @@ export const createRouter = () =>
         path: '/',
         name: 'Home',
         component: Home,
+      },
+      {
+        path: '/ausstellerliste',
+        name: 'Ausstellerliste',
+        component: Ausstellerliste,
       },
       {
         path: '/forbidden',
