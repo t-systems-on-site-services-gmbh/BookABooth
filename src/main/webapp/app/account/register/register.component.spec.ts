@@ -6,7 +6,7 @@ import sinon from 'sinon';
 
 import LoginService from '../login.service';
 import Register from './register.vue';
-import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from '@/constants';
+import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE, COMPANY_NAME_ALREADY_USED_TYPE, TERMS_NOT_ACCEPTED_TYPE } from '@/constants';
 
 type RegisterComponentType = InstanceType<typeof Register>;
 
@@ -23,6 +23,7 @@ describe('Register Component', () => {
     langKey: 'de',
     login: 'jhi',
     password: 'jhipster',
+    companyName: 'Test Company',
   };
 
   beforeEach(() => {
@@ -51,6 +52,7 @@ describe('Register Component', () => {
     expect(register.registerAccount.login).toBe(undefined);
     expect(register.registerAccount.password).toBe(undefined);
     expect(register.registerAccount.email).toBe(undefined);
+    expect(register.registerAccount.companyName).toBe(undefined);
   });
 
   it('should open login modal when asked to', () => {
@@ -71,12 +73,14 @@ describe('Register Component', () => {
         langKey: 'de',
         login: 'jhi',
         password: 'jhipster',
+        companyName: 'Test Company',
       }),
     ).toBeTruthy();
     expect(register.success).toBe(true);
     expect(register.error).toBe(null);
     expect(register.errorEmailExists).toBe(null);
     expect(register.errorUserExists).toBe(null);
+    expect(register.errorCompanyNameExists).toBe(null);
   });
 
   it('should register when password match but throw error when login already exist', async () => {
@@ -95,6 +99,7 @@ describe('Register Component', () => {
     expect(register.error).toBe(null);
     expect(register.errorEmailExists).toBe(null);
     expect(register.errorUserExists).toBe('ERROR');
+    expect(register.errorCompanyNameExists).toBe(null);
   });
 
   it('should register when password match but throw error when email already used', async () => {
@@ -113,6 +118,46 @@ describe('Register Component', () => {
     expect(register.error).toBe(null);
     expect(register.errorEmailExists).toBe('ERROR');
     expect(register.errorUserExists).toBe(null);
+    expect(register.errorCompanyNameExists).toBe(null);
+  });
+
+  it('should register when password match but throw error when companyName already used', async () => {
+    const error = { response: { status: 400, data: { type: COMPANY_NAME_ALREADY_USED_TYPE } } };
+    axiosStub.post.rejects(error);
+    register.registerAccount = filledRegisterAccount;
+    register.confirmPassword = filledRegisterAccount.password;
+    register.register();
+    await register.$nextTick();
+
+    expect(
+      axiosStub.post.calledWith('api/register', { email: 'jhi@pster.net', langKey: 'de', login: 'jhi', password: 'jhipster' }),
+    ).toBeTruthy();
+    await register.$nextTick();
+    expect(register.success).toBe(null);
+    expect(register.error).toBe(null);
+    expect(register.errorEmailExists).toBe(null);
+    expect(register.errorUserExists).toBe(null);
+    expect(register.errorCompanyNameExists).toBe('ERROR');
+  });
+
+  it('should register when password match but throw error when terms not accepted', async () => {
+    const error = { response: { status: 400, data: { type: TERMS_NOT_ACCEPTED_TYPE } } };
+    axiosStub.post.rejects(error);
+    register.registerAccount = filledRegisterAccount;
+    register.confirmPassword = filledRegisterAccount.password;
+    register.register();
+    await register.$nextTick();
+
+    expect(
+      axiosStub.post.calledWith('api/register', { email: 'jhi@pster.net', langKey: 'de', login: 'jhi', password: 'jhipster' }),
+    ).toBeTruthy();
+    await register.$nextTick();
+    expect(register.success).toBe(null);
+    expect(register.error).toBe(null);
+    expect(register.errorEmailExists).toBe(null);
+    expect(register.errorUserExists).toBe(null);
+    expect(register.errorCompanyNameExists).toBe(null);
+    expect(register.errorTermsNotAcceptedExits).toBe('ERROR');
   });
 
   it('should register when password match but throw error', async () => {
@@ -130,6 +175,7 @@ describe('Register Component', () => {
     expect(register.success).toBe(null);
     expect(register.errorEmailExists).toBe(null);
     expect(register.errorUserExists).toBe(null);
+    expect(register.errorCompanyNameExists).toBe(null);
     expect(register.error).toBe('ERROR');
   });
 });

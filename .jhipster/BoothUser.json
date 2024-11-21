@@ -1,6 +1,9 @@
 {
   "annotations": {
-    "changelogDate": "20240407201618"
+    "changelogDate": "20240407201618",
+    "dto": "mapstruct",
+    "lombok": true,
+    "service": "serviceClass"
   },
   "applications": "*",
   "fields": [
@@ -36,10 +39,10 @@
   "relationships": [
     {
       "options": {
+        "id": true,
         "onDelete": "CASCADE"
       },
       "otherEntityName": "user",
-      "otherEntityRelationshipName": "boothUser",
       "relationshipName": "user",
       "relationshipSide": "left",
       "relationshipType": "one-to-one",

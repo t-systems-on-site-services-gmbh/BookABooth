@@ -36,6 +36,12 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 256)
     private String imageUrl;
 
+    @Size(max = 256)
+    private String companyName;
+
+    @AssertTrue(message = "must be accepted")
+    private boolean termsAccepted = false;
+
     private boolean activated = false;
 
     @Size(min = 2, max = 10)
@@ -115,6 +121,22 @@ public class AdminUserDTO implements Serializable {
         return imageUrl;
     }
 
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public boolean isTermsAccepted() {
+        return termsAccepted;
+    }
+
+    public void setTermsAccepted(boolean termsAccepted) {
+        this.termsAccepted = termsAccepted;
+    }
+
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
@@ -184,6 +206,8 @@ public class AdminUserDTO implements Serializable {
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
+            ", company='" + companyName + '\'' +
+            ", termsAccepted='" + termsAccepted + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
             ", createdBy=" + createdBy +

@@ -2,6 +2,7 @@ package de.tsystems.onsite.bookabooth.web.rest.errors;
 
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
+import de.tsystems.onsite.bookabooth.service.exception.UsernameAlreadyUsedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Arrays;
@@ -81,14 +82,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private ProblemDetailWithCause getProblemDetailWithCause(Throwable ex) {
+        if (ex instanceof UsernameAlreadyUsedException) return (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
         if (
-            ex instanceof de.tsystems.onsite.bookabooth.service.UsernameAlreadyUsedException
-        ) return (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
-        if (
-            ex instanceof de.tsystems.onsite.bookabooth.service.EmailAlreadyUsedException
+            ex instanceof de.tsystems.onsite.bookabooth.service.exception.EmailAlreadyUsedException
         ) return (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
         if (
-            ex instanceof de.tsystems.onsite.bookabooth.service.InvalidPasswordException
+            ex instanceof de.tsystems.onsite.bookabooth.service.exception.InvalidPasswordException
         ) return (ProblemDetailWithCause) new InvalidPasswordException().getBody();
 
         if (
