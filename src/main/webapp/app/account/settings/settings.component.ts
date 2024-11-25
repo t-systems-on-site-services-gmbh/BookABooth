@@ -195,14 +195,24 @@ export default defineComponent({
             .uploadImage(this.settingsAccount.company.id, contentBase64)
             .then(param => {
               this.isSaving = false;
-              //this.alertService.showInfo('Unternehmenslogo aktualisiert'); Führt aktuell zu Problemen
+              this.$bvToast.toast('Unternehmenslogo aktualisiert', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+                solid: true,
+                autoHideDelay: 5000,
+              });
               this.settingsAccount.company.logo = param.logo;
               this.forceRender();
             })
             .catch(error => {
               this.isSaving = false;
               console.log(error.response);
-              this.alertService.showHttpError(error.response);
+              this.$bvToast.toast(error.response, {
+                toaster: 'b-toaster-top-center',
+                variant: 'danger',
+                solid: true,
+                autoHideDelay: 5000,
+              });
             });
         };
         reader.readAsBinaryString(file);
@@ -239,7 +249,10 @@ export default defineComponent({
         if (response.status === 200) {
           this.deleteError = false;
           console.log('Account wurde gelöscht');
-          this.hideModal();
+          sessionStorage.setItem('accountDeleted', 'true');
+          this.$router.push({ path: '/' }).then(() => {
+            this.$router.go(0);
+          });
         }
       } catch (ex) {
         this.deleteError = true;
