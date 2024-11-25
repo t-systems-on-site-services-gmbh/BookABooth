@@ -14,12 +14,17 @@ export default defineComponent({
         companies.value = data.map(company => ({
           ...company,
           booth: Array.isArray(company.boothTitles) ? company.boothTitles.join(', ') : company.boothTitles || '',
+          collapsed: true,
         }));
       } catch (error) {
         console.error('Fehler beim Laden der Daten:', error);
       } finally {
         loading.value = false;
       }
+    };
+
+    const toggleCollapse = (company: { collapsed: boolean }) => {
+      company.collapsed = !company.collapsed;
     };
 
     onMounted(() => {
@@ -29,6 +34,7 @@ export default defineComponent({
     return {
       companies,
       loading,
+      toggleCollapse,
     };
   },
 });
