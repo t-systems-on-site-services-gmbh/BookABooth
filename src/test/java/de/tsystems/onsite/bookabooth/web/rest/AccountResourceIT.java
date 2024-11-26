@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.PersistentToken;
 import de.tsystems.onsite.bookabooth.domain.User;
@@ -44,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @AutoConfigureMockMvc
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("mytest")
 class AccountResourceIT {
 
     static final String TEST_USER_LOGIN = "test";

@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.System;
 import de.tsystems.onsite.bookabooth.repository.SystemRepository;
 import de.tsystems.onsite.bookabooth.service.dto.SystemDTO;
@@ -33,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("mytest")
 @WithMockUser
 class SystemResourceIT {
 

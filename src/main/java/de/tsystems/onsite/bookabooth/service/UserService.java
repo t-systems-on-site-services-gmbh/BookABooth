@@ -356,45 +356,39 @@ public class UserService {
         log.debug("Request to delete Account with userId: {}", userId);
 
         if (isAdmin()) {
-            long adminCount = userRepository.countAdmins();
+            int adminCount = userRepository.countAdmins();
             if (adminCount <= 1) {
                 throw new IllegalStateException("Cannot delete the last admin user");
             }
-            log.debug("User is an admin, only deleting user");
+            log.debug("User is an admin, only deleting user: {}", userId);
             userRepository.findById(userId).ifPresent(userRepository::delete);
         }
         userRepository
             .findById(userId)
             .ifPresent(user -> {
-                Optional<BoothUser> boothUser = boothUserRepository.findByUserId(userId);
+                Optional<BoothUser> boothUser = boothUserRepository.findById(userId);
 
                 if (boothUser.isPresent()) {
-                    Long boothUserId = boothUser.get().getId();
                     Long companyId = boothUser.get().getCompany().getId();
 
-                    removeDependencies(userId, companyId);
+                    log.debug("Removing boothUser with ID: {}", userId);
+                    boothUserRepository.deleteById(userId);
 
-                    log.debug("Removing boothUser with ID: {}", boothUserId);
-                    boothUserRepository.delete(boothUser.get());
+                    bookingRepository
+                        .findByCompanyId(companyId)
+                        .ifPresent(booking -> {
+                            log.debug("Removing booking with ID: {}", booking.getId());
+                            bookingRepository.delete(booking);
+                        });
+                    log.debug("Removing user with ID: {}", userId);
+                    userRepository.deleteById(userId);
+
+                    log.debug("Removing company with ID: {}", companyId);
+                    companyRepository.deleteById(companyId);
                 } else {
-                    log.debug("No boothUser found for User ID: {}", userId);
+                    log.debug("No boothUser found with User ID: {}", userId);
                 }
             });
-    }
-
-    private void removeDependencies(Long userId, Long companyId) {
-        log.debug("Removing dependecies for user: {} and company: {}", userId, companyId);
-        bookingRepository
-            .findByCompanyId(companyId)
-            .ifPresent(booking -> {
-                log.debug("Removing booking with ID: {}", booking.getId());
-                bookingRepository.delete(booking);
-            });
-        log.debug("Removing user with ID: {}", userId);
-        userRepository.deleteById(userId);
-
-        log.debug("Removing company with ID: {}", companyId);
-        companyRepository.deleteById(companyId);
     }
 
     /**
@@ -566,9 +560,6 @@ public class UserService {
             BoothUser boothUser = boothUserRepository
                 .findById(user.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("BoothUser not found"));
-            BoothUser boothUser = boothUserRepository
-                .findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("BoothUser not found"));
 
             Company company = companyRepository
                 .findById(boothUser.getCompany().getId())

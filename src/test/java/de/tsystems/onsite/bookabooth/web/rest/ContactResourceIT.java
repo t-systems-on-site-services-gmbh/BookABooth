@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link ContactResource} REST controller.
  */
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("mytest")
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser

@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("mytest")
 @WithMockUser
 class CompanyResourceIT {
 

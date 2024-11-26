@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
+import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.PersistentToken;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
@@ -9,9 +10,9 @@ import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.*;
-import de.tsystems.onsite.bookabooth.service.exception.CompanyAlreadyUsedException;
 import de.tsystems.onsite.bookabooth.service.dto.PasswordChangeDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
+import de.tsystems.onsite.bookabooth.service.exception.CompanyAlreadyUsedException;
 import de.tsystems.onsite.bookabooth.web.rest.errors.*;
 import de.tsystems.onsite.bookabooth.web.rest.vm.KeyAndPasswordVM;
 import de.tsystems.onsite.bookabooth.web.rest.vm.ManagedUserVM;

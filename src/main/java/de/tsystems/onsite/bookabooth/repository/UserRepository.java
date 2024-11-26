@@ -38,5 +38,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
 
     @Query("SELECT COUNT(u) FROM User u JOIN u.authorities a WHERE a.name = 'ROLE_ADMIN'")
-    long countAdmins();
+    int countAdmins();
 }

@@ -104,7 +104,7 @@ public class AuthorityResource {
     }
 
     @GetMapping("/countAuthorities")
-    public long countAdmins() {
+    public int countAdmins() {
         return userRepository.countAdmins();
     }
 }
