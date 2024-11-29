@@ -150,12 +150,4 @@ public class CompanyDTO implements Serializable {
             ", contacts=" + getContacts() +
             "}";
     }
-
-    public boolean isWaitingList() {
-        return waitingList != null && waitingList;
-    }
-
-    public String getEmail() {
-        return mail;
-    }
 }

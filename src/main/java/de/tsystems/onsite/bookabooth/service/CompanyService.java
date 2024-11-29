@@ -109,22 +109,6 @@ public class CompanyService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Company : {}", id);
-
-        removeDependencies(id);
-
         companyRepository.deleteById(id);
-    }
-
-    /**
-     * Entfernt alle Abhängigkeiten des Unternehmens (z. B. Buchungen).
-     *
-     * @param companyId Die ID des Unternehmens.
-     */
-    private void removeDependencies(Long companyId) {
-        log.debug("Removing dependencies for Company ID: {}", companyId);
-
-        bookingRepository.deleteByCompanyId(companyId);
-
-        log.debug("Removed all bookings associated with Company ID: {}", companyId);
     }
 }
