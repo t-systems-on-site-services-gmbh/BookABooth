@@ -11,9 +11,4 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, Long> {
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM Booking b WHERE b.company.id = :companyId")
-    void deleteByCompanyId(@Param("companyId") Long companyId);
-}
+public interface BookingRepository extends JpaRepository<Booking, Long> {}

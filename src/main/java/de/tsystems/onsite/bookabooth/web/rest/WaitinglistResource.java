@@ -2,10 +2,12 @@ package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.CompanyService;
 import de.tsystems.onsite.bookabooth.service.MailService;
+import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
-import java.util.Comparator;
+import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -23,25 +25,49 @@ public class WaitinglistResource {
     private final Logger log = LoggerFactory.getLogger(WaitinglistResource.class);
 
     private final CompanyService companyService;
+    private final CompanyRepository companyRepository;
     private final MailService mailService;
+    private final UserService userService;
 
-    public WaitinglistResource(CompanyService companyService, MailService mailService) {
+    public WaitinglistResource(
+        CompanyService companyService,
+        CompanyRepository companyRepository,
+        MailService mailService,
+        UserService userService
+    ) {
         this.companyService = companyService;
+        this.companyRepository = companyRepository;
         this.mailService = mailService;
+        this.userService = userService;
     }
 
-    /**
-     * {@code GET /waitinglist} : get all companies on the waiting list.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of companies in body.
-     */
     @GetMapping("")
     public List<CompanyDTO> getAllWaitingListCompanies() {
         log.debug("REST request to get all companies on the waiting list");
+
         return companyService
             .findAll()
             .stream()
-            .sorted(Comparator.comparing(CompanyDTO::isWaitingList).reversed()) // Sortiert nach isWaitingList
+            .peek(company -> {
+                Long companyId = company.getId();
+                List<Long> userIds = userService.findUsersIdByCompanyId(companyId);
+
+                if (!userIds.isEmpty()) {
+                    List<String> emails = userIds
+                        .stream()
+                        .map(userService::findOne)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .map(User::getEmail)
+                        .toList();
+
+                    company.setMail(String.join(", ", emails));
+                } else {
+                    company.setMail("Keine Verbindung zwischen Firma und Benutzern");
+                    log.warn("No user IDs found for company ID: {}", companyId);
+                }
+            })
+            .sorted((c1, c2) -> Boolean.compare(c2.getWaitingList(), c1.getWaitingList()))
             .toList();
     }
 
@@ -49,49 +75,65 @@ public class WaitinglistResource {
     public ResponseEntity<Void> sendEmailsToWaitingList() {
         log.debug("REST request to send emails to companies on the waiting list");
 
-        List<CompanyDTO> waitingListCompanies = companyService.findAll().stream().filter(CompanyDTO::isWaitingList).toList();
+        List<CompanyDTO> waitingListCompanies = companyService.findAll().stream().filter(CompanyDTO::getWaitingList).toList();
 
         if (waitingListCompanies.isEmpty()) {
             log.info("No companies on the waiting list.");
             return ResponseEntity.ok().build();
         }
 
-        for (CompanyDTO company : waitingListCompanies) {
-            String email = company.getEmail();
+        waitingListCompanies.forEach(company -> {
+            Long companyId = company.getId();
             String companyName = company.getName();
+            List<Long> userIds = userService.findUsersIdByCompanyId(companyId);
 
-            User user = new User();
-            user.setLangKey(Constants.DEFAULT_LANGUAGE);
-            user.setLogin(companyName);
-            user.setEmail(email);
+            if (!userIds.isEmpty()) {
+                userIds.forEach(userId -> {
+                    Optional<User> userOptional = userService.findOne(userId);
+                    if (userOptional.isPresent()) {
+                        User user = userOptional.get();
+                        String userEmail = user.getEmail();
 
-            // Send the waiting list email
-            mailService.sendWaitingListEmail(user);
-        }
+                        user.setLangKey(Constants.DEFAULT_LANGUAGE);
+                        user.setLogin(companyName);
+
+                        mailService.sendWaitingListEmail(user);
+                    } else {
+                        log.warn("No user found for user ID: {}", userId);
+                    }
+                });
+            } else {
+                log.warn("No user IDs found for company ID: {}", companyId);
+            }
+        });
 
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateWaitingListStatus(@PathVariable Long id, @RequestBody CompanyDTO statusDTO) {
-        if (statusDTO == null || statusDTO.getWaitingList() == null) {
-            log.error("Received null or invalid status in the request body for ID: {}", id);
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Void> partialUpdateWaitingListStatus(@PathVariable Long id, @RequestBody CompanyDTO companyDTO) {
+        log.debug("REST request to partially update the status of company with ID: {}", id);
+
+        if (companyDTO == null || companyDTO.getWaitingList() == null) {
+            log.error("Received null or invalid CompanyDTO in the request body for ID: {}", id);
+            throw new BadRequestAlertException("Invalid CompanyDTO", "company", "invalidData");
+        }
+        if (companyDTO.getId() == null) {
+            log.debug("CompanyDTO ID is null, setting it to the path variable ID: {}", id);
+            companyDTO.setId(id);
         }
 
-        Boolean parsedStatus = statusDTO.getWaitingList();
-        log.debug("Parsed status (true/false): {}", parsedStatus);
+        if (!id.equals(companyDTO.getId())) {
+            log.error("Path ID {} does not match CompanyDTO ID {}", id, companyDTO.getId());
+            throw new BadRequestAlertException("ID mismatch", "company", "idMismatch");
+        }
 
-        // Fetch
-        Optional<CompanyDTO> companyOptional = companyService.findOne(id);
-        if (companyOptional.isEmpty()) {
+        if (!companyRepository.existsById(id)) {
             log.warn("Company with ID {} not found", id);
-            return ResponseEntity.notFound().build();
+            throw new BadRequestAlertException("Entity not found", "company", "notFound");
         }
 
-        CompanyDTO company = companyOptional.get();
-        company.setWaitingList(parsedStatus);
-        companyService.save(company);
+        companyService.partialUpdate(companyDTO);
 
         return ResponseEntity.ok().build();
     }

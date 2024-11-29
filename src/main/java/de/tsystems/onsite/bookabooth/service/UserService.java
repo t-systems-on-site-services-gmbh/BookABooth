@@ -508,4 +508,13 @@ public class UserService {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
         }
     }
+
+    public List<Long> findUsersIdByCompanyId(Long companyId) {
+        return boothUserRepository.findAllByCompanyId(companyId).stream().map(BoothUser::getId).toList();
+    }
+
+    public Optional<User> findOne(Long userId) {
+        log.debug("Request to find user with ID: {}", userId);
+        return userRepository.findById(userId);
+    }
 }
