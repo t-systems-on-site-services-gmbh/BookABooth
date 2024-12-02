@@ -31,9 +31,9 @@
         <div>
           <h4 class="mb-2 mt-4">Checkliste und Status:</h4>
           <div class="list-group w-50">
-            <a
-              href="#"
+            <div
               v-bind:class="{
+                'mb-0': true,
                 'list-group-item': true,
                 'list-group-item-action': true,
                 'list-group-item-success': authenticated,
@@ -45,25 +45,25 @@
                 <small class="text-body-secondary" v-text="authenticated ? 'erledigt' : 'offen'"></small>
               </div>
               <p class="mb-1 font-weight-normal">Account wurde erstellt.</p>
-            </a>
-            <a
-              href="#"
+            </div>
+            <div
               v-bind:class="{
+                'mb-0': true,
                 'list-group-item': true,
                 'list-group-item-action': true,
-                'list-group-item-success': verifiedEmail,
-                'list-group-item-danger': !verifiedEmail,
+                'list-group-item-success': verified,
+                'list-group-item-danger': !verified,
               }"
             >
               <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Verifizierung</h5>
-                <small class="text-body-secondary" v-text="verifiedEmail ? 'erledigt' : 'offen'"></small>
+                <small class="text-body-secondary" v-text="verified ? 'erledigt' : 'offen'"></small>
               </div>
-              <p class="mb-1 font-weight-normal">Bestätigen Sie Ihre E-Mail-Adresse.</p>
-            </a>
-            <a
-              href="#"
+              <p class="mb-1 font-weight-normal">Account ist verifiziert.</p>
+            </div>
+            <div
               v-bind:class="{
+                'mb-0': true,
                 'list-group-item': true,
                 'list-group-item-action': true,
                 'list-group-item-success': address && logo && pressContact && companyDescription,
@@ -71,46 +71,46 @@
               }"
             >
               <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Kontaktdaten vervollständigt</h5>
+                <h5 class="mb-1">Kontaktdaten</h5>
                 <small
                   class="text-body-secondary"
                   v-text="address && logo && pressContact && companyDescription ? 'erledigt' : 'offen'"
                 ></small>
               </div>
-              <p
+              <div
                 :class="{
                   'list-group-item': true,
                   'list-group-item-danger': !address,
                   'list-group-item-success': address,
-                  'mb-1': true,
+                  'mb-0': true,
                   'font-weight-normal': true,
                 }"
               >
                 Rechnungsanschrift
-              </p>
-              <p
+              </div>
+              <div
                 :class="{
                   'list-group-item': true,
                   'list-group-item-warning': !logo,
                   'list-group-item-success': logo,
-                  'mb-1': true,
+                  'mb-0': true,
                   'font-weight-normal': true,
                 }"
               >
                 Logo des Unternehmens
-              </p>
-              <p
+              </div>
+              <div
                 :class="{
                   'list-group-item': true,
                   'list-group-item-warning': !pressContact,
                   'list-group-item-success': pressContact,
-                  'mb-1': true,
+                  'mb-0': true,
                   'font-weight-normal': true,
                 }"
               >
                 Pressekontakt
-              </p>
-              <p
+              </div>
+              <div
                 :class="{
                   'list-group-item': true,
                   'list-group-item-warning': !companyDescription,
@@ -120,28 +120,34 @@
                 }"
               >
                 Firmenkurzbeschreibung
-              </p>
-            </a>
-            <a
-              href="#"
+              </div>
+              <p class="mb-1 font-weight-normal">Ändern Sie Ihre Kontaktdaten im <a href="account/settings">Profil</a>.</p>
+            </div>
+            <div
               v-bind:class="{
+                'mb-0': true,
                 'list-group-item': true,
                 'list-group-item-action': true,
-                'list-group-item-success': concludedBooking,
-                'list-group-item-danger': !concludedBooking,
+                'list-group-item-success': bookingStatus === 'CONFIRMED',
+                'list-group-item-danger':
+                  bookingStatus === null || bookingStatus === 'CANCELED' || bookingStatus === 'BLOCKED' || bookingStatus === 'PREBOOKED',
               }"
             >
               <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Buchung getätigt</h5>
-                <small class="text-body-secondary" v-text="concludedBooking ? 'erledigt' : 'offen'"></small>
+                <h5 class="mb-1">Buchungsstatus</h5>
+                <small class="text-body-secondary" v-text="bookingStatus === 'CONFIRMED' ? 'erledigt' : 'offen'"></small>
               </div>
-              <p class="mb-1 font-weight-normal"></p>
-            </a>
+              <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'PREBOOKED'">Bestätigen Sie Ihre Buchung per E-Mail-Link.</p>
+              <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'CANCELED'">Ihre Buchung ist storniert.</p>
+              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null">
+                Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.
+              </p>
+            </div>
           </div>
           <p class="mt-4">
-            <small class="mr-2" style="background-color: #c3e6cb">Grün: erledigt</small>
-            <small class="mr-2" style="background-color: #f5c6cb">Rot: ausstehende Pflichtangabe</small>
-            <small class="mr-2" style="background-color: #ffeeba">Gelb: ausstehend, aber optional</small>
+            <small class="mr-2 px-2" style="background-color: #f5c6cb">&nbsp;</small> Rot: ausstehende Pflichtangabe<br />
+            <small class="mr-2 px-2" style="background-color: #ffeeba">&nbsp;</small> Gelb: ausstehend, aber optional<br />
+            <small class="mr-2 px-2" style="background-color: #c3e6cb">&nbsp;</small> Grün: erledigt <br />
           </p>
         </div>
       </div>

@@ -342,7 +342,7 @@ public class AccountResource {
         cl.setLogo(false);
         cl.setPressContact(false);
         cl.setCompanyDescription(true);
-        cl.setBookingStatus(BookingStatus.BLOCKED);
+        cl.setBookingStatus(Optional.of(BookingStatus.BLOCKED));
         // dummy data
 
         // BoothUser bUser = boothUserService.getBoothUserByLogin(authentication.getName());

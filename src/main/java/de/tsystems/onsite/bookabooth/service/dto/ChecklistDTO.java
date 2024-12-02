@@ -1,6 +1,7 @@
 package de.tsystems.onsite.bookabooth.service.dto;
 
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import java.util.Optional;
 
 public class ChecklistDTO {
 
@@ -9,7 +10,7 @@ public class ChecklistDTO {
     private Boolean logo; // Logo hochgeladen?
     private Boolean pressContact; // Pressekontakt hinterlegt?
     private Boolean companyDescription; // Firmenbeschreibung hinterlegt?
-    private BookingStatus bookingStatus; // Buchung abgeschlossen?
+    private Optional<BookingStatus> bookingStatus; // Buchung abgeschlossen?
 
     public ChecklistDTO() {}
 
@@ -53,11 +54,11 @@ public class ChecklistDTO {
         this.companyDescription = companyDescription;
     }
 
-    public BookingStatus getBookingStatus() {
+    public Optional<BookingStatus> getBookingStatus() {
         return bookingStatus;
     }
 
-    public void setBookingStatus(BookingStatus bookingStatus) {
+    public void setBookingStatus(Optional<BookingStatus> bookingStatus) {
         this.bookingStatus = bookingStatus;
     }
 }
