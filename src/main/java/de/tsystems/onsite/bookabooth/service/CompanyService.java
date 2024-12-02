@@ -1,7 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Company;
-import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
@@ -24,6 +23,7 @@ public class CompanyService {
     private final Logger log = LoggerFactory.getLogger(CompanyService.class);
 
     private final CompanyRepository companyRepository;
+
     private final CompanyMapper companyMapper;
 
     public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
