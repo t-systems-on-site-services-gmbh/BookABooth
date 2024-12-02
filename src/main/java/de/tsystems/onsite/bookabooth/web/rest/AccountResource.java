@@ -1,9 +1,8 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
-import de.tsystems.onsite.bookabooth.domain.BoothUser;
-import de.tsystems.onsite.bookabooth.domain.PersistentToken;
-import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.domain.*;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
@@ -333,35 +332,7 @@ public class AccountResource {
      */
     @GetMapping("/checklist")
     public ResponseEntity<ChecklistDTO> getUserChecklist(Authentication authentication) {
-        ChecklistDTO cl = new ChecklistDTO();
-
-        // todo: delete dummy data after implementation
-        // dummy data
-        cl.setVerified(true);
-        cl.setAddress(true);
-        cl.setLogo(false);
-        cl.setPressContact(false);
-        cl.setCompanyDescription(true);
-        cl.setBookingStatus(Optional.of(BookingStatus.BLOCKED));
-        // dummy data
-
-        // BoothUser bUser = boothUserService.getBoothUserByLogin(authentication.getName());
-
-        // Check if the user has a verified email
-        // cl.set bUser.isVerified()
-
-        // Check if the user has an address (company)
-        // bUser.getCompany().getAddress()
-
-        // Check if the user has a logo
-
-        // Check if the user has a press contact
-
-        // Check if the user has a company description
-
-        // Check if the user has concluded a booking
-
-        // Return the checklist
-        return ResponseEntity.ok(cl);
+        String login = authentication.getName();
+        return ResponseEntity.ok(userService.getChecklistDTO(login));
     }
 }

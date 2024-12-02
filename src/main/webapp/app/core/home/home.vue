@@ -30,7 +30,14 @@
       <div v-if="!hasAnyAuthority('ROLE_ADMIN') && authenticated">
         <div>
           <h4 class="mb-2 mt-4">Checkliste und Status:</h4>
-          <div class="list-group w-50">
+
+          <div v-if="verified === false" class="d-flex justify-content-center my-2">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+
+          <div v-if="verified === true" class="list-group w-50">
             <div
               v-bind:class="{
                 'mb-0': true,
