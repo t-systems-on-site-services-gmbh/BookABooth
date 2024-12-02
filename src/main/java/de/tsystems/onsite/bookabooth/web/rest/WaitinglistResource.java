@@ -50,16 +50,10 @@ public class WaitinglistResource {
             .stream()
             .peek(company -> {
                 Long companyId = company.getId();
-                List<Long> userIds = userService.findUsersIdByCompanyId(companyId);
+                List<User> users = userService.findUsersByCompanyId(companyId);
 
-                if (!userIds.isEmpty()) {
-                    List<String> emails = userIds
-                        .stream()
-                        .map(userService::findOne)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .map(User::getEmail)
-                        .toList();
+                if (!users.isEmpty()) {
+                    List<String> emails = users.stream().map(User::getEmail).toList();
 
                     company.setMail(String.join(", ", emails));
                 } else {
@@ -85,25 +79,21 @@ public class WaitinglistResource {
         waitingListCompanies.forEach(company -> {
             Long companyId = company.getId();
             String companyName = company.getName();
-            List<Long> userIds = userService.findUsersIdByCompanyId(companyId);
+            List<User> users = userService.findUsersByCompanyId(companyId);
 
-            if (!userIds.isEmpty()) {
-                userIds.forEach(userId -> {
-                    Optional<User> userOptional = userService.findOne(userId);
-                    if (userOptional.isPresent()) {
-                        User user = userOptional.get();
+            if (!users.isEmpty()) {
+                users.forEach(user -> {
+                    if (user != null) {
                         String userEmail = user.getEmail();
 
                         user.setLangKey(Constants.DEFAULT_LANGUAGE);
                         user.setLogin(companyName);
 
                         mailService.sendWaitingListEmail(user);
-                    } else {
-                        log.warn("No user found for user ID: {}", userId);
                     }
                 });
             } else {
-                log.warn("No user IDs found for company ID: {}", companyId);
+                log.warn("No users found for company ID: {}", companyId);
             }
         });
 

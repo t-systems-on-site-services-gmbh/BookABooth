@@ -24,12 +24,10 @@ public class CompanyService {
     private final Logger log = LoggerFactory.getLogger(CompanyService.class);
 
     private final CompanyRepository companyRepository;
-    private final BookingRepository bookingRepository;
     private final CompanyMapper companyMapper;
 
-    public CompanyService(CompanyRepository companyRepository, BookingRepository bookingRepository, CompanyMapper companyMapper) {
+    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
         this.companyRepository = companyRepository;
-        this.bookingRepository = bookingRepository;
         this.companyMapper = companyMapper;
     }
 

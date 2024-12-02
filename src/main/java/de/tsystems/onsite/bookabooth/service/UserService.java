@@ -596,7 +596,12 @@ public class UserService {
         }
     }
 
-    public List<Long> findUsersIdByCompanyId(Long companyId) {
+    public List<User> findUsersByCompanyId(Long companyId) {
+        var boothUsers = boothUserRepository.findAllByCompanyId(companyId);
+        return boothUsers.stream().map(BoothUser::getUser).toList();
+    }
+
+    public List<Long> findUserIdsByCompanyId(Long companyId) {
         return boothUserRepository.findAllByCompanyId(companyId).stream().map(BoothUser::getId).toList();
     }
 
