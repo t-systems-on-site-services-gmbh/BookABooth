@@ -599,9 +599,4 @@ public class UserService {
         var boothUsers = boothUserRepository.findByCompanyId(companyId);
         return boothUsers.stream().map(BoothUser::getUser).toList();
     }
-
-    public Optional<User> findOne(Long userId) {
-        log.debug("Request to find user with ID: {}", userId);
-        return userRepository.findById(userId);
-    }
 }
