@@ -8,7 +8,9 @@ import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +55,19 @@ public class WaitinglistResource {
                 List<User> users = userService.findUsersByCompanyId(companyId);
 
                 if (!users.isEmpty()) {
-                    List<String> emails = users.stream().map(User::getEmail).toList();
-
+                    List<String> emails = users.stream().map(User::getEmail).filter(Objects::nonNull).toList();
                     company.setMail(String.join(", ", emails));
                 } else {
-                    company.setMail("Keine Verbindung zwischen Firma und Benutzern");
+                    company.setMail("Dieser Firma ist kein Benutzer zugeordnet.");
                     log.warn("No user IDs found for company ID: {}", companyId);
                 }
             })
-            .sorted((c1, c2) -> Boolean.compare(c2.getWaitingList(), c1.getWaitingList()))
+            .sorted((c1, c2) -> {
+                Boolean w1 = c1.getWaitingList();
+                Boolean w2 = c2.getWaitingList();
+                // nulls first, false next, true last
+                return Comparator.nullsFirst(Boolean::compareTo).reversed().compare(w1, w2);
+            })
             .toList();
     }
 
@@ -69,7 +75,11 @@ public class WaitinglistResource {
     public ResponseEntity<Void> sendEmailsToWaitingList() {
         log.debug("REST request to send emails to companies on the waiting list");
 
-        List<CompanyDTO> waitingListCompanies = companyService.findAll().stream().filter(CompanyDTO::getWaitingList).toList();
+        List<CompanyDTO> waitingListCompanies = companyService
+            .findAll()
+            .stream()
+            .filter(company -> Objects.nonNull(company.getWaitingList()) && company.getWaitingList())
+            .toList();
 
         if (waitingListCompanies.isEmpty()) {
             log.info("No companies on the waiting list.");
@@ -83,7 +93,7 @@ public class WaitinglistResource {
 
             if (!users.isEmpty()) {
                 users.forEach(user -> {
-                    if (user != null) {
+                    if ((user.getEmail() != null) && user.isActivated()) {
                         String userEmail = user.getEmail();
 
                         user.setLangKey(Constants.DEFAULT_LANGUAGE);
