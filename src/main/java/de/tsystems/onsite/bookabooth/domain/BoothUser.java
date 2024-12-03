@@ -207,9 +207,4 @@ public class BoothUser implements Serializable {
             ", disabled='" + getDisabled() + "'" +
             "}";
     }
-
-    public boolean isVerified() {
-        // this.getuser().
-        return false; // todo logic here
-    }
 }

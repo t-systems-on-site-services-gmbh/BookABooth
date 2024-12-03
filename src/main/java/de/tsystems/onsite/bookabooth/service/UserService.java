@@ -626,10 +626,6 @@ public class UserService {
             cl.setCompanyDescription(true);
         }
 
-        if (!bUser.getCompany().getDescription().isEmpty()) {
-            cl.setCompanyDescription(true);
-        }
-
         cl.setBookingStatus(Optional.of(booking.getStatus()));
 
         return cl;

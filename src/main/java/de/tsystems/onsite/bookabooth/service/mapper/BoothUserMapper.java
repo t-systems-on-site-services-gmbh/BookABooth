@@ -4,7 +4,6 @@ import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
-import de.tsystems.onsite.bookabooth.service.dto.ChecklistDTO;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
 import org.mapstruct.*;
@@ -27,6 +26,4 @@ public interface BoothUserMapper extends EntityMapper<BoothUserDTO, BoothUser> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     CompanyDTO toDtoCompanyId(Company company);
-    //@Mapping(target = "address", expression = "java(boothUser.getCompany() != null && boothUser.getCompany().getBillingAddress() != null)")
-    //ChecklistDTO toChecklistDto(BoothUser boothUser);
 }
