@@ -10,7 +10,6 @@ import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.*;
-import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.dto.*;
@@ -629,5 +628,9 @@ public class UserService {
         cl.setBookingStatus(Optional.of(booking.getStatus()));
 
         return cl;
+
+    public List<User> findUsersByCompanyId(Long companyId) {
+        var boothUsers = boothUserRepository.findByCompanyId(companyId);
+        return boothUsers.stream().map(BoothUser::getUser).toList();
     }
 }
