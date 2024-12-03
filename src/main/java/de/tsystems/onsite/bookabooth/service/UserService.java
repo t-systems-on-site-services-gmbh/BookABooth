@@ -628,6 +628,7 @@ public class UserService {
         cl.setBookingStatus(Optional.of(booking.getStatus()));
 
         return cl;
+    }
 
     public List<User> findUsersByCompanyId(Long companyId) {
         var boothUsers = boothUserRepository.findByCompanyId(companyId);
