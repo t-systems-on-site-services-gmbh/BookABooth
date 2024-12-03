@@ -186,6 +186,21 @@ class MailServiceIT {
     }
 
     @Test
+    void testSendWaitingListEmail() throws Exception {
+        User user = new User();
+        user.setLangKey(Constants.DEFAULT_LANGUAGE);
+        user.setLogin("john");
+        user.setEmail("john.doe@example.com");
+        mailService.sendWaitingListEmail(user);
+        verify(javaMailSender).send(messageCaptor.capture());
+        MimeMessage message = messageCaptor.getValue();
+        assertThat(message.getAllRecipients()[0]).hasToString(user.getEmail());
+        assertThat(message.getFrom()[0]).hasToString(jHipsterProperties.getMail().getFrom());
+        assertThat(message.getContent().toString()).isNotEmpty();
+        assertThat(message.getDataHandler().getContentType()).isEqualTo("text/html;charset=UTF-8");
+    }
+
+    @Test
     void testSendEmailWithException() {
         doThrow(MailSendException.class).when(javaMailSender).send(any(MimeMessage.class));
         try {

@@ -1,6 +1,6 @@
 <template>
   <div id="footer" class="footer">
-    <p>Dies ist Ihre Fußzeile</p>
+    <p></p>
   </div>
 </template>
 

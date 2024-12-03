@@ -13,8 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BoothUserRepository extends JpaRepository<BoothUser, Long> {
     Optional<BoothUser> findByUserLogin(String login);
-
     List<BoothUser> findByCompanyName(String companyName);
-
+    List<BoothUser> findByCompanyId(Long id);
     long countByCompanyId(Long companyId);
 }

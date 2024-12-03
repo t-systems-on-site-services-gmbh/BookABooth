@@ -655,4 +655,44 @@ public class UserService {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
         }
     }
+
+    public ChecklistDTO getChecklistDTO(String login) {
+        ChecklistDTO cl = new ChecklistDTO();
+        BoothUser bUser = boothUserRepository.findByUserLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Booking booking = bookingRepository.findById(bUser.getUser().getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (bUser.getUser().isActivated()) {
+            cl.setVerified(true);
+        }
+
+        if (!bUser.getCompany().getBillingAddress().isEmpty()) {
+            cl.setAddress(true);
+        }
+
+        if (!bUser.getCompany().getLogo().isEmpty()) {
+            cl.setLogo(true);
+        }
+
+        // todo: delete dummy data after implementation
+        // dummy data
+        cl.setPressContact(false);
+        // dummy data
+
+        if (!bUser.getCompany().getLogo().isEmpty()) {
+            cl.setLogo(true);
+        }
+
+        if (!bUser.getCompany().getDescription().isEmpty()) {
+            cl.setCompanyDescription(true);
+        }
+
+        cl.setBookingStatus(Optional.of(booking.getStatus()));
+
+        return cl;
+    }
+
+    public List<User> findUsersByCompanyId(Long companyId) {
+        var boothUsers = boothUserRepository.findByCompanyId(companyId);
+        return boothUsers.stream().map(BoothUser::getUser).toList();
+    }
 }

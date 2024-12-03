@@ -1,16 +1,17 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
-import de.tsystems.onsite.bookabooth.domain.BoothUser;
-import de.tsystems.onsite.bookabooth.domain.PersistentToken;
-import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
-import de.tsystems.onsite.bookabooth.service.dto.*;
+import de.tsystems.onsite.bookabooth.service.dto.ChecklistDTO;
 import de.tsystems.onsite.bookabooth.service.dto.PasswordChangeDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
 import de.tsystems.onsite.bookabooth.service.exception.CompanyAlreadyUsedException;
 import de.tsystems.onsite.bookabooth.web.rest.errors.*;
 import de.tsystems.onsite.bookabooth.web.rest.vm.KeyAndPasswordVM;
@@ -322,5 +323,16 @@ public class AccountResource {
             password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
+    }
+
+    /**
+     *
+     * @param authentication authenticate the user
+     * @return the data for the current user
+     */
+    @GetMapping("/checklist")
+    public ResponseEntity<ChecklistDTO> getUserChecklist(Authentication authentication) {
+        String login = authentication.getName();
+        return ResponseEntity.ok(userService.getChecklistDTO(login));
     }
 }
