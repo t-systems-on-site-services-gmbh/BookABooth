@@ -111,6 +111,5 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# Nicht mergen!
 application:
-  upload-folder: C:/fg/repo/BookABooth/uploads/
+  upload-folder: C:/Projekte/BookABooth/BookABooth/uploads/

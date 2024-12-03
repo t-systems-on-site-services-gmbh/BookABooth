@@ -5,10 +5,12 @@ import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CON
 
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.*;
+
 import de.tsystems.onsite.bookabooth.domain.Authority;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.User;
+
 import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
@@ -441,6 +443,7 @@ public class UserService {
             // Is checked to prevent the user from entering invalid user-details
             throw new BadRequestException();
         }
+
         Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
         if (optionalUser.isEmpty()) {
             throw new AccountNotFoundException("User could not be found");
@@ -596,6 +599,7 @@ public class UserService {
             if (booking.isPresent()) {
                 bookingDTO = bookingMapper.toDto(booking.get());
             }
+
             return new UserProfileDTO(
                 userDTO,
                 companyDTO,

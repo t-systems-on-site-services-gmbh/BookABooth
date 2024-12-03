@@ -18,6 +18,7 @@ public class UserDTO implements Serializable {
 
     @Email
     @Size(min = 5, max = 254)
+
     private String email;
 
     private String firstName;

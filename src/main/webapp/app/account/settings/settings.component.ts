@@ -40,6 +40,7 @@ export default defineComponent({
     const adminCount = ref<number>(0);
     const onlyOneAdmin = ref<boolean>(true);
 
+
     const onExhibitorList = computed(() => {
       return exhibitorList.value ? 'Sie befinden sich in der Ausstellerliste' : 'Sie befinden sich nicht in der Ausstellerliste';
     });
@@ -142,6 +143,7 @@ export default defineComponent({
       componentKey,
       adminCount,
       onlyOneAdmin,
+
     };
   },
   computed: {

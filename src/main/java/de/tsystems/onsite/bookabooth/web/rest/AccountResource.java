@@ -262,6 +262,20 @@ public class AccountResource {
             );
     }
 
+    // Checks, if the password of the user matches with the password input and deletes the account
+    @DeleteMapping("/account/delete-account")
+    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO) {
+        if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
+            // Hier später die Delete-Methoden aufrufen
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     /**
      *
      * @param passwordChangeDTO is used to check the password in the db with password input
