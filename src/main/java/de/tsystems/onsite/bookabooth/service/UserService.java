@@ -659,7 +659,9 @@ public class UserService {
     public ChecklistDTO getChecklistDTO(String login) {
         ChecklistDTO cl = new ChecklistDTO();
         BoothUser bUser = boothUserRepository.findByUserLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Booking booking = bookingRepository.findById(bUser.getUser().getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+        Booking booking = bookingRepository
+            .findByCompanyId(bUser.getCompany().getId())
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         if (bUser.getUser().isActivated()) {
             cl.setVerified(true);
