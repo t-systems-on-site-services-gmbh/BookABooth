@@ -14,10 +14,12 @@ import java.io.File;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tech.jhipster.config.JHipsterConstants;
@@ -26,6 +28,8 @@ import tech.jhipster.config.JHipsterProperties;
 /**
  * Unit tests for the {@link WebConfigurer} class.
  */
+@SpringBootTest
+@ActiveProfiles("mytest")
 class WebConfigurerTest {
 
     private WebConfigurer webConfigurer;

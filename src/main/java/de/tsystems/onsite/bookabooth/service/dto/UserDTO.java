@@ -1,6 +1,8 @@
 package de.tsystems.onsite.bookabooth.service.dto;
 
 import de.tsystems.onsite.bookabooth.domain.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -14,6 +16,8 @@ public class UserDTO implements Serializable {
 
     private String login;
 
+    @Email
+    @Size(min = 5, max = 254)
     private String email;
 
     private String firstName;

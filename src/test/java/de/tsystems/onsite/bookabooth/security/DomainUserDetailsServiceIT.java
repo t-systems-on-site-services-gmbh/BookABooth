@@ -3,7 +3,6 @@ package de.tsystems.onsite.bookabooth.security;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import java.util.Locale;
@@ -12,15 +11,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integrations tests for {@link DomainUserDetailsService}.
  */
 @Transactional
-@IntegrationTest
+@SpringBootTest
+@ActiveProfiles("mytest")
 class DomainUserDetailsServiceIT {
 
     private static final String USER_ONE_LOGIN = "test-user-one";

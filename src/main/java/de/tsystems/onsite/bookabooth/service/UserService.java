@@ -21,6 +21,8 @@ import de.tsystems.onsite.bookabooth.service.exception.*;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -50,11 +52,11 @@ public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
+    private final UserRepository userRepository;
+
     private final CompanyService companyService;
 
     private final CompanyRepository companyRepository;
-
-    private final UserRepository userRepository;
 
     private final BoothUserRepository boothUserRepository;
 
@@ -74,9 +76,10 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final Validator validator;
+
     public UserService(
         CompanyService companyService,
-        CompanyRepository companyRepository1,
         UserRepository userRepository,
         CompanyRepository companyRepository,
         BoothUserRepository boothUserRepository,
@@ -87,7 +90,8 @@ public class UserService {
         PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        Validator validator
     ) {
         this.companyService = companyService;
         this.companyRepository = companyRepository;
@@ -101,6 +105,7 @@ public class UserService {
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.validator = validator;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -350,6 +355,55 @@ public class UserService {
             });
     }
 
+    // Deletes an account and its dependencies, cannot delete admin if there is only one in the system
+    @Transactional
+    public void deleteAccount(Long userId) {
+        log.debug("Request to delete Account with userId: {}", userId);
+
+        // Checks, if the user is an admin and how many admins are in the system
+        if (isAdmin()) {
+            long adminCount = userRepository.countByAuthoritiesName("ROLE_ADMIN");
+            if (adminCount <= 1) {
+                throw new BadRequestException("Cannot delete the last admin user");
+            }
+            log.debug("User is an admin, only deleting user: {}", userId);
+            userRepository.findById(userId).ifPresent(userRepository::delete);
+        }
+        // find and delete the user with its dependencies
+        userRepository
+            .findById(userId)
+            .ifPresent(user -> {
+                Optional<BoothUser> boothUser = boothUserRepository.findById(userId);
+
+                if (boothUser.isPresent()) {
+                    Long companyId = boothUser.get().getCompany().getId();
+
+                    log.debug("Removing boothUser with ID: {}", userId);
+                    boothUserRepository.deleteById(userId);
+
+                    // Checks, if the user is the last user of its company
+                    long boothUserCount = boothUserRepository.countByCompanyId(companyId);
+                    if (boothUserCount == 0) {
+                        bookingRepository
+                            .findByCompanyId(companyId)
+                            .ifPresent(booking -> {
+                                log.debug("Removing booking with ID: {}", booking.getId());
+                                bookingRepository.delete(booking);
+                            });
+                        log.debug("Removing company with ID: {}", companyId);
+                        companyRepository.deleteById(companyId);
+                    } else {
+                        log.debug("Company with ID: {} has other users, not deleting company and booking", companyId);
+                    }
+
+                    log.debug("Removing user with ID: {}", userId);
+                    userRepository.deleteById(userId);
+                } else {
+                    log.debug("No boothUser found with User ID: {}", userId);
+                }
+            });
+    }
+
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
@@ -376,25 +430,28 @@ public class UserService {
             });
     }
 
-    // Method to update the Userprofile with user- and companydata
+    /**
+     *
+     * @param userProfileDTO Profile containing user- and company-information, is checked in controller-method and passed through to service
+     * @throws AccountNotFoundException Exception is thrown if the repository cannot find the id passed down from the profile
+     */
     public void updateUserProfile(UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+        Set<ConstraintViolation<UserDTO>> violations = validator.validate(userProfileDTO.getUser());
+        if (!violations.isEmpty()) {
+            // Is checked to prevent the user from entering invalid user-details
+            throw new BadRequestException();
+        }
         Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
         if (optionalUser.isEmpty()) {
             throw new AccountNotFoundException("User could not be found");
         }
-        boolean isAdmin = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
 
         User user = optionalUser.get();
         this.clearUserCaches(user);
         userMapper.profileDTOtoUserEntity(userProfileDTO, user);
         userRepository.save(user);
 
-        if (!isAdmin && userProfileDTO.getCompany() != null) {
+        if (!isAdmin() && userProfileDTO.getCompany() != null) {
             Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
             if (optionalCompany.isPresent()) {
                 Company company = optionalCompany.get();
@@ -404,6 +461,15 @@ public class UserService {
         }
         this.clearUserCaches(user);
         log.debug("Changed Information for User: {}", user);
+    }
+
+    public static boolean isAdmin() {
+        return SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
     }
 
     // Removes the user from the waiting list
@@ -419,27 +485,25 @@ public class UserService {
     }
 
     // Set the booking status to canceled (from prebooked or confirmed)
-    public void cancelBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(booking -> {
+    public void cancelBooking(UserProfileDTO userProfileDTO, Long bookingId) {
+        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        optionalBooking.ifPresent(booking -> {
+            if (booking.getId().equals(bookingId)) {
                 booking.setStatus(CANCELED);
                 bookingRepository.save(booking);
-                return userProfileDTO;
-            });
+            }
+        });
     }
 
     // Set the booking status from prebooked to confirmed
-    public void confirmBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(booking -> {
+    public void confirmBooking(UserProfileDTO userProfileDTO, Long bookingId) {
+        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        optionalBooking.ifPresent(booking -> {
+            if (booking.getId().equals(bookingId)) {
                 booking.setStatus(CONFIRMED);
                 bookingRepository.save(booking);
-                return userProfileDTO;
-            });
+            }
+        });
     }
 
     // Checks the password of the current user
@@ -507,16 +571,9 @@ public class UserService {
     public UserProfileDTO getUserProfile(String login) {
         User user = userRepository.findOneByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        boolean isAdmin = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
-
         UserDTO userDTO = userMapper.userToUserDTO(user);
 
-        if (isAdmin) {
+        if (isAdmin()) {
             return new UserProfileDTO(
                 userDTO,
                 null,
@@ -533,12 +590,16 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Company not found"));
 
             CompanyDTO companyDTO = companyMapper.toDto(company);
-            Optional<Booking> booking = bookingRepository.findById(user.getId());
 
+            Optional<Booking> booking = bookingRepository.findByCompanyId(company.getId());
+            BookingDTO bookingDTO = null;
+            if (booking.isPresent()) {
+                bookingDTO = bookingMapper.toDto(booking.get());
+            }
             return new UserProfileDTO(
                 userDTO,
                 companyDTO,
-                booking.map(bookingMapper::toDto).orElse(null),
+                bookingDTO,
                 user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
             );
         }

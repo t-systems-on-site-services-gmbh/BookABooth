@@ -6,7 +6,6 @@ import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
-import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.ChecklistDTO;
@@ -51,8 +50,6 @@ public class AccountResource {
 
     private final UserService userService;
 
-    private final BoothUserService boothUserService;
-
     private final MailService mailService;
 
     private final PersistentTokenRepository persistentTokenRepository;
@@ -60,13 +57,11 @@ public class AccountResource {
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
-        BoothUserService boothUserService,
         MailService mailService,
         PersistentTokenRepository persistentTokenRepository
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
-        this.boothUserService = boothUserService;
         this.mailService = mailService;
         this.persistentTokenRepository = persistentTokenRepository;
     }
@@ -183,7 +178,7 @@ public class AccountResource {
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.cancelBooking(userProfileDTO);
+        userService.cancelBooking(userProfileDTO, userProfileDTO.getBooking().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -200,7 +195,7 @@ public class AccountResource {
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.confirmBooking(userProfileDTO);
+        userService.confirmBooking(userProfileDTO, userProfileDTO.getBooking().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -267,14 +262,19 @@ public class AccountResource {
             );
     }
 
-    // Checks, if the password of the user matches with the password input and deletes the account
-    @DeleteMapping("/account/delete-account")
-    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO) {
+    /**
+     *
+     * @param passwordChangeDTO is used to check the password in the db with password input
+     * @param id is given in the url to identify the user
+     * @return bad request, if the password is incorrect, otherwise it returns ok
+     */
+    @DeleteMapping("/account/delete-account/{id}")
+    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO, @PathVariable Long id) {
         if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
-            // Hier später die Delete-Methoden aufrufen
+            userService.deleteAccount(id);
             return ResponseEntity.status(HttpStatus.OK).build();
         } else {
             return ResponseEntity.badRequest().build();

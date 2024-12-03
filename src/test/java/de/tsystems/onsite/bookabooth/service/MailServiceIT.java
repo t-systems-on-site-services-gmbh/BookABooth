@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.User;
 import jakarta.mail.Multipart;
@@ -27,15 +26,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.ActiveProfiles;
 import tech.jhipster.config.JHipsterProperties;
 
 /**
  * Integration tests for {@link MailService}.
  */
-@IntegrationTest
+@SpringBootTest
+@ActiveProfiles("mytest")
 class MailServiceIT {
 
     private static final String[] languages = {

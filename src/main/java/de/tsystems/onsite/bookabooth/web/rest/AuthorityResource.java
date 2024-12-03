@@ -2,6 +2,7 @@ package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.Authority;
 import de.tsystems.onsite.bookabooth.repository.AuthorityRepository;
+import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -35,8 +36,11 @@ public class AuthorityResource {
 
     private final AuthorityRepository authorityRepository;
 
-    public AuthorityResource(AuthorityRepository authorityRepository) {
+    private final UserRepository userRepository;
+
+    public AuthorityResource(AuthorityRepository authorityRepository, UserRepository userRepository) {
         this.authorityRepository = authorityRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -97,5 +101,10 @@ public class AuthorityResource {
         log.debug("REST request to delete Authority : {}", id);
         authorityRepository.deleteById(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id)).build();
+    }
+
+    @GetMapping("/countAuthorities")
+    public long countAdmins() {
+        return userRepository.countByAuthoritiesName("ROLE_ADMIN");
     }
 }
