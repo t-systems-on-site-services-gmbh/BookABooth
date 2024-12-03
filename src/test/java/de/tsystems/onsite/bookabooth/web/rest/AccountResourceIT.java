@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.PersistentToken;
 import de.tsystems.onsite.bookabooth.domain.User;
@@ -17,8 +16,8 @@ import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.service.UserService;
-import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
-import de.tsystems.onsite.bookabooth.service.dto.PasswordChangeDTO;
+import de.tsystems.onsite.bookabooth.service.dto.*;
+import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
 import de.tsystems.onsite.bookabooth.web.rest.vm.KeyAndPasswordVM;
 import de.tsystems.onsite.bookabooth.web.rest.vm.ManagedUserVM;
 import java.time.Instant;
@@ -31,9 +30,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link AccountResource} REST controller.
  */
 @AutoConfigureMockMvc
-@IntegrationTest
+@SpringBootTest
+@ActiveProfiles("mytest")
 class AccountResourceIT {
 
     static final String TEST_USER_LOGIN = "test";
@@ -86,32 +88,30 @@ class AccountResourceIT {
     }
 
     @Test
-    @WithMockUser(TEST_USER_LOGIN)
+    @Transactional
+    @WithMockUser(value = TEST_USER_LOGIN, authorities = AuthoritiesConstants.ADMIN)
     void testGetExistingAccount() throws Exception {
-        Set<String> authorities = new HashSet<>();
-        authorities.add(AuthoritiesConstants.ADMIN);
-
-        AdminUserDTO user = new AdminUserDTO();
+        User user = new User();
         user.setLogin(TEST_USER_LOGIN);
-        user.setFirstName("john");
-        user.setLastName("doe");
-        user.setEmail("john.doe@jhipster.com");
-        user.setImageUrl("http://placehold.it/50x50");
-        user.setLangKey("en");
-        user.setAuthorities(authorities);
-        userService.createUser(user);
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setFirstName("Test");
+        user.setLastName("admin");
+        user.setEmail("testadmin@localhost.de");
+        userRepository.saveAndFlush(user);
+
+        UserMapper userMapper = new UserMapper();
+        UserDTO userDTO = userMapper.userToUserDTO(user);
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        userProfileDTO.setUser(userDTO);
 
         restAccountMockMvc
-            .perform(get("/api/account").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/api/account").accept(MediaType.APPLICATION_JSON).with(csrf()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.login").value(TEST_USER_LOGIN))
-            .andExpect(jsonPath("$.firstName").value("john"))
-            .andExpect(jsonPath("$.lastName").value("doe"))
-            .andExpect(jsonPath("$.email").value("john.doe@jhipster.com"))
-            .andExpect(jsonPath("$.imageUrl").value("http://placehold.it/50x50"))
-            .andExpect(jsonPath("$.langKey").value("en"))
-            .andExpect(jsonPath("$.authorities").value(AuthoritiesConstants.ADMIN));
+            .andExpect(jsonPath("$.user.login").value(userDTO.getLogin()))
+            .andExpect(jsonPath("$.user.firstName").value(userDTO.getFirstName()))
+            .andExpect(jsonPath("$.user.lastName").value(userDTO.getLastName()))
+            .andExpect(jsonPath("$.user.email").value(userDTO.getEmail()));
     }
 
     @Test
@@ -129,6 +129,8 @@ class AccountResourceIT {
         validUser.setLastName("Test");
         validUser.setEmail("test-register-valid@example.com");
         validUser.setImageUrl("http://placehold.it/50x50");
+        validUser.setCompanyName("company");
+        validUser.setTermsAccepted(true);
         validUser.setLangKey(Constants.DEFAULT_LANGUAGE);
         validUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
         assertThat(userRepository.findOneByLogin("test-register-valid")).isEmpty();
@@ -216,6 +218,8 @@ class AccountResourceIT {
         firstUser.setImageUrl("http://placehold.it/50x50");
         firstUser.setLangKey(Constants.DEFAULT_LANGUAGE);
         firstUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        firstUser.setCompanyName("company");
+        firstUser.setTermsAccepted(true);
 
         // Duplicate login, different email
         ManagedUserVM secondUser = new ManagedUserVM();
@@ -231,6 +235,8 @@ class AccountResourceIT {
         secondUser.setLastModifiedBy(firstUser.getLastModifiedBy());
         secondUser.setLastModifiedDate(firstUser.getLastModifiedDate());
         secondUser.setAuthorities(new HashSet<>(firstUser.getAuthorities()));
+        secondUser.setCompanyName(firstUser.getCompanyName());
+        secondUser.setTermsAccepted(firstUser.isTermsAccepted());
 
         // First user
         restAccountMockMvc
@@ -264,6 +270,8 @@ class AccountResourceIT {
         firstUser.setLastName("Test");
         firstUser.setEmail("test-register-duplicate-email@example.com");
         firstUser.setImageUrl("http://placehold.it/50x50");
+        firstUser.setCompanyName("company");
+        firstUser.setTermsAccepted(true);
         firstUser.setLangKey(Constants.DEFAULT_LANGUAGE);
         firstUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
 
@@ -283,6 +291,8 @@ class AccountResourceIT {
         secondUser.setLastName(firstUser.getLastName());
         secondUser.setEmail(firstUser.getEmail());
         secondUser.setImageUrl(firstUser.getImageUrl());
+        secondUser.setCompanyName(firstUser.getCompanyName());
+        secondUser.setTermsAccepted(firstUser.isTermsAccepted());
         secondUser.setLangKey(firstUser.getLangKey());
         secondUser.setAuthorities(new HashSet<>(firstUser.getAuthorities()));
 
@@ -306,6 +316,8 @@ class AccountResourceIT {
         userWithUpperCaseEmail.setLastName(firstUser.getLastName());
         userWithUpperCaseEmail.setEmail("TEST-register-duplicate-email@example.com");
         userWithUpperCaseEmail.setImageUrl(firstUser.getImageUrl());
+        userWithUpperCaseEmail.setCompanyName(firstUser.getCompanyName());
+        userWithUpperCaseEmail.setTermsAccepted(firstUser.isTermsAccepted());
         userWithUpperCaseEmail.setLangKey(firstUser.getLangKey());
         userWithUpperCaseEmail.setAuthorities(new HashSet<>(firstUser.getAuthorities()));
 
@@ -343,6 +355,8 @@ class AccountResourceIT {
         validUser.setEmail("badguy@example.com");
         validUser.setActivated(true);
         validUser.setImageUrl("http://placehold.it/50x50");
+        validUser.setCompanyName("badCompany");
+        validUser.setTermsAccepted(true);
         validUser.setLangKey(Constants.DEFAULT_LANGUAGE);
         validUser.setAuthorities(Collections.singleton(AuthoritiesConstants.ADMIN));
 
@@ -393,29 +407,27 @@ class AccountResourceIT {
         user.setActivated(true);
         userRepository.saveAndFlush(user);
 
-        AdminUserDTO userDTO = new AdminUserDTO();
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
-        userDTO.setEmail("save-account@example.com");
-        userDTO.setActivated(false);
-        userDTO.setImageUrl("http://placehold.it/50x50");
-        userDTO.setLangKey(Constants.DEFAULT_LANGUAGE);
-        userDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.ADMIN));
+        userDTO.setEmail("unique-save-account@example.com");
+        userProfileDTO.setUser(userDTO);
 
         restAccountMockMvc
-            .perform(post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)).with(csrf()))
+            .perform(
+                post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userProfileDTO)).with(csrf())
+            )
             .andExpect(status().isOk());
 
-        User updatedUser = userRepository.findOneWithAuthoritiesByLogin(user.getLogin()).orElse(null);
-        assertThat(updatedUser.getFirstName()).isEqualTo(userDTO.getFirstName());
-        assertThat(updatedUser.getLastName()).isEqualTo(userDTO.getLastName());
-        assertThat(updatedUser.getEmail()).isEqualTo(userDTO.getEmail());
-        assertThat(updatedUser.getLangKey()).isEqualTo(userDTO.getLangKey());
+        User updatedUser = userRepository.findOneByLogin(user.getLogin()).orElse(null);
+        assertThat(updatedUser.getFirstName()).isEqualTo(userProfileDTO.getUser().getFirstName());
+        assertThat(updatedUser.getLastName()).isEqualTo(userProfileDTO.getUser().getLastName());
+        assertThat(updatedUser.getEmail()).isEqualTo(userProfileDTO.getUser().getEmail());
         assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
-        assertThat(updatedUser.getImageUrl()).isEqualTo(userDTO.getImageUrl());
         assertThat(updatedUser.isActivated()).isTrue();
-        assertThat(updatedUser.getAuthorities()).isEmpty();
     }
 
     @Test
@@ -430,18 +442,19 @@ class AccountResourceIT {
 
         userRepository.saveAndFlush(user);
 
-        AdminUserDTO userDTO = new AdminUserDTO();
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
         userDTO.setEmail("invalid email");
-        userDTO.setActivated(false);
-        userDTO.setImageUrl("http://placehold.it/50x50");
-        userDTO.setLangKey(Constants.DEFAULT_LANGUAGE);
-        userDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.ADMIN));
+        userProfileDTO.setUser(userDTO);
 
         restAccountMockMvc
-            .perform(post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)).with(csrf()))
+            .perform(
+                post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userProfileDTO)).with(csrf())
+            )
             .andExpect(status().isBadRequest());
 
         assertThat(userRepository.findOneByEmailIgnoreCase("invalid email")).isNotPresent();
@@ -466,18 +479,30 @@ class AccountResourceIT {
 
         userRepository.saveAndFlush(anotherUser);
 
-        AdminUserDTO userDTO = new AdminUserDTO();
-        userDTO.setLogin("not-used");
-        userDTO.setFirstName("firstname");
-        userDTO.setLastName("lastname");
-        userDTO.setEmail("save-existing-email2@example.com");
-        userDTO.setActivated(false);
-        userDTO.setImageUrl("http://placehold.it/50x50");
-        userDTO.setLangKey(Constants.DEFAULT_LANGUAGE);
-        userDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.ADMIN));
+        AdminUserDTO adminUserDTO = new AdminUserDTO();
+        adminUserDTO.setId(1L);
+        adminUserDTO.setLogin("not-used");
+        adminUserDTO.setFirstName("firstname");
+        adminUserDTO.setLastName("lastname");
+        adminUserDTO.setEmail("save-existing-email2@example.com");
+        adminUserDTO.setActivated(false);
+        adminUserDTO.setImageUrl("http://placehold.it/50x50");
+        adminUserDTO.setLangKey(Constants.DEFAULT_LANGUAGE);
+        adminUserDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.ADMIN));
+
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(adminUserDTO.getId());
+        userDTO.setLogin(adminUserDTO.getLogin());
+        userDTO.setFirstName(adminUserDTO.getFirstName());
+        userDTO.setLastName(adminUserDTO.getLastName());
+        userDTO.setEmail(adminUserDTO.getEmail());
+        userProfileDTO.setUser(userDTO);
 
         restAccountMockMvc
-            .perform(post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)).with(csrf()))
+            .perform(
+                post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userProfileDTO)).with(csrf())
+            )
             .andExpect(status().isBadRequest());
 
         User updatedUser = userRepository.findOneByLogin("save-existing-email").orElse(null);
@@ -495,18 +520,30 @@ class AccountResourceIT {
         user.setActivated(true);
         userRepository.saveAndFlush(user);
 
-        AdminUserDTO userDTO = new AdminUserDTO();
-        userDTO.setLogin("not-used");
-        userDTO.setFirstName("firstname");
-        userDTO.setLastName("lastname");
-        userDTO.setEmail("save-existing-email-and-login@example.com");
-        userDTO.setActivated(false);
-        userDTO.setImageUrl("http://placehold.it/50x50");
-        userDTO.setLangKey(Constants.DEFAULT_LANGUAGE);
-        userDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.ADMIN));
+        AdminUserDTO adminUserDTO = new AdminUserDTO();
+        adminUserDTO.setId(1L);
+        adminUserDTO.setLogin("not-used");
+        adminUserDTO.setFirstName("firstname");
+        adminUserDTO.setLastName("lastname");
+        adminUserDTO.setEmail("save-existing-email-and-login@example.com");
+        adminUserDTO.setActivated(false);
+        adminUserDTO.setImageUrl("http://placehold.it/50x50");
+        adminUserDTO.setLangKey(Constants.DEFAULT_LANGUAGE);
+        adminUserDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.ADMIN));
+
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setLogin(user.getLogin());
+        userDTO.setFirstName(user.getFirstName());
+        userDTO.setLastName(user.getLastName());
+        userDTO.setEmail(user.getEmail());
+        userProfileDTO.setUser(userDTO);
 
         restAccountMockMvc
-            .perform(post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)).with(csrf()))
+            .perform(
+                post("/api/account").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userProfileDTO)).with(csrf())
+            )
             .andExpect(status().isOk());
 
         User updatedUser = userRepository.findOneByLogin("save-existing-email-and-login").orElse(null);

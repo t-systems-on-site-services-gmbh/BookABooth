@@ -5,13 +5,26 @@ import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CON
 
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.*;
+
+import de.tsystems.onsite.bookabooth.domain.Authority;
+import de.tsystems.onsite.bookabooth.domain.BoothUser;
+import de.tsystems.onsite.bookabooth.domain.Company;
+import de.tsystems.onsite.bookabooth.domain.User;
+
 import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.dto.*;
+import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
+import de.tsystems.onsite.bookabooth.service.exception.*;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -26,6 +39,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +55,8 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+
+    private final CompanyService companyService;
 
     private final CompanyRepository companyRepository;
 
@@ -62,7 +78,10 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final Validator validator;
+
     public UserService(
+        CompanyService companyService,
         UserRepository userRepository,
         CompanyRepository companyRepository,
         BoothUserRepository boothUserRepository,
@@ -73,10 +92,12 @@ public class UserService {
         PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        Validator validator
     ) {
-        this.userRepository = userRepository;
+        this.companyService = companyService;
         this.companyRepository = companyRepository;
+        this.userRepository = userRepository;
         this.boothUserRepository = boothUserRepository;
         this.userMapper = userMapper;
         this.companyMapper = companyMapper;
@@ -86,6 +107,7 @@ public class UserService {
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.validator = validator;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -128,7 +150,73 @@ public class UserService {
             });
     }
 
-    public User registerUser(AdminUserDTO userDTO, String password) {
+    public BoothUser registerUser(UserRegistrationDTO userRegistrationDTO) {
+        if (!userRegistrationDTO.getTermsAccepted()) {
+            throw new TermsNotAcceptedException();
+        }
+
+        userRepository
+            .findOneByLogin(userRegistrationDTO.getLogin().toLowerCase())
+            .ifPresent(existingUser -> {
+                boolean removed = removeNonActivatedUser(existingUser);
+                if (!removed) {
+                    throw new UsernameAlreadyUsedException();
+                }
+            });
+        userRepository
+            .findOneByEmailIgnoreCase(userRegistrationDTO.getEmail())
+            .ifPresent(existingUser -> {
+                boolean removed = removeNonActivatedUser(existingUser);
+                if (!removed) {
+                    throw new EmailAlreadyUsedException();
+                }
+            });
+        // find user by company name
+        boothUserRepository
+            .findByCompanyName(userRegistrationDTO.getCompanyName())
+            .stream()
+            .findFirst()
+            .ifPresent(existingUser -> {
+                User user = existingUser.getUser();
+                boolean removed = removeNonActivatedUser(user);
+                if (!removed) {
+                    throw new CompanyAlreadyUsedException();
+                }
+            });
+
+        // new User
+        User newUser = new User();
+        // add Authority USER
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        newUser.setAuthorities(authorities);
+        newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
+        newUser.setActivated(false);
+        newUser.setActivationKey(RandomUtil.generateActivationKey());
+        newUser.setLogin(userRegistrationDTO.getLogin().toLowerCase());
+        newUser.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        newUser.setEmail(userRegistrationDTO.getEmail().toLowerCase());
+
+        // new Company
+        CompanyDTO companyDTO = new CompanyDTO();
+        companyDTO.setName(userRegistrationDTO.getCompanyName());
+        companyDTO = companyService.save(companyDTO);
+        Company company = companyRepository.getReferenceById(companyDTO.getId());
+
+        // new BoothUser
+        BoothUser newBoothUser = new BoothUser();
+        newBoothUser.setUser(newUser);
+        newBoothUser.setCompany(company);
+        boothUserRepository.save(newBoothUser);
+        //this.clearUserCaches(newUser);
+
+        log.debug("Created Information for User: {}", newUser);
+        log.debug("user was rigistered: {}", newUser);
+        return newBoothUser;
+    }
+
+    @Deprecated
+    public User old_registerUser(AdminUserDTO userDTO, String password) {
         userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
             .ifPresent(existingUser -> {
@@ -145,6 +233,12 @@ public class UserService {
                     throw new EmailAlreadyUsedException();
                 }
             });
+        companyRepository
+            .findOneByNameIgnoreCase(userDTO.getCompanyName())
+            .ifPresent(c -> {
+                throw new CompanyAlreadyUsedException();
+            });
+
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(userDTO.getLogin().toLowerCase());
@@ -263,6 +357,55 @@ public class UserService {
             });
     }
 
+    // Deletes an account and its dependencies, cannot delete admin if there is only one in the system
+    @Transactional
+    public void deleteAccount(Long userId) {
+        log.debug("Request to delete Account with userId: {}", userId);
+
+        // Checks, if the user is an admin and how many admins are in the system
+        if (isAdmin()) {
+            long adminCount = userRepository.countByAuthoritiesName("ROLE_ADMIN");
+            if (adminCount <= 1) {
+                throw new BadRequestException("Cannot delete the last admin user");
+            }
+            log.debug("User is an admin, only deleting user: {}", userId);
+            userRepository.findById(userId).ifPresent(userRepository::delete);
+        }
+        // find and delete the user with its dependencies
+        userRepository
+            .findById(userId)
+            .ifPresent(user -> {
+                Optional<BoothUser> boothUser = boothUserRepository.findById(userId);
+
+                if (boothUser.isPresent()) {
+                    Long companyId = boothUser.get().getCompany().getId();
+
+                    log.debug("Removing boothUser with ID: {}", userId);
+                    boothUserRepository.deleteById(userId);
+
+                    // Checks, if the user is the last user of its company
+                    long boothUserCount = boothUserRepository.countByCompanyId(companyId);
+                    if (boothUserCount == 0) {
+                        bookingRepository
+                            .findByCompanyId(companyId)
+                            .ifPresent(booking -> {
+                                log.debug("Removing booking with ID: {}", booking.getId());
+                                bookingRepository.delete(booking);
+                            });
+                        log.debug("Removing company with ID: {}", companyId);
+                        companyRepository.deleteById(companyId);
+                    } else {
+                        log.debug("Company with ID: {} has other users, not deleting company and booking", companyId);
+                    }
+
+                    log.debug("Removing user with ID: {}", userId);
+                    userRepository.deleteById(userId);
+                } else {
+                    log.debug("No boothUser found with User ID: {}", userId);
+                }
+            });
+    }
+
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
@@ -289,25 +432,29 @@ public class UserService {
             });
     }
 
-    // Method to update the Userprofile with user- and companydata
+    /**
+     *
+     * @param userProfileDTO Profile containing user- and company-information, is checked in controller-method and passed through to service
+     * @throws AccountNotFoundException Exception is thrown if the repository cannot find the id passed down from the profile
+     */
     public void updateUserProfile(UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+        Set<ConstraintViolation<UserDTO>> violations = validator.validate(userProfileDTO.getUser());
+        if (!violations.isEmpty()) {
+            // Is checked to prevent the user from entering invalid user-details
+            throw new BadRequestException();
+        }
+
         Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
         if (optionalUser.isEmpty()) {
             throw new AccountNotFoundException("User could not be found");
         }
-        boolean isAdmin = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
 
         User user = optionalUser.get();
         this.clearUserCaches(user);
         userMapper.profileDTOtoUserEntity(userProfileDTO, user);
         userRepository.save(user);
 
-        if (!isAdmin && userProfileDTO.getCompany() != null) {
+        if (!isAdmin() && userProfileDTO.getCompany() != null) {
             Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
             if (optionalCompany.isPresent()) {
                 Company company = optionalCompany.get();
@@ -317,6 +464,15 @@ public class UserService {
         }
         this.clearUserCaches(user);
         log.debug("Changed Information for User: {}", user);
+    }
+
+    public static boolean isAdmin() {
+        return SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
     }
 
     // Removes the user from the waiting list
@@ -332,27 +488,25 @@ public class UserService {
     }
 
     // Set the booking status to canceled (from prebooked or confirmed)
-    public void cancelBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(booking -> {
+    public void cancelBooking(UserProfileDTO userProfileDTO, Long bookingId) {
+        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        optionalBooking.ifPresent(booking -> {
+            if (booking.getId().equals(bookingId)) {
                 booking.setStatus(CANCELED);
                 bookingRepository.save(booking);
-                return userProfileDTO;
-            });
+            }
+        });
     }
 
     // Set the booking status from prebooked to confirmed
-    public void confirmBooking(UserProfileDTO userProfileDTO) {
-        Optional.of(bookingRepository.findById(userProfileDTO.getUser().getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(booking -> {
+    public void confirmBooking(UserProfileDTO userProfileDTO, Long bookingId) {
+        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        optionalBooking.ifPresent(booking -> {
+            if (booking.getId().equals(bookingId)) {
                 booking.setStatus(CONFIRMED);
                 bookingRepository.save(booking);
-                return userProfileDTO;
-            });
+            }
+        });
     }
 
     // Checks the password of the current user
@@ -418,18 +572,11 @@ public class UserService {
      */
     @Transactional
     public UserProfileDTO getUserProfile(String login) {
-        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new RuntimeException("User not found"));
-
-        boolean isAdmin = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .anyMatch(role -> role.equalsIgnoreCase("ROLE_ADMIN"));
+        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         UserDTO userDTO = userMapper.userToUserDTO(user);
 
-        if (isAdmin) {
+        if (isAdmin()) {
             return new UserProfileDTO(
                 userDTO,
                 null,
@@ -437,16 +584,22 @@ public class UserService {
                 user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet())
             );
         } else {
-            BoothUser boothUser = boothUserRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("BoothUser not found"));
+            BoothUser boothUser = boothUserRepository
+                .findById(user.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("BoothUser not found"));
 
             Company company = companyRepository
                 .findById(boothUser.getCompany().getId())
                 .orElseThrow(() -> new RuntimeException("Company not found"));
 
-            Booking booking = bookingRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
-
             CompanyDTO companyDTO = companyMapper.toDto(company);
-            BookingDTO bookingDTO = bookingMapper.toDto(booking);
+
+            Optional<Booking> booking = bookingRepository.findByCompanyId(company.getId());
+            BookingDTO bookingDTO = null;
+            if (booking.isPresent()) {
+                bookingDTO = bookingMapper.toDto(booking.get());
+            }
+
             return new UserProfileDTO(
                 userDTO,
                 companyDTO,
@@ -505,5 +658,45 @@ public class UserService {
         if (user.getEmail() != null) {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
         }
+    }
+
+    public ChecklistDTO getChecklistDTO(String login) {
+        ChecklistDTO cl = new ChecklistDTO();
+        BoothUser bUser = boothUserRepository.findByUserLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Booking booking = bookingRepository.findById(bUser.getUser().getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (bUser.getUser().isActivated()) {
+            cl.setVerified(true);
+        }
+
+        if (!bUser.getCompany().getBillingAddress().isEmpty()) {
+            cl.setAddress(true);
+        }
+
+        if (!bUser.getCompany().getLogo().isEmpty()) {
+            cl.setLogo(true);
+        }
+
+        // todo: delete dummy data after implementation
+        // dummy data
+        cl.setPressContact(false);
+        // dummy data
+
+        if (!bUser.getCompany().getLogo().isEmpty()) {
+            cl.setLogo(true);
+        }
+
+        if (!bUser.getCompany().getDescription().isEmpty()) {
+            cl.setCompanyDescription(true);
+        }
+
+        cl.setBookingStatus(Optional.of(booking.getStatus()));
+
+        return cl;
+    }
+
+    public List<User> findUsersByCompanyId(Long companyId) {
+        var boothUsers = boothUserRepository.findByCompanyId(companyId);
+        return boothUsers.stream().map(BoothUser::getUser).toList();
     }
 }

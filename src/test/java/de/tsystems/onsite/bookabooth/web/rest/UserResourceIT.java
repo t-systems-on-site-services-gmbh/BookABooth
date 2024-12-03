@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.Authority;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
@@ -23,9 +22,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @AutoConfigureMockMvc
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
-@IntegrationTest
+@SpringBootTest
+@ActiveProfiles("mytest")
 class UserResourceIT {
 
     private static final String DEFAULT_LOGIN = "johndoe";
@@ -135,6 +137,7 @@ class UserResourceIT {
         user.setActivated(true);
         user.setImageUrl(DEFAULT_IMAGEURL);
         user.setLangKey(DEFAULT_LANGKEY);
+        user.setTermsAccepted(true);
         user.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
 
         restUserMockMvc
@@ -303,6 +306,7 @@ class UserResourceIT {
         user.setLastModifiedBy(updatedUser.getLastModifiedBy());
         user.setLastModifiedDate(updatedUser.getLastModifiedDate());
         user.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        user.setTermsAccepted(true);
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)).with(csrf()))
@@ -344,6 +348,7 @@ class UserResourceIT {
         user.setLastModifiedBy(updatedUser.getLastModifiedBy());
         user.setLastModifiedDate(updatedUser.getLastModifiedDate());
         user.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        user.setTermsAccepted(true);
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)).with(csrf()))

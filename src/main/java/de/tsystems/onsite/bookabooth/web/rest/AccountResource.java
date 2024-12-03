@@ -1,14 +1,18 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
-import de.tsystems.onsite.bookabooth.domain.PersistentToken;
-import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
+import de.tsystems.onsite.bookabooth.service.dto.ChecklistDTO;
 import de.tsystems.onsite.bookabooth.service.dto.PasswordChangeDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
+import de.tsystems.onsite.bookabooth.service.exception.CompanyAlreadyUsedException;
 import de.tsystems.onsite.bookabooth.web.rest.errors.*;
 import de.tsystems.onsite.bookabooth.web.rest.vm.KeyAndPasswordVM;
 import de.tsystems.onsite.bookabooth.web.rest.vm.ManagedUserVM;
@@ -65,19 +69,21 @@ public class AccountResource {
     /**
      * {@code POST  /register} : register the user.
      *
-     * @param managedUserVM the managed user View Model.
+     * @param userReg the managed user View Model.
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already used.
+     * @throws CompanyAlreadyUsedException {@code 400 (Bad Request)} if the company is already used.
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
+    public void registerAccount(@Valid @RequestBody UserRegistrationDTO userReg) {
+        if (isPasswordLengthInvalid(userReg.getPassword())) {
             throw new InvalidPasswordException();
         }
-        User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
+
+        BoothUser boothUser = userService.registerUser(userReg);
+        mailService.sendActivationEmail(boothUser.getUser());
     }
 
     /**
@@ -172,7 +178,7 @@ public class AccountResource {
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.cancelBooking(userProfileDTO);
+        userService.cancelBooking(userProfileDTO, userProfileDTO.getBooking().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -189,7 +195,7 @@ public class AccountResource {
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.confirmBooking(userProfileDTO);
+        userService.confirmBooking(userProfileDTO, userProfileDTO.getBooking().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -271,6 +277,25 @@ public class AccountResource {
     }
 
     /**
+     *
+     * @param passwordChangeDTO is used to check the password in the db with password input
+     * @param id is given in the url to identify the user
+     * @return bad request, if the password is incorrect, otherwise it returns ok
+     */
+    @DeleteMapping("/account/delete-account/{id}")
+    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO, @PathVariable Long id) {
+        if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
+            userService.deleteAccount(id);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
      * {@code POST   /account/reset-password/init} : Send an email to reset the password of the user.
      *
      * @param mail the mail of the user.
@@ -312,5 +337,16 @@ public class AccountResource {
             password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
+    }
+
+    /**
+     *
+     * @param authentication authenticate the user
+     * @return the data for the current user
+     */
+    @GetMapping("/checklist")
+    public ResponseEntity<ChecklistDTO> getUserChecklist(Authentication authentication) {
+        String login = authentication.getName();
+        return ResponseEntity.ok(userService.getChecklistDTO(login));
     }
 }

@@ -117,4 +117,10 @@ public class MailService {
         log.debug("Sending password reset email to '{}'", user.getEmail());
         this.sendEmailFromTemplateSync(user, "mail/passwordResetEmail", "email.reset.title");
     }
+
+    @Async
+    public void sendWaitingListEmail(User user) {
+        log.debug("Sending waiting list email to '{}'", user.getEmail());
+        this.sendEmailFromTemplateSync(user, "mail/waitinglistEmail", "email.waitinglist.title");
+    }
 }

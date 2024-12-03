@@ -334,11 +334,31 @@
           <br /><br />
         </div>
         <!--- Konto löschen + Modal -->
-        <p>
-          Hier können Sie Ihr Konto löschen. Dies kann nicht rückgängig gemacht werden. Beachten Sie, dass dies nicht möglich ist, wenn Sie
-          eine aktive Standbuchung haben.
+        <p v-if="settingsAccount?.booking?.status === 'PREBOOKED'">
+          Solange Sie eine vorgemerkte Standbuchung haben, können Sie Ihr Konto nicht löschen. Stonieren Sie Ihre Standbuchung, falls Sie
+          Ihr Konto löschen wollen.
         </p>
-        <button type="button" class="btn btn-danger" id="show-btn" @click="showModal">Konto löschen</button>
+        <p v-else-if="settingsAccount?.booking?.status === 'CONFIRMED'">
+          Solange Sie eine bestätigte Standbuchung haben, können Sie Ihr Konto nicht löschen. Stonieren Sie Ihre Standbuchung, falls Sie Ihr
+          Konto löschen wollen.
+        </p>
+        <p v-else-if="hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin">
+          Sie sind der einzige Admin im System. Es ist nicht möglich, den einzigen Admin zu löschen.
+        </p>
+        <p v-else>Hier können Sie Ihr Konto löschen. Wenn Sie Ihr Konto löschen, kann es nicht wiederhergestellt werden.</p>
+        <button
+          type="button"
+          class="btn btn-danger"
+          id="show-btn"
+          :disabled="
+            settingsAccount?.booking?.status === 'PREBOOKED' ||
+            settingsAccount?.booking?.status === 'CONFIRMED' ||
+            (hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin)
+          "
+          @click="showModal"
+        >
+          Konto löschen
+        </button>
         <b-modal ref="deleteAcc-modal" hide-footer title="Benutzerkonto löschen" @hidden="resetModal">
           <div class="d-block text-left">
             <div class="w-100">
@@ -349,7 +369,7 @@
             </div>
             <h4>Sind Sie sich sicher, dass Sie Ihr Konto löschen wollen?</h4>
             <p>Beachten Sie, dass dies nicht rückgängig gemacht werden kann.</p>
-            <form name="deleteForm" id="delete-form" @submit.prevent="confirmDelete">
+            <form name="deleteForm" id="delete-form" @submit.prevent="confirmDelete(settingsAccount.user.id)">
               <b-form-group label="Bestätigen Sie mit Ihrem Passwort." label-for="passwordConfirm">
                 <b-form-input
                   id="passwordConfirm"
@@ -366,7 +386,9 @@
           </div>
           <div class="d-flex justify-content-end">
             <b-button class="btn btn-secondary" @click="hideModal">Abbrechen</b-button>
-            <b-button type="submit" class="btn btn-danger ml-3" id="confirmDelete" @click="confirmDelete">Konto löschen</b-button>
+            <b-button type="submit" class="btn btn-danger ml-3" id="confirmDelete" @click="confirmDelete(settingsAccount.user.id)"
+              >Konto löschen</b-button
+            >
           </div>
         </b-modal>
       </div>
