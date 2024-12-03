@@ -5,7 +5,11 @@ import static de.tsystems.onsite.bookabooth.domain.DepartmentTestSamples.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+@SpringBootTest
+@ActiveProfiles("mytest")
 class DepartmentMapperTest {
 
     private DepartmentMapper departmentMapper;

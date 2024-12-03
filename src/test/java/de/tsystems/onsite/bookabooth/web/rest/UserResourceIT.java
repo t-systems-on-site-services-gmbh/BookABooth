@@ -137,6 +137,7 @@ class UserResourceIT {
         user.setActivated(true);
         user.setImageUrl(DEFAULT_IMAGEURL);
         user.setLangKey(DEFAULT_LANGKEY);
+        user.setTermsAccepted(true);
         user.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
 
         restUserMockMvc
@@ -305,6 +306,7 @@ class UserResourceIT {
         user.setLastModifiedBy(updatedUser.getLastModifiedBy());
         user.setLastModifiedDate(updatedUser.getLastModifiedDate());
         user.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        user.setTermsAccepted(true);
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)).with(csrf()))
@@ -346,6 +348,7 @@ class UserResourceIT {
         user.setLastModifiedBy(updatedUser.getLastModifiedBy());
         user.setLastModifiedDate(updatedUser.getLastModifiedDate());
         user.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        user.setTermsAccepted(true);
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)).with(csrf()))

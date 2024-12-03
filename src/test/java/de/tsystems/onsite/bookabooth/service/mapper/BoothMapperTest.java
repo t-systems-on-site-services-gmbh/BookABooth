@@ -5,7 +5,11 @@ import static de.tsystems.onsite.bookabooth.domain.BoothTestSamples.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+@SpringBootTest
+@ActiveProfiles("mytest")
 class BoothMapperTest {
 
     private BoothMapper boothMapper;

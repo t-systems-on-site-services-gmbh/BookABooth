@@ -6,7 +6,6 @@ import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
-import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.*;
@@ -50,8 +49,6 @@ public class AccountResource {
 
     private final UserService userService;
 
-    private final BoothUserService boothUserService;
-
     private final MailService mailService;
 
     private final PersistentTokenRepository persistentTokenRepository;
@@ -59,13 +56,11 @@ public class AccountResource {
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
-        BoothUserService boothUserService,
         MailService mailService,
         PersistentTokenRepository persistentTokenRepository
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
-        this.boothUserService = boothUserService;
         this.mailService = mailService;
         this.persistentTokenRepository = persistentTokenRepository;
     }

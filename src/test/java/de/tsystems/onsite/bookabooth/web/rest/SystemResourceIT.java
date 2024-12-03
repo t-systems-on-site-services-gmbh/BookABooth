@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.domain.System;
 import de.tsystems.onsite.bookabooth.repository.SystemRepository;
+import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.service.dto.SystemDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.SystemMapper;
 import jakarta.persistence.EntityManager;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("mytest")
-@WithMockUser
+@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 class SystemResourceIT {
 
     private static final Boolean DEFAULT_ENABLED = false;

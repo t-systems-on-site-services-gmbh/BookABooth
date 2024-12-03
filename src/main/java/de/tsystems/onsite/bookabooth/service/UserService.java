@@ -10,7 +10,6 @@ import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.*;
-import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.dto.*;
@@ -22,6 +21,8 @@ import de.tsystems.onsite.bookabooth.service.exception.*;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -75,6 +76,8 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final Validator validator;
+
     public UserService(
         CompanyService companyService,
         UserRepository userRepository,
@@ -87,7 +90,8 @@ public class UserService {
         PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        Validator validator
     ) {
         this.companyService = companyService;
         this.companyRepository = companyRepository;
@@ -101,6 +105,7 @@ public class UserService {
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.validator = validator;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -350,19 +355,21 @@ public class UserService {
             });
     }
 
-    // Deletes an account over boothUser, also goes over the dependencies
+    // Deletes an account and its dependencies, cannot delete admin if there is only one in the system
     @Transactional
     public void deleteAccount(Long userId) {
         log.debug("Request to delete Account with userId: {}", userId);
 
+        // Checks, if the user is an admin and how many admins are in the system
         if (isAdmin()) {
-            int adminCount = userRepository.countAdmins();
+            long adminCount = userRepository.countByAuthoritiesName("ROLE_ADMIN");
             if (adminCount <= 1) {
-                throw new IllegalStateException("Cannot delete the last admin user");
+                throw new BadRequestException("Cannot delete the last admin user");
             }
             log.debug("User is an admin, only deleting user: {}", userId);
             userRepository.findById(userId).ifPresent(userRepository::delete);
         }
+        // find and delete the user with its dependencies
         userRepository
             .findById(userId)
             .ifPresent(user -> {
@@ -374,17 +381,23 @@ public class UserService {
                     log.debug("Removing boothUser with ID: {}", userId);
                     boothUserRepository.deleteById(userId);
 
-                    bookingRepository
-                        .findByCompanyId(companyId)
-                        .ifPresent(booking -> {
-                            log.debug("Removing booking with ID: {}", booking.getId());
-                            bookingRepository.delete(booking);
-                        });
+                    // Checks, if the user is the last user of its company
+                    long boothUserCount = boothUserRepository.countByCompanyId(companyId);
+                    if (boothUserCount == 0) {
+                        bookingRepository
+                            .findByCompanyId(companyId)
+                            .ifPresent(booking -> {
+                                log.debug("Removing booking with ID: {}", booking.getId());
+                                bookingRepository.delete(booking);
+                            });
+                        log.debug("Removing company with ID: {}", companyId);
+                        companyRepository.deleteById(companyId);
+                    } else {
+                        log.debug("Company with ID: {} has other users, not deleting company and booking", companyId);
+                    }
+
                     log.debug("Removing user with ID: {}", userId);
                     userRepository.deleteById(userId);
-
-                    log.debug("Removing company with ID: {}", companyId);
-                    companyRepository.deleteById(companyId);
                 } else {
                     log.debug("No boothUser found with User ID: {}", userId);
                 }
@@ -417,8 +430,17 @@ public class UserService {
             });
     }
 
-    // Method to update the Userprofile with user- and companydata
+    /**
+     *
+     * @param userProfileDTO Profile containing user- and company-information, is checked in controller-method and passed through to service
+     * @throws AccountNotFoundException Exception is thrown if the repository cannot find the id passed down from the profile
+     */
     public void updateUserProfile(UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+        Set<ConstraintViolation<UserDTO>> violations = validator.validate(userProfileDTO.getUser());
+        if (!violations.isEmpty()) {
+            // Is checked to prevent the user from entering invalid user-details
+            throw new BadRequestException();
+        }
         Optional<User> optionalUser = userRepository.findById(userProfileDTO.getUser().getId());
         if (optionalUser.isEmpty()) {
             throw new AccountNotFoundException("User could not be found");
@@ -465,20 +487,22 @@ public class UserService {
     // Set the booking status to canceled (from prebooked or confirmed)
     public void cancelBooking(UserProfileDTO userProfileDTO, Long bookingId) {
         Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
-        optionalBooking.stream().filter(booking -> booking.getId().equals(bookingId)).findFirst();
         optionalBooking.ifPresent(booking -> {
-            booking.setStatus(CANCELED);
-            bookingRepository.save(booking);
+            if (booking.getId().equals(bookingId)) {
+                booking.setStatus(CANCELED);
+                bookingRepository.save(booking);
+            }
         });
     }
 
     // Set the booking status from prebooked to confirmed
     public void confirmBooking(UserProfileDTO userProfileDTO, Long bookingId) {
         Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
-        optionalBooking.stream().filter(booking -> booking.getId().equals(bookingId)).findFirst();
         optionalBooking.ifPresent(booking -> {
-            booking.setStatus(CONFIRMED);
-            bookingRepository.save(booking);
+            if (booking.getId().equals(bookingId)) {
+                booking.setStatus(CONFIRMED);
+                bookingRepository.save(booking);
+            }
         });
     }
 

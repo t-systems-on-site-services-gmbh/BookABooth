@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.tsystems.onsite.bookabooth.IntegrationTest;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
@@ -29,16 +28,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integration tests for the {@link BoothUserResource} REST controller.
  */
-@IntegrationTest
+@SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("mytest")
 @WithMockUser
 class BoothUserResourceIT {
 
@@ -51,10 +53,10 @@ class BoothUserResourceIT {
     private static final UUID DEFAULT_VERIFICATION_CODE = UUID.randomUUID();
     private static final UUID UPDATED_VERIFICATION_CODE = UUID.randomUUID();
 
-    private static final ZonedDateTime DEFAULT_VERIFIED = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
+    private static final ZonedDateTime DEFAULT_VERIFIED = ZonedDateTime.ofInstant(Instant.ofEpochMilli(100000000000L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_VERIFIED = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
 
-    private static final ZonedDateTime DEFAULT_LAST_LOGIN = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
+    private static final ZonedDateTime DEFAULT_LAST_LOGIN = ZonedDateTime.ofInstant(Instant.ofEpochMilli(1000000000000L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_LAST_LOGIN = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
 
     private static final Boolean DEFAULT_DISABLED = false;
