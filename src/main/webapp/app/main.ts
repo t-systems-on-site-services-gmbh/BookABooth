@@ -92,7 +92,7 @@ const app = createApp({
         if (status === 401) {
           // Store logged out state.
           store.logout();
-          if (!url.endsWith('api/account') && !url.endsWith('api/authentication')) {
+          if (!url.endsWith('api/account') && !url.endsWith('api/authentication') && !url.endsWith('api/checklist')) {
             // Ask for a new authentication
             loginService.openLogin();
             return;

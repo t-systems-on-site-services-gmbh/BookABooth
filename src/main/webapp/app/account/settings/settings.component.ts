@@ -30,7 +30,6 @@ export default defineComponent({
     const exhibitorList = inject<ComputedRef<Boolean>>('exhibitorList', () => computed(() => store.account.company?.exhibitorList), true);
     const authorities = inject<ComputedRef<Set<String>>>('authorities', () => computed(() => store.account?.authorities), true);
     const preview = ref(null);
-    const image = ref(false);
     const bookingStatus = ref(null);
     const deleteAccount = ref(null);
     const passwordConfirm = ref('');
@@ -85,9 +84,7 @@ export default defineComponent({
           description: {
             maxLength: maxLength(254),
           },
-          logoUpload: {
-            maxLength: maxLength(200),
-          },
+          logoUpload: {},
           exhibitorList: {},
         },
         user: {
@@ -124,7 +121,6 @@ export default defineComponent({
       settingsAccount,
       username,
       preview,
-      image,
       waitingList,
       bookingStatus,
       exhibitorList,

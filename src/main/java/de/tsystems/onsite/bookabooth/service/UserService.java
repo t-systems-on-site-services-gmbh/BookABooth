@@ -659,36 +659,32 @@ public class UserService {
     public ChecklistDTO getChecklistDTO(String login) {
         ChecklistDTO cl = new ChecklistDTO();
         BoothUser bUser = boothUserRepository.findByUserLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Booking booking = bookingRepository.findById(bUser.getUser().getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+        Booking booking = bookingRepository
+            .findByCompanyId(bUser.getCompany().getId())
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         if (bUser.getUser().isActivated()) {
             cl.setVerified(true);
         }
-
-        if (!bUser.getCompany().getBillingAddress().isEmpty()) {
+        if (isNotEmpty(bUser.getCompany().getBillingAddress())) {
             cl.setAddress(true);
         }
-
-        if (!bUser.getCompany().getLogo().isEmpty()) {
+        if (isNotEmpty(bUser.getCompany().getLogo())) {
             cl.setLogo(true);
         }
-
-        // todo: delete dummy data after implementation
-        // dummy data
+        // todo: implement pressContact and delete dummy data
         cl.setPressContact(false);
-        // dummy data
 
-        if (!bUser.getCompany().getLogo().isEmpty()) {
-            cl.setLogo(true);
-        }
-
-        if (!bUser.getCompany().getDescription().isEmpty()) {
+        if (isNotEmpty(bUser.getCompany().getDescription())) {
             cl.setCompanyDescription(true);
         }
-
         cl.setBookingStatus(Optional.of(booking.getStatus()));
-
         return cl;
+    }
+
+    // Utility Method for checklist to prevent NullPointerException
+    private boolean isNotEmpty(String value) {
+        return value != null && !value.isEmpty();
     }
 
     public List<User> findUsersByCompanyId(Long companyId) {
