@@ -41,6 +41,16 @@ public interface CompanyMapper extends EntityMapper<CompanyDTO, Company> {
     @Mapping(target = "id", source = "id")
     ContactDTO toDtoContactId(Contact contact);
 
+    @Named("contactDetails")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "firstName", source = "firstName")
+    @Mapping(target = "lastName", source = "lastName")
+    @Mapping(target = "mail", source = "mail")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "responsibility", source = "responsibility")
+    @Mapping(target = "note", source = "note")
+    ContactDTO toDtoContactDetails(Contact contact);
+
     @Named("contactIdSet")
     default Set<ContactDTO> toDtoContactIdSet(Set<Contact> contact) {
         return contact.stream().map(this::toDtoContactId).collect(Collectors.toSet());

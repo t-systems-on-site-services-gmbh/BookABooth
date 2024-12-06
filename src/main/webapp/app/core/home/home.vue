@@ -91,9 +91,14 @@
                   'list-group-item-success': address,
                   'mb-0': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Rechnungsanschrift
+                <span class="text">Rechnungsanschrift</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingOne' }" v-if="!address">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <div
                 :class="{
@@ -102,9 +107,14 @@
                   'list-group-item-success': logo,
                   'mb-0': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Logo des Unternehmens
+                <span class="text">Logo des Unternehmens</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingOne' }" v-if="!logo">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <div
                 :class="{
@@ -113,9 +123,14 @@
                   'list-group-item-success': pressContact,
                   'mb-0': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Pressekontakt
+                <span class="text">Pressekontakt</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingThree' }" v-if="!pressContact">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <div
                 :class="{
@@ -124,9 +139,14 @@
                   'list-group-item-success': companyDescription,
                   'mb-1': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Firmenkurzbeschreibung
+                <span class="text">Firmenkurzbeschreibung</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingOne' }" v-if="!companyDescription">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <p class="mb-1 font-weight-normal">Ändern Sie Ihre Kontaktdaten im <a href="account/settings">Profil</a>.</p>
             </div>
@@ -162,7 +182,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .logo {
   max-width: 100%;
   height: auto;

@@ -20,6 +20,7 @@ import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
 import de.tsystems.onsite.bookabooth.service.exception.*;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.ContactMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -58,11 +59,15 @@ public class UserService {
 
     private final CompanyRepository companyRepository;
 
+    private final ContactRepository contactRepository;
+
     private final BoothUserRepository boothUserRepository;
 
     private final UserMapper userMapper;
 
     private final CompanyMapper companyMapper;
+
+    private final ContactMapper contactMapper;
 
     private final BookingMapper bookingMapper;
 
@@ -82,9 +87,11 @@ public class UserService {
         CompanyService companyService,
         UserRepository userRepository,
         CompanyRepository companyRepository,
+        ContactRepository contactRepository,
         BoothUserRepository boothUserRepository,
         UserMapper userMapper,
         CompanyMapper companyMapper,
+        ContactMapper contactMapper,
         BookingMapper bookingMapper,
         BookingRepository bookingRepository,
         PasswordEncoder passwordEncoder,
@@ -96,9 +103,11 @@ public class UserService {
         this.companyService = companyService;
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
+        this.contactRepository = contactRepository;
         this.boothUserRepository = boothUserRepository;
         this.userMapper = userMapper;
         this.companyMapper = companyMapper;
+        this.contactMapper = contactMapper;
         this.bookingMapper = bookingMapper;
         this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
@@ -384,6 +393,20 @@ public class UserService {
                     // Checks, if the user is the last user of its company
                     long boothUserCount = boothUserRepository.countByCompanyId(companyId);
                     if (boothUserCount == 0) {
+                        // Remove the relationship between company and contact
+                        Set<Contact> contactsToDelete = new HashSet<>();
+                        companyRepository
+                            .findById(companyId)
+                            .ifPresent(company -> {
+                                company
+                                    .getContacts()
+                                    .forEach(contact -> {
+                                        contact.getCompanies().remove(company);
+                                        contactRepository.save(contact);
+                                        contactsToDelete.add(contact);
+                                    });
+                            });
+                        // Deletes bookings associated with the company
                         bookingRepository
                             .findByCompanyId(companyId)
                             .ifPresent(booking -> {
@@ -392,8 +415,14 @@ public class UserService {
                             });
                         log.debug("Removing company with ID: {}", companyId);
                         companyRepository.deleteById(companyId);
+
+                        // Deletes contacts without relationsship to a company
+                        contactsToDelete.forEach(contact -> {
+                            log.debug("Removing contact with ID: {}", contact.getId());
+                            contactRepository.delete(contact);
+                        });
                     } else {
-                        log.debug("Company with ID: {} has other users, not deleting company and booking", companyId);
+                        log.debug("Company with ID: {} has other users, not deleting company, contacts and booking", companyId);
                     }
 
                     log.debug("Removing user with ID: {}", userId);
@@ -435,7 +464,7 @@ public class UserService {
      * @param userProfileDTO Profile containing user- and company-information, is checked in controller-method and passed through to service
      * @throws AccountNotFoundException Exception is thrown if the repository cannot find the id passed down from the profile
      */
-    public void updateUserProfile(UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+    public UserProfileDTO updateUserProfile(UserProfileDTO userProfileDTO) throws AccountNotFoundException {
         Set<ConstraintViolation<UserDTO>> violations = validator.validate(userProfileDTO.getUser());
         if (!violations.isEmpty()) {
             // Is checked to prevent the user from entering invalid user-details
@@ -451,16 +480,46 @@ public class UserService {
         userMapper.profileDTOtoUserEntity(userProfileDTO, user);
         userRepository.save(user);
 
+        Company updatedCompany = null;
         if (!isAdmin() && userProfileDTO.getCompany() != null) {
             Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
             if (optionalCompany.isPresent()) {
                 Company company = optionalCompany.get();
                 companyMapper.toEntity(userProfileDTO.getCompany(), company);
                 companyRepository.save(company);
+
+                if (userProfileDTO.getCompany().getContacts() != null) {
+                    for (ContactDTO contactDTO : userProfileDTO.getCompany().getContacts()) {
+                        Contact contact;
+                        if (contactDTO.getId() != null) {
+                            Optional<Contact> optionalContact = contactRepository.findById(contactDTO.getId());
+                            if (optionalContact.isPresent()) {
+                                contact = optionalContact.get();
+                                contactMapper.toCompanyEntity(contactDTO, contact);
+                            } else {
+                                contact = contactMapper.toEntity(contactDTO);
+                            }
+                        } else {
+                            contact = contactMapper.toEntity(contactDTO);
+                        }
+                        contactRepository.save(contact);
+                        company.getContacts().add(contact);
+                        contact.getCompanies().add(company);
+                    }
+                    companyRepository.save(company);
+                }
+                updatedCompany = company;
             }
         }
         this.clearUserCaches(user);
         log.debug("Changed Information for User: {}", user);
+
+        UserProfileDTO updatedProfile = new UserProfileDTO();
+        updatedProfile.setUser(userMapper.userToUserDTO(user));
+        if (updatedCompany != null) {
+            updatedProfile.setCompany(companyMapper.toDto(updatedCompany));
+        }
+        return updatedProfile;
     }
 
     public static boolean isAdmin() {
@@ -591,6 +650,18 @@ public class UserService {
 
             CompanyDTO companyDTO = companyMapper.toDto(company);
 
+            Set<ContactDTO> contactDTOs = companyDTO.getContacts();
+            if (contactDTOs != null && !contactDTOs.isEmpty()) {
+                Set<ContactDTO> detailedContacts = contactDTOs
+                    .stream()
+                    .map(contactDTO -> contactRepository.findById(contactDTO.getId()).map(companyMapper::toDtoContactDetails).orElse(null))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+                companyDTO.setContacts(detailedContacts);
+            } else {
+                companyDTO.setContacts(Collections.emptySet());
+            }
+
             Optional<Booking> booking = bookingRepository.findByCompanyId(company.getId());
             BookingDTO bookingDTO = null;
             if (booking.isPresent()) {
@@ -672,9 +743,9 @@ public class UserService {
         if (isNotEmpty(bUser.getCompany().getLogo())) {
             cl.setLogo(true);
         }
-        // todo: implement pressContact and delete dummy data
-        cl.setPressContact(false);
-
+        if (isContactPresent(bUser.getCompany())) {
+            cl.setPressContact(true);
+        }
         if (isNotEmpty(bUser.getCompany().getDescription())) {
             cl.setCompanyDescription(true);
         }
@@ -685,6 +756,11 @@ public class UserService {
     // Utility Method for checklist to prevent NullPointerException
     private boolean isNotEmpty(String value) {
         return value != null && !value.isEmpty();
+    }
+
+    // Another Utility Method because Contact is a set, not a string
+    private boolean isContactPresent(Company company) {
+        return company.getContacts() != null && !company.getContacts().isEmpty();
     }
 
     public List<User> findUsersByCompanyId(Long companyId) {
