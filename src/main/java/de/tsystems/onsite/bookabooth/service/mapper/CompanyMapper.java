@@ -6,7 +6,6 @@ import de.tsystems.onsite.bookabooth.domain.Department;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.service.dto.ContactDTO;
 import de.tsystems.onsite.bookabooth.service.dto.DepartmentDTO;
-import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.*;
