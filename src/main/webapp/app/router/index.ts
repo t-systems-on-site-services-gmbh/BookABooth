@@ -44,6 +44,11 @@ export const createRouter = () =>
         redirect: '/not-found',
       },
     ],
+    scrollBehavior(to, from, savedPosition) {
+      if (to.hash) {
+        return { el: to.hash };
+      }
+    },
   });
 
 const router = createRouter();

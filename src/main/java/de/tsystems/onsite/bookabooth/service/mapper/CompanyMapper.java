@@ -6,7 +6,6 @@ import de.tsystems.onsite.bookabooth.domain.Department;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.service.dto.ContactDTO;
 import de.tsystems.onsite.bookabooth.service.dto.DepartmentDTO;
-import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.*;
@@ -40,6 +39,16 @@ public interface CompanyMapper extends EntityMapper<CompanyDTO, Company> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     ContactDTO toDtoContactId(Contact contact);
+
+    @Named("contactDetails")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "firstName", source = "firstName")
+    @Mapping(target = "lastName", source = "lastName")
+    @Mapping(target = "mail", source = "mail")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "responsibility", source = "responsibility")
+    @Mapping(target = "note", source = "note")
+    ContactDTO toDtoContactDetails(Contact contact);
 
     @Named("contactIdSet")
     default Set<ContactDTO> toDtoContactIdSet(Set<Contact> contact) {
