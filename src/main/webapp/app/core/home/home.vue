@@ -10,6 +10,9 @@
     <div class="col-md-9">
       <h1 class="display-4">Willkommen!</h1>
       <p class="lead">Hier können Sie Ihren Stand für den Karrieretag buchen.</p>
+      <div class="alert alert-success w-50" v-if="authenticated">
+        <span v-if="username">Sie sind als Benutzer "{{ username }}" angemeldet.</span>
+      </div>
       <div v-if="!authenticated">
         <div>
           Der Jade Karrieretag steht wieder an und wie jedes Jahr können Sie die Gelegenheit nutzen, Aussteller auf unserem Karrieremarkt zu
@@ -22,9 +25,6 @@
         <div>
           Falls Sie noch keinen Zugang haben, können Sie sich hier
           <router-link class="alert-link" to="/register">registrieren</router-link>.
-        </div>
-        <div class="alert alert-success" v-if="authenticated">
-          <span v-if="username">Sie sind als Benutzer "{{ username }}" angemeldet.</span>
         </div>
       </div>
       <div v-if="!hasAnyAuthority('ROLE_ADMIN') && authenticated">
@@ -91,9 +91,14 @@
                   'list-group-item-success': address,
                   'mb-0': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Rechnungsanschrift
+                <span class="text">Rechnungsanschrift</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingOne' }" v-if="!address">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <div
                 :class="{
@@ -102,9 +107,14 @@
                   'list-group-item-success': logo,
                   'mb-0': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Logo des Unternehmens
+                <span class="text">Logo des Unternehmens</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingOne' }" v-if="!logo">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <div
                 :class="{
@@ -113,9 +123,14 @@
                   'list-group-item-success': pressContact,
                   'mb-0': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Pressekontakt
+                <span class="text">Pressekontakt</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingThree' }" v-if="!pressContact">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <div
                 :class="{
@@ -124,9 +139,14 @@
                   'list-group-item-success': companyDescription,
                   'mb-1': true,
                   'font-weight-normal': true,
+                  'd-flex': true,
+                  'justify-content-between': true,
                 }"
               >
-                Firmenkurzbeschreibung
+                <span class="text">Firmenkurzbeschreibung</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingOne' }" v-if="!companyDescription">
+                  <font-awesome-icon icon="arrow-right" />
+                </router-link>
               </div>
               <p class="mb-1 font-weight-normal">Ändern Sie Ihre Kontaktdaten im <a href="account/settings">Profil</a>.</p>
             </div>
@@ -162,7 +182,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .logo {
   max-width: 100%;
   height: auto;

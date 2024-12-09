@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, defineComponent, inject, onMounted, ref, type Ref } from 'vue';
+import { computed, type ComputedRef, defineComponent, inject, onMounted, watch, ref, type Ref, onUpdated } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { email, maxLength, minLength, required, requiredUnless } from '@vuelidate/validators';
 import axios from 'axios';
@@ -30,7 +30,6 @@ export default defineComponent({
     const exhibitorList = inject<ComputedRef<Boolean>>('exhibitorList', () => computed(() => store.account.company?.exhibitorList), true);
     const authorities = inject<ComputedRef<Set<String>>>('authorities', () => computed(() => store.account?.authorities), true);
     const preview = ref(null);
-    const image = ref(false);
     const bookingStatus = ref(null);
     const deleteAccount = ref(null);
     const passwordConfirm = ref('');
@@ -65,6 +64,26 @@ export default defineComponent({
       }
     };
 
+    const ensureContactsArray = () => {
+      if (settingsAccount.value && settingsAccount.value.company) {
+        if (!settingsAccount.value.company.contacts) {
+          settingsAccount.value.company.contacts = [{}];
+        } else if (settingsAccount.value.company.contacts.length === 0) {
+          settingsAccount.value.company.contacts.push({});
+        }
+      }
+    };
+
+    onUpdated(() => {
+      watch(
+        settingsAccount,
+        newValue => {
+          ensureContactsArray();
+        },
+        { immediate: true },
+      );
+    });
+
     onMounted(() => {
       fetchAdminCount();
     });
@@ -85,10 +104,26 @@ export default defineComponent({
           description: {
             maxLength: maxLength(254),
           },
-          logoUpload: {
-            maxLength: maxLength(200),
-          },
+          logoUpload: {},
           exhibitorList: {},
+          contacts: [
+            {
+              firstName: {
+                maxLength: maxLength(50),
+              },
+              lastName: {
+                maxLength: maxLength(50),
+              },
+              mail: {
+                email,
+                maxLength: maxLength(254),
+              },
+              phone: {
+                maxLength: maxLength(50),
+              },
+              responsibility: {},
+            },
+          ],
         },
         user: {
           firstName: {
@@ -124,7 +159,6 @@ export default defineComponent({
       settingsAccount,
       username,
       preview,
-      image,
       waitingList,
       bookingStatus,
       exhibitorList,
@@ -151,16 +185,33 @@ export default defineComponent({
     },
   },
   methods: {
+    createPayload(settingsAccount) {
+      const filteredContacts = settingsAccount.company.contacts.filter(contacts => {
+        return contacts.firstName || contacts.lastName || contacts.email || contacts.phone || contacts.responsibility;
+      });
+      return {
+        ...settingsAccount,
+        company: {
+          ...settingsAccount.company,
+          contacts: filteredContacts,
+        },
+      };
+    },
     save() {
       this.error = null;
       this.errorEmailExists = null;
+      const payload = this.createPayload(this.settingsAccount);
       return axios
-        .post('api/account', this.settingsAccount)
+        .post('api/account', payload)
         .then(() => {
           this.error = null;
           this.success = 'OK';
           this.errorEmailExists = null;
           window.scrollTo(0, 0);
+          return axios.get('api/account');
+        })
+        .then(response => {
+          Object.assign(this.settingsAccount, response.data);
         })
         .catch(ex => {
           this.success = null;
@@ -288,6 +339,12 @@ export default defineComponent({
       } else {
         console.log('Es ist ein Fehler aufgetreten');
       }
+    },
+    fillContact(event) {
+      event.preventDefault();
+      this.settingsAccount.company.contacts[0].firstName = this.settingsAccount.user.firstName;
+      this.settingsAccount.company.contacts[0].lastName = this.settingsAccount.user.lastName;
+      this.settingsAccount.company.contacts[0].mail = this.settingsAccount.user.email;
     },
   },
 });

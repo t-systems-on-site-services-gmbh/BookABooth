@@ -1,8 +1,6 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.*;
-import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
-import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
@@ -133,7 +131,8 @@ public class AccountResource {
      * @return the profile with its new values
      */
     @PostMapping("/account")
-    public ResponseEntity<Void> updateUserProfile(@Valid @RequestBody UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+    public ResponseEntity<UserProfileDTO> updateUserProfile(@Valid @RequestBody UserProfileDTO userProfileDTO)
+        throws AccountNotFoundException {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         Optional<User> user = userRepository.findOneByLogin(userLogin);
@@ -144,8 +143,8 @@ public class AccountResource {
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
         }
-        userService.updateUserProfile(userProfileDTO);
-        return ResponseEntity.ok().build();
+        UserProfileDTO result = userService.updateUserProfile(userProfileDTO);
+        return ResponseEntity.ok().body(result);
     }
 
     /**

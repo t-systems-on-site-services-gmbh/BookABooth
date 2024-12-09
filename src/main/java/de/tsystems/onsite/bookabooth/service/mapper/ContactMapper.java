@@ -19,6 +19,9 @@ public interface ContactMapper extends EntityMapper<ContactDTO, Contact> {
     @Mapping(target = "removeCompany", ignore = true)
     Contact toEntity(ContactDTO contactDTO);
 
+    @Mapping(target = "id", ignore = true)
+    void updateContactEntity(ContactDTO contactDTO, @MappingTarget Contact contact);
+
     @Named("companyId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
