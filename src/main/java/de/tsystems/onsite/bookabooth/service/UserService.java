@@ -495,7 +495,7 @@ public class UserService {
                             Optional<Contact> optionalContact = contactRepository.findById(contactDTO.getId());
                             if (optionalContact.isPresent()) {
                                 contact = optionalContact.get();
-                                contactMapper.toCompanyEntity(contactDTO, contact);
+                                contactMapper.updateContactEntity(contactDTO, contact);
                             } else {
                                 contact = contactMapper.toEntity(contactDTO);
                             }
@@ -654,7 +654,7 @@ public class UserService {
             if (contactDTOs != null && !contactDTOs.isEmpty()) {
                 Set<ContactDTO> detailedContacts = contactDTOs
                     .stream()
-                    .map(contactDTO -> contactRepository.findById(contactDTO.getId()).map(companyMapper::toDtoContactDetails).orElse(null))
+                    .map(contactDTO -> contactRepository.findById(contactDTO.getId()).map(contactMapper::toDto).orElse(null))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
                 companyDTO.setContacts(detailedContacts);

@@ -20,7 +20,7 @@ public interface ContactMapper extends EntityMapper<ContactDTO, Contact> {
     Contact toEntity(ContactDTO contactDTO);
 
     @Mapping(target = "id", ignore = true)
-    void toCompanyEntity(ContactDTO contactDTO, @MappingTarget Contact contact);
+    void updateContactEntity(ContactDTO contactDTO, @MappingTarget Contact contact);
 
     @Named("companyId")
     @BeanMapping(ignoreByDefault = true)
