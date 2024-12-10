@@ -263,115 +263,19 @@
                       >
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <div class="card" v-if="!hasAnyAuthority('ROLE_ADMIN')">
-              <div class="card-header" id="headingThree">
-                <h4 class="mb-0">
-                  <!--- <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo"></button> -->
-                  Pressekontakt (Optional)
-                </h4>
-              </div>
-              <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordionProfile">
-                <div class="card-body">
-                  <button @click="fillContact($event)" class="btn btn-primary mb-2 btn-sm" data-cy="fillcontact">
-                    Nutzer als Pressekontakt übernehmen
-                  </button>
-                  <!--- Vorname des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.firstName">Vorname Pressekontakt</label>
+                  <div class="form-group" v-if="!hasAnyAuthority('ROLE_ADMIN')">
+                    <label class="form-control-label" for="phoneNumber">Telefonnummer Ansprechpartner</label>
                     <input
-                      type="text"
+                      type="phone"
                       class="form-control"
-                      id="company.contacts.firstName"
-                      name="company.contacts.firstName"
-                      placeholder="Vorname Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].firstName.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].firstName.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].firstName.$model"
-                      maxlength="50"
-                      data-cy="company.contacts.firstname"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="Ihre Telefonnummer"
+                      :class="{ valid: !v$.settingsAccount.phoneNumber.$invalid, invalid: v$.settingsAccount.phoneNumber.$invalid }"
+                      v-model="v$.settingsAccount.phoneNumber.$model"
+                      maxlength="20"
+                      data-cy="phonenumber"
                     />
-                  </div>
-                  <!--- Nachname des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.lastName">Nachname Pressekontakt</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="company.contacts.lastName"
-                      name="company.contacts.lastName"
-                      placeholder="Nachname Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].lastName.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].lastName.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].lastName.$model"
-                      maxlength="50"
-                      data-cy="company.contacts.lastname"
-                    />
-                  </div>
-                  <!--- E-Mail-Adresse des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.mail">E-Mail-Adresse</label>
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="company.contacts.mail"
-                      name="company.contacts.mail"
-                      placeholder="E-Mail-Adresse Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].mail.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].mail.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].mail.$model"
-                      maxlength="254"
-                      email
-                      data-cy="company.contacts.mail"
-                    />
-                    <div
-                      v-if="v$.settingsAccount.company.contacts[0].mail.$anyDirty && v$.settingsAccount.company.contacts[0].mail.$invalid"
-                    >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.contacts[0].mail.email"
-                        >Die E-Mail-Adresse Ihres Pressekontakts ist ungültig.</small
-                      >
-                    </div>
-                  </div>
-                  <!--- Telefonnummer des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.phone">Telefonnummer</label>
-                    <input
-                      type="tel"
-                      class="form-control"
-                      id="company.contacts.phone"
-                      name="company.contacts.phone"
-                      placeholder="Telefonnummer Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].phone.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].phone.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].phone.$model"
-                      maxlength="50"
-                      data-cy="company.contacts.phone"
-                    />
-                  </div>
-                  <!--- Zuständigkeit des Pressekontakts-->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.responsibility">Zuständigkeit</label><br />
-                    <select
-                      name="company.contacts.responsibility"
-                      id="company.contacts.responsibility"
-                      v-model="v$.settingsAccount.company.contacts[0].responsibility.$model"
-                      data-cy="company.contacts.responsibility"
-                    >
-                      <option value="PRESS">Press</option>
-                      <option value="COMPANY_ADMIN">Company_Admin</option>
-                      <option value="GENERALLY">Generally</option>
-                      <option value="OTHER">Other</option>
-                    </select>
                   </div>
                 </div>
               </div>

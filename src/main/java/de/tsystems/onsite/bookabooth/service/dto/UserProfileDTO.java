@@ -14,6 +14,8 @@ public class UserProfileDTO {
     private UserDTO user;
     private CompanyDTO company;
     private BookingDTO booking;
+    private Set<String> authorities;
+    private String phoneNumber;
 
     public UserDTO getUser() {
         return user;
@@ -47,16 +49,23 @@ public class UserProfileDTO {
         this.authorities = authorities;
     }
 
-    private Set<String> authorities;
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     public UserProfileDTO() {
         // Empty constructor needed for Jackson.
     }
 
-    public UserProfileDTO(UserDTO user, CompanyDTO company, BookingDTO booking, Set<String> authorities) {
+    public UserProfileDTO(UserDTO user, CompanyDTO company, BookingDTO booking, Set<String> authorities, String phoneNumber) {
         this.user = user;
         this.company = company;
         this.booking = booking;
         this.authorities = authorities;
+        this.phoneNumber = phoneNumber;
     }
 }
