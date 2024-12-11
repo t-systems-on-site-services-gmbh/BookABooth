@@ -16,7 +16,7 @@ export default defineComponent({
     const verified = ref(false); // Beispielwert, anpassen nach Bedarf
     const address = ref(true); // Beispielwert, anpassen nach Bedarf
     const logo = ref(true); // Beispielwert, anpassen nach Bedarf
-    const pressContact = ref(true); // Beispielwert, anpassen nach Bedarf
+    const phoneNumber = ref(true); // Beispielwert, anpassen nach Bedarf
     const companyDescription = ref(true); // Beispielwert, anpassen nach Bedarf
     const bookingStatus = ref(null); // Beispielwert, anpassen nach Bedarf
 
@@ -29,7 +29,7 @@ export default defineComponent({
         verified.value = checklist.verified;
         address.value = checklist.address;
         logo.value = checklist.logo;
-        pressContact.value = checklist.pressContact;
+        phoneNumber.value = checklist.phoneNumber;
         companyDescription.value = checklist.companyDescription;
         bookingStatus.value = checklist.bookingStatus;
       } catch (error) {
@@ -71,7 +71,7 @@ export default defineComponent({
       bookingStatus,
       address,
       logo,
-      pressContact,
+      phoneNumber,
       companyDescription,
       openLogin,
       username,

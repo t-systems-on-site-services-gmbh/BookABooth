@@ -8,7 +8,7 @@ public class ChecklistDTO {
     private Boolean verified; // Verifizierte E-Mail-Adresse?
     private Boolean address; // Rechnungsadresse hinterlegt?
     private Boolean logo; // Logo hochgeladen?
-    private Boolean pressContact; // Pressekontakt hinterlegt?
+    private Boolean phoneNumber; // Telefonnummer hinterlegt?
     private Boolean companyDescription; // Firmenbeschreibung hinterlegt?
     private Optional<BookingStatus> bookingStatus; // Buchung abgeschlossen?
 
@@ -38,12 +38,12 @@ public class ChecklistDTO {
         this.logo = logo;
     }
 
-    public Boolean getPressContact() {
-        return pressContact;
+    public Boolean getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPressContact(Boolean pressContact) {
-        this.pressContact = pressContact;
+    public void setPhoneNumber(Boolean phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Boolean getCompanyDescription() {

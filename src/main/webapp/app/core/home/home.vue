@@ -73,15 +73,15 @@
                 'mb-0': true,
                 'list-group-item': true,
                 'list-group-item-action': true,
-                'list-group-item-success': address && logo && pressContact && companyDescription,
-                'list-group-item-warning': !(address && logo && pressContact && companyDescription),
+                'list-group-item-success': address && logo && phoneNumber && companyDescription,
+                'list-group-item-warning': !(address && logo && phoneNumber && companyDescription),
               }"
             >
               <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Kontaktdaten</h5>
                 <small
                   class="text-body-secondary"
-                  v-text="address && logo && pressContact && companyDescription ? 'erledigt' : 'offen'"
+                  v-text="address && logo && phoneNumber && companyDescription ? 'erledigt' : 'offen'"
                 ></small>
               </div>
               <div
@@ -119,16 +119,16 @@
               <div
                 :class="{
                   'list-group-item': true,
-                  'list-group-item-warning': !pressContact,
-                  'list-group-item-success': pressContact,
+                  'list-group-item-warning': !phoneNumber,
+                  'list-group-item-success': phoneNumber,
                   'mb-0': true,
                   'font-weight-normal': true,
                   'd-flex': true,
                   'justify-content-between': true,
                 }"
               >
-                <span class="text">Pressekontakt</span
-                ><router-link :to="{ path: '/account/settings', hash: '#headingThree' }" v-if="!pressContact">
+                <span class="text">Telefonnummer</span
+                ><router-link :to="{ path: '/account/settings', hash: '#headingTwo' }" v-if="!phoneNumber">
                   <font-awesome-icon icon="arrow-right" />
                 </router-link>
               </div>
