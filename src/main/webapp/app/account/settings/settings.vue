@@ -144,11 +144,35 @@
                       @change="logoUpload"
                     />
                   </div>
+                  <!--- Checkbox, dass der User kein Logo hinzufügen will (aber trotzdem auf Ausstellerliste) -->
+                  <div class="form-group">
+                    <input
+                      type="checkbox"
+                      id="noLogo"
+                      name="noLogo"
+                      v-model="noLogoCheckbox"
+                      v-if="!company.logo"
+                      :disabled="settingsAccount.company.logo"
+                    />
+                    Ich habe kein Logo
+                  </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">
-                    <label class="form-control-label" for="company.exhibitorList"
-                      >Hier können Sie Ihre Freigabe in der Austellerliste verwalten</label
-                    >
+                    <label class="form-control-label" for="company.exhibitorList">
+                      <p v-if="settingsAccount.company.logo && settingsAccount?.booking?.status === 'CONFIRMED'">
+                        Hier können Sie Ihre Freigabe in der Austellerliste verwalten
+                      </p>
+                      <p v-else-if="!settingsAccount.company.logo && !noLogoCheckbox && settingsAccount?.booking?.status === 'CONFIRMED'">
+                        Bitte laden Sie ein Logo hoch, um sich in die Ausstellerliste einzutragen
+                      </p>
+                      <p v-else-if="!settingsAccount.company.logo && noLogoCheckbox && settingsAccount?.booking?.status === 'CONFIRMED'">
+                        Sie können sich in die Ausstellerliste eintragen, aber es wird kein Logo verwendet
+                      </p>
+                      <p v-else-if="settingsAccount.company.logo || (noLogoCheckbox && settingsAccount?.booking?.status !== 'CONFIRMED')">
+                        Bitte buchen Sie einen Stand, um sich in die Ausstellerliste einzutragen
+                      </p>
+                      <p v-else>Bitte buchen Sie einen Stand und laden ein Logo hoch, um sich in die Ausstellerliste einzutragen</p>
+                    </label>
                     <br />
                     <input
                       type="checkbox"
@@ -158,10 +182,20 @@
                         valid: !v$.settingsAccount.company.exhibitorList.$invalid,
                         invalid: v$.settingsAccount.company.exhibitorList.$invalid,
                       }"
+                      :disabled="enableExhibitorCheckbox"
                       v-model="v$.settingsAccount.company.exhibitorList.$model"
                       data-cy="exhibitorlist"
                     />
                     {{ onExhibitorList }}
+                    <br /><br />
+                    <p v-if="settingsAccount.company.logo && settingsAccount?.booking?.status === 'CONFIRMED'">
+                      <strong>HINWEIS: </strong>Wenn Sie auf der Ausstellerliste stehen, können Dritte Ihren Firmennamen, Ihr Logo, Ihre
+                      Firmenbeschreibung und Ihren gebuchten Stand einsehen!
+                    </p>
+                    <p v-else-if="!enableExhibitorCheckbox">
+                      <strong>HINWEIS: </strong>Wenn Sie auf der Ausstellerliste stehen, können Dritte Ihren Firmennamen, Ihre
+                      Firmenbeschreibung und Ihren gebuchten Stand einsehen!
+                    </p>
                   </div>
                 </div>
               </div>
@@ -263,6 +297,7 @@
                       >
                     </div>
                   </div>
+                  <!--- Telefonnummer des Ansprechpartners -->
                   <div class="form-group" v-if="!hasAnyAuthority('ROLE_ADMIN')">
                     <label class="form-control-label" for="phoneNumber">Telefonnummer Ansprechpartner</label>
                     <input
@@ -340,11 +375,22 @@
               settingsAccount?.booking?.status == null ||
               settingsAccount?.booking?.status == 'BLOCKED'
             "
-            @click="setCanceled"
+            @click="showCancelBooking"
             data-cy="cancel"
           >
             Standbuchung stornieren
           </button>
+          <b-modal ref="cancelBooking-modal" hide-footer title="Standbuchung stornieren">
+            <div class="d-block text-left">
+              <h4>Sind Sie sicher, dass Sie Ihre Standbuchung stornieren wollen?</h4>
+              <p>Wenn Sie fortfahren, kann Ihr gewählter Stand von anderen Unternehmen gebucht werden.</p>
+              <p>Ihr Benutzerkonto bleibt bestehen und Sie haben die Möglichkeit, andere freie Stände zu buchen.</p>
+            </div>
+            <div class="d-flex justify-content-end">
+              <b-button class="btn btn-secondary" @click="hideCancelBooking">Abbrechen</b-button>
+              <b-button type="button" class="btn btn-danger ml-3" @click="setCanceled">Standbuchung stornieren</b-button>
+            </div>
+          </b-modal>
           <br /><br />
         </div>
         <!--- Konto löschen + Modal -->
@@ -369,11 +415,11 @@
             settingsAccount?.booking?.status === 'CONFIRMED' ||
             (hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin)
           "
-          @click="showModal"
+          @click="showDeleteModal"
         >
           Konto löschen
         </button>
-        <b-modal ref="deleteAcc-modal" hide-footer title="Benutzerkonto löschen" @hidden="resetModal">
+        <b-modal ref="deleteAcc-modal" hide-footer title="Benutzerkonto löschen" @hidden="resetDeleteModal">
           <div class="d-block text-left">
             <div class="w-100">
               <b-alert show data-cy="deleteError" variant="danger" v-if="deleteError"
@@ -399,7 +445,7 @@
             </form>
           </div>
           <div class="d-flex justify-content-end">
-            <b-button class="btn btn-secondary" @click="hideModal">Abbrechen</b-button>
+            <b-button class="btn btn-secondary" @click="hideDeleteModal">Abbrechen</b-button>
             <b-button type="submit" class="btn btn-danger ml-3" id="confirmDelete" @click="confirmDelete(settingsAccount.user.id)"
               >Konto löschen</b-button
             >

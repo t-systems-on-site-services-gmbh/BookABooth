@@ -38,9 +38,10 @@ export default defineComponent({
     const componentKey = ref(new Date().getTime());
     const adminCount = ref<number>(0);
     const onlyOneAdmin = ref<boolean>(true);
+    const noLogoCheckbox = ref<boolean>(false);
 
     const onExhibitorList = computed(() => {
-      return exhibitorList.value ? 'Sie befinden sich in der Ausstellerliste' : 'Sie befinden sich nicht in der Ausstellerliste';
+      return exhibitorList.value ? 'Sie befinden sich auf der Ausstellerliste' : 'Sie befinden sich nicht auf der Ausstellerliste';
     });
 
     const isAdmin = computed(() => {
@@ -64,8 +65,21 @@ export default defineComponent({
       }
     };
 
+    // Bedingungen, um die Ausstellerliste-Checkbox zu aktivieren
+    const enableExhibitorCheckbox = computed(() => {
+      return !(settingsAccount.value.company.logo || noLogoCheckbox.value) || settingsAccount.value.booking.status !== 'CONFIRMED';
+    });
+
+    // Setzt die "kein Logo"-Checkbox neu, wenn der User die Seite verlässt
+    const checkNoLogo = () => {
+      if (exhibitorList.value === true && settingsAccount.value.company.logo === null) {
+        noLogoCheckbox.value = true;
+      }
+    };
+
     onMounted(() => {
       fetchAdminCount();
+      checkNoLogo();
     });
 
     const validations = {
@@ -141,6 +155,8 @@ export default defineComponent({
       componentKey,
       adminCount,
       onlyOneAdmin,
+      noLogoCheckbox,
+      enableExhibitorCheckbox,
     };
   },
   computed: {
@@ -201,6 +217,7 @@ export default defineComponent({
                 autoHideDelay: 5000,
               });
               this.settingsAccount.company.logo = param.logo;
+              this.noLogoCheckbox = false;
               this.forceRender();
             })
             .catch(error => {
@@ -217,15 +234,21 @@ export default defineComponent({
         reader.readAsBinaryString(file);
       }
     },
-    showModal() {
+    showDeleteModal() {
       this.$refs['deleteAcc-modal'].show();
     },
-    hideModal() {
+    hideDeleteModal() {
       this.$refs['deleteAcc-modal'].hide();
     },
-    resetModal() {
+    resetDeleteModal() {
       this.passwordConfirm = '';
       this.deleteError = false;
+    },
+    showCancelBooking() {
+      this.$refs['cancelBooking-modal'].show();
+    },
+    hideCancelBooking() {
+      this.$refs['cancelBooking-modal'].hide();
     },
     hasAnyAuthority(authorities: any): boolean {
       this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {

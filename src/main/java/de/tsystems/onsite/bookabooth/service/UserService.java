@@ -514,6 +514,12 @@ public class UserService {
                 bookingRepository.save(booking);
             }
         });
+        // Removes the user from the exhibitor list
+        Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
+        optionalCompany.ifPresent(company -> {
+            company.setExhibitorList(false);
+            companyRepository.save(company);
+        });
     }
 
     // Set the booking status from prebooked to confirmed
