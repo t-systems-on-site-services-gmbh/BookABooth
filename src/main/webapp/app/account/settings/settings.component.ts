@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, defineComponent, inject, onMounted, watch, ref, type Ref, onUpdated } from 'vue';
+import { computed, type ComputedRef, defineComponent, inject, onMounted, ref, type Ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { email, maxLength, minLength, required, requiredUnless } from '@vuelidate/validators';
 import axios from 'axios';
@@ -38,9 +38,10 @@ export default defineComponent({
     const componentKey = ref(new Date().getTime());
     const adminCount = ref<number>(0);
     const onlyOneAdmin = ref<boolean>(true);
+    const noLogoCheckbox = ref<boolean>(false);
 
     const onExhibitorList = computed(() => {
-      return exhibitorList.value ? 'Sie befinden sich in der Ausstellerliste' : 'Sie befinden sich nicht in der Ausstellerliste';
+      return exhibitorList.value ? 'Sie befinden sich auf der Ausstellerliste' : 'Sie befinden sich nicht auf der Ausstellerliste';
     });
 
     const isAdmin = computed(() => {
@@ -64,28 +65,21 @@ export default defineComponent({
       }
     };
 
-    const ensureContactsArray = () => {
-      if (settingsAccount.value && settingsAccount.value.company) {
-        if (!settingsAccount.value.company.contacts) {
-          settingsAccount.value.company.contacts = [{}];
-        } else if (settingsAccount.value.company.contacts.length === 0) {
-          settingsAccount.value.company.contacts.push({});
-        }
+    // Bedingungen, um die Ausstellerliste-Checkbox zu aktivieren
+    const enableExhibitorCheckbox = computed(() => {
+      return !(settingsAccount.value.company.logo || noLogoCheckbox.value) || settingsAccount.value.booking.status !== 'CONFIRMED';
+    });
+
+    // Setzt die "kein Logo"-Checkbox neu, wenn der User die Seite verlässt
+    const checkNoLogo = () => {
+      if (exhibitorList.value === true && settingsAccount.value.company.logo === null) {
+        noLogoCheckbox.value = true;
       }
     };
 
-    onUpdated(() => {
-      watch(
-        settingsAccount,
-        newValue => {
-          ensureContactsArray();
-        },
-        { immediate: true },
-      );
-    });
-
     onMounted(() => {
       fetchAdminCount();
+      checkNoLogo();
     });
 
     const validations = {
@@ -106,24 +100,6 @@ export default defineComponent({
           },
           logoUpload: {},
           exhibitorList: {},
-          contacts: [
-            {
-              firstName: {
-                maxLength: maxLength(50),
-              },
-              lastName: {
-                maxLength: maxLength(50),
-              },
-              mail: {
-                email,
-                maxLength: maxLength(254),
-              },
-              phone: {
-                maxLength: maxLength(50),
-              },
-              responsibility: {},
-            },
-          ],
         },
         user: {
           firstName: {
@@ -142,6 +118,9 @@ export default defineComponent({
             minLength: minLength(5),
             maxLength: maxLength(254),
           },
+        },
+        phoneNumber: {
+          maxLength: maxLength(20),
         },
       },
       deleteAccount: {
@@ -176,6 +155,8 @@ export default defineComponent({
       componentKey,
       adminCount,
       onlyOneAdmin,
+      noLogoCheckbox,
+      enableExhibitorCheckbox,
     };
   },
   computed: {
@@ -185,33 +166,16 @@ export default defineComponent({
     },
   },
   methods: {
-    createPayload(settingsAccount) {
-      const filteredContacts = settingsAccount.company.contacts.filter(contacts => {
-        return contacts.firstName || contacts.lastName || contacts.email || contacts.phone || contacts.responsibility;
-      });
-      return {
-        ...settingsAccount,
-        company: {
-          ...settingsAccount.company,
-          contacts: filteredContacts,
-        },
-      };
-    },
     save() {
       this.error = null;
       this.errorEmailExists = null;
-      const payload = this.createPayload(this.settingsAccount);
       return axios
-        .post('api/account', payload)
+        .post('api/account', this.settingsAccount)
         .then(() => {
           this.error = null;
           this.success = 'OK';
           this.errorEmailExists = null;
           window.scrollTo(0, 0);
-          return axios.get('api/account');
-        })
-        .then(response => {
-          Object.assign(this.settingsAccount, response.data);
         })
         .catch(ex => {
           this.success = null;
@@ -253,6 +217,7 @@ export default defineComponent({
                 autoHideDelay: 5000,
               });
               this.settingsAccount.company.logo = param.logo;
+              this.noLogoCheckbox = false;
               this.forceRender();
             })
             .catch(error => {
@@ -269,15 +234,21 @@ export default defineComponent({
         reader.readAsBinaryString(file);
       }
     },
-    showModal() {
+    showDeleteModal() {
       this.$refs['deleteAcc-modal'].show();
     },
-    hideModal() {
+    hideDeleteModal() {
       this.$refs['deleteAcc-modal'].hide();
     },
-    resetModal() {
+    resetDeleteModal() {
       this.passwordConfirm = '';
       this.deleteError = false;
+    },
+    showCancelBooking() {
+      this.$refs['cancelBooking-modal'].show();
+    },
+    hideCancelBooking() {
+      this.$refs['cancelBooking-modal'].hide();
     },
     hasAnyAuthority(authorities: any): boolean {
       this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
@@ -339,12 +310,6 @@ export default defineComponent({
       } else {
         console.log('Es ist ein Fehler aufgetreten');
       }
-    },
-    fillContact(event) {
-      event.preventDefault();
-      this.settingsAccount.company.contacts[0].firstName = this.settingsAccount.user.firstName;
-      this.settingsAccount.company.contacts[0].lastName = this.settingsAccount.user.lastName;
-      this.settingsAccount.company.contacts[0].mail = this.settingsAccount.user.email;
     },
   },
 });

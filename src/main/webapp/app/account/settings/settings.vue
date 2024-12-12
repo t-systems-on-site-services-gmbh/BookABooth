@@ -144,11 +144,35 @@
                       @change="logoUpload"
                     />
                   </div>
+                  <!--- Checkbox, dass der User kein Logo hinzufügen will (aber trotzdem auf Ausstellerliste) -->
+                  <div class="form-group">
+                    <input
+                      type="checkbox"
+                      id="noLogo"
+                      name="noLogo"
+                      v-model="noLogoCheckbox"
+                      v-if="!company.logo"
+                      :disabled="settingsAccount.company.logo"
+                    />
+                    Ich habe kein Logo
+                  </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">
-                    <label class="form-control-label" for="company.exhibitorList"
-                      >Hier können Sie Ihre Freigabe in der Austellerliste verwalten</label
-                    >
+                    <label class="form-control-label" for="company.exhibitorList">
+                      <p v-if="settingsAccount.company.logo && settingsAccount?.booking?.status === 'CONFIRMED'">
+                        Hier können Sie Ihre Freigabe in der Austellerliste verwalten
+                      </p>
+                      <p v-else-if="!settingsAccount.company.logo && !noLogoCheckbox && settingsAccount?.booking?.status === 'CONFIRMED'">
+                        Bitte laden Sie ein Logo hoch, um sich in die Ausstellerliste einzutragen
+                      </p>
+                      <p v-else-if="!settingsAccount.company.logo && noLogoCheckbox && settingsAccount?.booking?.status === 'CONFIRMED'">
+                        Sie können sich in die Ausstellerliste eintragen, aber es wird kein Logo verwendet
+                      </p>
+                      <p v-else-if="settingsAccount.company.logo || (noLogoCheckbox && settingsAccount?.booking?.status !== 'CONFIRMED')">
+                        Bitte buchen Sie einen Stand, um sich in die Ausstellerliste einzutragen
+                      </p>
+                      <p v-else>Bitte buchen Sie einen Stand und laden ein Logo hoch, um sich in die Ausstellerliste einzutragen</p>
+                    </label>
                     <br />
                     <input
                       type="checkbox"
@@ -158,10 +182,20 @@
                         valid: !v$.settingsAccount.company.exhibitorList.$invalid,
                         invalid: v$.settingsAccount.company.exhibitorList.$invalid,
                       }"
+                      :disabled="enableExhibitorCheckbox"
                       v-model="v$.settingsAccount.company.exhibitorList.$model"
                       data-cy="exhibitorlist"
                     />
                     {{ onExhibitorList }}
+                    <br /><br />
+                    <p v-if="settingsAccount.company.logo && settingsAccount?.booking?.status === 'CONFIRMED'">
+                      <strong>HINWEIS: </strong>Wenn Sie auf der Ausstellerliste stehen, können Dritte Ihren Firmennamen, Ihr Logo, Ihre
+                      Firmenbeschreibung und Ihren gebuchten Stand einsehen!
+                    </p>
+                    <p v-else-if="!enableExhibitorCheckbox">
+                      <strong>HINWEIS: </strong>Wenn Sie auf der Ausstellerliste stehen, können Dritte Ihren Firmennamen, Ihre
+                      Firmenbeschreibung und Ihren gebuchten Stand einsehen!
+                    </p>
                   </div>
                 </div>
               </div>
@@ -263,115 +297,20 @@
                       >
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <div class="card" v-if="!hasAnyAuthority('ROLE_ADMIN')">
-              <div class="card-header" id="headingThree">
-                <h4 class="mb-0">
-                  <!--- <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo"></button> -->
-                  Pressekontakt (Optional)
-                </h4>
-              </div>
-              <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordionProfile">
-                <div class="card-body">
-                  <button @click="fillContact($event)" class="btn btn-primary mb-2 btn-sm" data-cy="fillcontact">
-                    Nutzer als Pressekontakt übernehmen
-                  </button>
-                  <!--- Vorname des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.firstName">Vorname Pressekontakt</label>
+                  <!--- Telefonnummer des Ansprechpartners -->
+                  <div class="form-group" v-if="!hasAnyAuthority('ROLE_ADMIN')">
+                    <label class="form-control-label" for="phoneNumber">Telefonnummer Ansprechpartner</label>
                     <input
-                      type="text"
+                      type="phone"
                       class="form-control"
-                      id="company.contacts.firstName"
-                      name="company.contacts.firstName"
-                      placeholder="Vorname Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].firstName.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].firstName.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].firstName.$model"
-                      maxlength="50"
-                      data-cy="company.contacts.firstname"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="Ihre Telefonnummer"
+                      :class="{ valid: !v$.settingsAccount.phoneNumber.$invalid, invalid: v$.settingsAccount.phoneNumber.$invalid }"
+                      v-model="v$.settingsAccount.phoneNumber.$model"
+                      maxlength="20"
+                      data-cy="phonenumber"
                     />
-                  </div>
-                  <!--- Nachname des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.lastName">Nachname Pressekontakt</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="company.contacts.lastName"
-                      name="company.contacts.lastName"
-                      placeholder="Nachname Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].lastName.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].lastName.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].lastName.$model"
-                      maxlength="50"
-                      data-cy="company.contacts.lastname"
-                    />
-                  </div>
-                  <!--- E-Mail-Adresse des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.mail">E-Mail-Adresse</label>
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="company.contacts.mail"
-                      name="company.contacts.mail"
-                      placeholder="E-Mail-Adresse Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].mail.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].mail.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].mail.$model"
-                      maxlength="254"
-                      email
-                      data-cy="company.contacts.mail"
-                    />
-                    <div
-                      v-if="v$.settingsAccount.company.contacts[0].mail.$anyDirty && v$.settingsAccount.company.contacts[0].mail.$invalid"
-                    >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.contacts[0].mail.email"
-                        >Die E-Mail-Adresse Ihres Pressekontakts ist ungültig.</small
-                      >
-                    </div>
-                  </div>
-                  <!--- Telefonnummer des Pressekontakts -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.phone">Telefonnummer</label>
-                    <input
-                      type="tel"
-                      class="form-control"
-                      id="company.contacts.phone"
-                      name="company.contacts.phone"
-                      placeholder="Telefonnummer Ihres Pressekontakts"
-                      :class="{
-                        valid: !v$.settingsAccount.company.contacts[0].phone.$invalid,
-                        invalid: v$.settingsAccount.company.contacts[0].phone.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.contacts[0].phone.$model"
-                      maxlength="50"
-                      data-cy="company.contacts.phone"
-                    />
-                  </div>
-                  <!--- Zuständigkeit des Pressekontakts-->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.contacts.responsibility">Zuständigkeit</label><br />
-                    <select
-                      name="company.contacts.responsibility"
-                      id="company.contacts.responsibility"
-                      v-model="v$.settingsAccount.company.contacts[0].responsibility.$model"
-                      data-cy="company.contacts.responsibility"
-                    >
-                      <option value="PRESS">Press</option>
-                      <option value="COMPANY_ADMIN">Company_Admin</option>
-                      <option value="GENERALLY">Generally</option>
-                      <option value="OTHER">Other</option>
-                    </select>
                   </div>
                 </div>
               </div>
@@ -436,11 +375,22 @@
               settingsAccount?.booking?.status == null ||
               settingsAccount?.booking?.status == 'BLOCKED'
             "
-            @click="setCanceled"
+            @click="showCancelBooking"
             data-cy="cancel"
           >
             Standbuchung stornieren
           </button>
+          <b-modal ref="cancelBooking-modal" hide-footer title="Standbuchung stornieren">
+            <div class="d-block text-left">
+              <h4>Sind Sie sicher, dass Sie Ihre Standbuchung stornieren wollen?</h4>
+              <p>Wenn Sie fortfahren, kann Ihr gewählter Stand von anderen Unternehmen gebucht werden.</p>
+              <p>Ihr Benutzerkonto bleibt bestehen und Sie haben die Möglichkeit, andere freie Stände zu buchen.</p>
+            </div>
+            <div class="d-flex justify-content-end">
+              <b-button class="btn btn-secondary" @click="hideCancelBooking">Abbrechen</b-button>
+              <b-button type="button" class="btn btn-danger ml-3" @click="setCanceled">Standbuchung stornieren</b-button>
+            </div>
+          </b-modal>
           <br /><br />
         </div>
         <!--- Konto löschen + Modal -->
@@ -465,11 +415,11 @@
             settingsAccount?.booking?.status === 'CONFIRMED' ||
             (hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin)
           "
-          @click="showModal"
+          @click="showDeleteModal"
         >
           Konto löschen
         </button>
-        <b-modal ref="deleteAcc-modal" hide-footer title="Benutzerkonto löschen" @hidden="resetModal">
+        <b-modal ref="deleteAcc-modal" hide-footer title="Benutzerkonto löschen" @hidden="resetDeleteModal">
           <div class="d-block text-left">
             <div class="w-100">
               <b-alert show data-cy="deleteError" variant="danger" v-if="deleteError"
@@ -495,7 +445,7 @@
             </form>
           </div>
           <div class="d-flex justify-content-end">
-            <b-button class="btn btn-secondary" @click="hideModal">Abbrechen</b-button>
+            <b-button class="btn btn-secondary" @click="hideDeleteModal">Abbrechen</b-button>
             <b-button type="submit" class="btn btn-danger ml-3" id="confirmDelete" @click="confirmDelete(settingsAccount.user.id)"
               >Konto löschen</b-button
             >
