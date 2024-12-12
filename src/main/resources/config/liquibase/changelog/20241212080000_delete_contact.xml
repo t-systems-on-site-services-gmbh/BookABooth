@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Drop table Contact.
+    -->
+    <changeSet id="20241212080000-1" author="fgeddert">
+        <dropForeignKeyConstraint baseTableName="rel_contact__company" constraintName="fk_rel_contact__company__contact_id"/>
+        <dropForeignKeyConstraint baseTableName="rel_contact__company" constraintName="fk_rel_contact__company__company_id"/>
+        <dropTable tableName="contact"/>
+        <dropTable tableName="rel_contact__company"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+
+</databaseChangeLog>

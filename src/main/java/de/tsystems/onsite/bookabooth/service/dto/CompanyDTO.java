@@ -31,8 +31,6 @@ public class CompanyDTO implements Serializable {
 
     private Set<DepartmentDTO> departments = new HashSet<>();
 
-    private Set<ContactDTO> contacts = new HashSet<>();
-
     public Long getId() {
         return id;
     }
@@ -105,14 +103,6 @@ public class CompanyDTO implements Serializable {
         this.departments = departments;
     }
 
-    public Set<ContactDTO> getContacts() {
-        return contacts;
-    }
-
-    public void setContacts(Set<ContactDTO> contacts) {
-        this.contacts = contacts;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -147,7 +137,6 @@ public class CompanyDTO implements Serializable {
             ", waitingList='" + getWaitingList() + "'" +
             ", exhibitorList='" + getExhibitorList() + "'" +
             ", departments=" + getDepartments() +
-            ", contacts=" + getContacts() +
             "}";
     }
 }

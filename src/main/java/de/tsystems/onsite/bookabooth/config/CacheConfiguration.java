@@ -67,8 +67,6 @@ public class CacheConfiguration {
             createCache(cm, de.tsystems.onsite.bookabooth.domain.ServicePackage.class.getName() + ".booths");
             createCache(cm, de.tsystems.onsite.bookabooth.domain.Booking.class.getName());
             createCache(cm, de.tsystems.onsite.bookabooth.domain.BoothUser.class.getName());
-            createCache(cm, de.tsystems.onsite.bookabooth.domain.Contact.class.getName());
-            createCache(cm, de.tsystems.onsite.bookabooth.domain.Contact.class.getName() + ".companies");
             // jhipster-needle-ehcache-add-entry
         };
     }
