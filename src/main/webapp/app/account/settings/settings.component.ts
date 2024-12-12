@@ -72,7 +72,7 @@ export default defineComponent({
 
     // Setzt die "kein Logo"-Checkbox neu, wenn der User die Seite verlässt
     const checkNoLogo = () => {
-      if (exhibitorList.value === true && settingsAccount.value.company.logo === null) {
+      if (exhibitorList.value === true && (settingsAccount.value.company.logo === null || settingsAccount.value.company.logo === '')) {
         noLogoCheckbox.value = true;
       }
     };

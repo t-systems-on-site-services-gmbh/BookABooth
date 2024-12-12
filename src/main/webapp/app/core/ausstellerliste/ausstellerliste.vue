@@ -3,7 +3,7 @@
     <h1 class="text-center mb-4">Ausstellerliste</h1>
     <div v-if="loading" class="d-flex justify-content-center align-items-center">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Lade Daten...</span>
+        <span class="visually-hidden"></span>
       </div>
     </div>
     <div v-else>
@@ -11,7 +11,16 @@
         <div v-for="company in companies" :key="company.id" class="col-md-6 col-lg-4 mb-4">
           <div class="card shadow-sm company-card">
             <div class="img-container">
-              <img :src="company.logo" alt="Firmenlogo" class="card-img-top p-3" style="object-fit: contain; height: 150px" />
+              <img
+                :src="getLogoUrl(company.logo)"
+                v-if="company.logo"
+                alt="Firmenlogo"
+                class="card-img-top p-3"
+                style="object-fit: contain; height: 150px"
+              />
+              <div v-else class="placeholder" style="height: 150px; display: flex; align-items: center; justify-content: center">
+                {{ company.name }}
+              </div>
             </div>
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{ company.name }}</h5>

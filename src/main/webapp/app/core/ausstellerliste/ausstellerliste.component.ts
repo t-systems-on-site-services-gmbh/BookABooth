@@ -27,6 +27,10 @@ export default defineComponent({
       company.collapsed = !company.collapsed;
     };
 
+    const getLogoUrl = (logo: any) => {
+      return logo ? `${logo}?${new Date().getTime()}` : '';
+    };
+
     onMounted(() => {
       loadCompanies();
     });
@@ -35,6 +39,7 @@ export default defineComponent({
       companies,
       loading,
       toggleCollapse,
+      getLogoUrl,
     };
   },
 });

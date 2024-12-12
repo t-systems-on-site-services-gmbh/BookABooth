@@ -6,6 +6,7 @@ import de.tsystems.onsite.bookabooth.service.BoothService;
 import de.tsystems.onsite.bookabooth.service.CompanyService;
 import de.tsystems.onsite.bookabooth.service.dto.AusstellerlisteDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ public class AusstellerlisteResource {
             .stream()
             .filter(company -> Boolean.TRUE.equals(company.getExhibitorList()))
             .filter(company -> confirmedCompanyIds.contains(company.getId()))
+            .sorted((c1, c2) -> Comparator.nullsFirst(String::compareTo).compare(c1.getName(), c2.getName()))
             .map(
                 company ->
                     new AusstellerlisteDTO(

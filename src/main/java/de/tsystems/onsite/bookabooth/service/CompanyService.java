@@ -123,7 +123,12 @@ public class CompanyService {
     private void removeDependencies(Long companyId) {
         log.debug("Removing dependencies for Company ID: {}", companyId);
 
-        bookingRepository.deleteByCompanyId(companyId);
+        bookingRepository
+            .findByCompanyId(companyId)
+            .ifPresent(booking -> {
+                log.debug("Removing booking with ID: {}", booking.getId());
+                bookingRepository.delete(booking);
+            });
 
         log.debug("Removed all bookings associated with Company ID: {}", companyId);
     }
