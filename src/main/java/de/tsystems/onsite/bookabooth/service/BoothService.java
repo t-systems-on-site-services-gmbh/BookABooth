@@ -26,9 +26,12 @@ public class BoothService {
 
     private final BoothMapper boothMapper;
 
-    public BoothService(BoothRepository boothRepository, BoothMapper boothMapper) {
+    private final ServicePackageService servicePackageService;
+
+    public BoothService(BoothRepository boothRepository, BoothMapper boothMapper, ServicePackageService servicePackageService) {
         this.boothRepository = boothRepository;
         this.boothMapper = boothMapper;
+        this.servicePackageService = servicePackageService;
     }
 
     /**
@@ -108,5 +111,27 @@ public class BoothService {
     public void delete(Long id) {
         log.debug("Request to delete Booth : {}", id);
         boothRepository.deleteById(id);
+    }
+
+    /**
+     * Update the servicePackages of a booth.
+     * Removes booth from all servicePackages and adds it to the ones in the DTO.
+     * @param boothDTO the entity to update.
+     */
+    public void updateServicePackages(BoothDTO boothDTO) {
+        log.debug("Request to update ServicePackages : {}", boothDTO);
+        Optional<Booth> optionalBooth = boothRepository.findById(boothDTO.getId());
+        if (optionalBooth.isPresent()) {
+            Booth booth = optionalBooth.get();
+            var servicePackages = booth.getServicePackages();
+            servicePackages.forEach(servicePackage -> {
+                servicePackageService.removeBooth(servicePackage, booth);
+            });
+            boothDTO
+                .getServicePackages()
+                .forEach(servicePackageDTO -> {
+                    servicePackageService.addBooth(servicePackageDTO, booth);
+                });
+        }
     }
 }

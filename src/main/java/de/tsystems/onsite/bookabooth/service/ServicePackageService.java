@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import de.tsystems.onsite.bookabooth.domain.Booth;
 import de.tsystems.onsite.bookabooth.domain.ServicePackage;
 import de.tsystems.onsite.bookabooth.repository.ServicePackageRepository;
 import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
@@ -123,5 +124,18 @@ public class ServicePackageService {
     public void delete(Long id) {
         log.debug("Request to delete ServicePackage : {}", id);
         servicePackageRepository.deleteById(id);
+    }
+
+    public ServicePackage removeBooth(ServicePackage servicePackage, Booth booth) {
+        servicePackage.removeBooth(booth);
+        servicePackageRepository.save(servicePackage);
+        return servicePackage;
+    }
+
+    public ServicePackage addBooth(ServicePackageDTO servicePackageDTO, Booth booth) {
+        ServicePackage servicePackage = servicePackageMapper.toEntity(servicePackageDTO);
+        servicePackage.addBooth(booth);
+        servicePackageRepository.save(servicePackage);
+        return servicePackage;
     }
 }

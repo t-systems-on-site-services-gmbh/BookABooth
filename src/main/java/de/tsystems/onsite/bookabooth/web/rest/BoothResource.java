@@ -2,6 +2,7 @@ package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.BoothService;
+import de.tsystems.onsite.bookabooth.service.ServicePackageService;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -88,7 +89,9 @@ public class BoothResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        boothService.updateServicePackages(boothDTO);
         boothDTO = boothService.update(boothDTO);
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, boothDTO.getId().toString()))
             .body(boothDTO);
