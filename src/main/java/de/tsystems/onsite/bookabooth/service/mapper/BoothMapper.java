@@ -19,8 +19,7 @@ public interface BoothMapper extends EntityMapper<BoothDTO, Booth> {
     @Mapping(target = "servicePackages", source = "servicePackages", qualifiedByName = "servicePackageIdSet")
     BoothDTO toDto(Booth s);
 
-    @Mapping(target = "servicePackages", ignore = true)
-    @Mapping(target = "removeServicePackage", ignore = true)
+    @Mapping(target = "servicePackages", source = "servicePackages")
     Booth toEntity(BoothDTO boothDTO);
 
     @Named("locationId")
@@ -32,6 +31,11 @@ public interface BoothMapper extends EntityMapper<BoothDTO, Booth> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     ServicePackageDTO toDtoServicePackageId(ServicePackage servicePackage);
+
+    @Named("entityServicePackageId")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    ServicePackage toEntityServicePackageId(ServicePackageDTO servicePackage);
 
     @Named("servicePackageIdSet")
     default Set<ServicePackageDTO> toDtoServicePackageIdSet(Set<ServicePackage> servicePackage) {
