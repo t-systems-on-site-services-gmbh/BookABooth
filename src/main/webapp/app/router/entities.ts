@@ -268,5 +268,7 @@ export default {
       component: Waitinglist,
       meta: { authorities: [Authority.USER] },
     },
+
+    // jhipster-needle-add-entity-to-router - JHipster will add entities to the router here
   ],
 };

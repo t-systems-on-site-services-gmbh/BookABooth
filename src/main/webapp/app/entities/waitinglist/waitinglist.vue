@@ -4,11 +4,10 @@
       <span id="waiting-list-heading">Warteliste</span>
       <div class="d-flex justify-content-end">
         <button class="btn btn-info me-2 mr-2" @click="handleSyncList" :disabled="isFetching">
-          <i class="fas fa-sync mr-2" :class="{ 'fa-spin': isFetching }"></i>
-          <span>Liste aktualisieren</span>
+          <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon><span>Liste aktualisieren</span>
         </button>
         <button class="btn btn-primary" :disabled="waitingListEntries.length === 0 || !isEnabled" @click="notifyWaitingList">
-          <i class="fas fa-envelope"></i>
+          <font-awesome-icon icon="envelope"></font-awesome-icon>
           <span>E-Mails senden</span>
         </button>
       </div>

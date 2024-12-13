@@ -33,7 +33,6 @@
                     <img
                       v-if="settingsAccount.company?.logo"
                       alt="Unternehmenslogo"
-                      :key="componentKey"
                       :src="absoluteImageUrl"
                       style="width: 150px; height: auto"
                     />
@@ -152,7 +151,7 @@
                       name="noLogo"
                       v-model="noLogoCheckbox"
                       v-if="!company.logo"
-                      :disabled="settingsAccount.company.logo"
+                      :disabled="!!settingsAccount.company.logo"
                     />
                     Ich habe kein Logo
                   </div>

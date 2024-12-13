@@ -67,12 +67,12 @@ export default defineComponent({
 
     // Bedingungen, um die Ausstellerliste-Checkbox zu aktivieren
     const enableExhibitorCheckbox = computed(() => {
-      return !(settingsAccount.value.company.logo || noLogoCheckbox.value) || settingsAccount.value.booking.status !== 'CONFIRMED';
+      return !(settingsAccount.value.company.logo || noLogoCheckbox.value) || settingsAccount.value.booking?.status !== 'CONFIRMED';
     });
 
     // Setzt die "kein Logo"-Checkbox neu, wenn der User die Seite verlässt
     const checkNoLogo = () => {
-      if (exhibitorList.value === true && settingsAccount.value.company.logo === null) {
+      if (exhibitorList.value === true && (settingsAccount.value.company.logo === null || settingsAccount.value.company.logo === '')) {
         noLogoCheckbox.value = true;
       }
     };

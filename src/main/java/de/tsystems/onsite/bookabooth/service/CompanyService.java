@@ -23,7 +23,6 @@ public class CompanyService {
     private final Logger log = LoggerFactory.getLogger(CompanyService.class);
 
     private final CompanyRepository companyRepository;
-
     private final CompanyMapper companyMapper;
 
     public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
@@ -107,6 +106,7 @@ public class CompanyService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Company : {}", id);
+
         companyRepository.deleteById(id);
     }
 }

@@ -11,6 +11,7 @@ import { faBook } from '@fortawesome/free-solid-svg-icons/faBook';
 import { faCloud } from '@fortawesome/free-solid-svg-icons/faCloud';
 import { faCogs } from '@fortawesome/free-solid-svg-icons/faCogs';
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons/faEnvelope';
 import { faEye } from '@fortawesome/free-solid-svg-icons/faEye';
 import { faFlag } from '@fortawesome/free-solid-svg-icons/faFlag';
 import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
@@ -39,6 +40,7 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons/faUserPlus';
 import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers';
 import { faUsersCog } from '@fortawesome/free-solid-svg-icons/faUsersCog';
 import { faWrench } from '@fortawesome/free-solid-svg-icons/faWrench';
+import { faBuilding } from '@fortawesome/free-solid-svg-icons/faBuilding';
 
 export function initFortAwesome(vue) {
   vue.component('font-awesome-icon', FontAwesomeIcon);
@@ -54,6 +56,7 @@ export function initFortAwesome(vue) {
     faCloud,
     faCogs,
     faDatabase,
+    faEnvelope,
     faEye,
     faFlag,
     faHeart,
@@ -82,5 +85,6 @@ export function initFortAwesome(vue) {
     faUsers,
     faUsersCog,
     faWrench,
+    faBuilding,
   );
 }
