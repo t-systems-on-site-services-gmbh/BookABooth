@@ -33,33 +33,31 @@ public class AusstellerlisteResource {
     public List<AusstellerlisteDTO> getAllAusstellerlisteCompanies() {
         log.debug("REST request to get all companies on the waiting list");
 
-        Map<Long, String> boothTitlesByCompanyId = boothService
-            .findAll()
-            .stream()
-            .collect(Collectors.groupingBy(BoothDTO::getId, Collectors.mapping(BoothDTO::getTitle, Collectors.joining(", "))));
-        List<Long> confirmedCompanyIds = bookingService
+        // Collect confirmed bookings and map companyID to boothID
+        Map<Long, Long> confirmedCompanyAndBoothId = bookingService
             .findAll()
             .stream()
             .filter(booking -> BookingStatus.CONFIRMED.equals(booking.getStatus()))
-            .map(booking -> booking.getCompany().getId())
-            .collect(Collectors.toList());
+            .collect(Collectors.toMap(booking -> booking.getCompany().getId(), booking -> booking.getBooth().getId()));
+
+        // Collect booths and map boothID to boothTitle
+        Map<Long, String> boothIdAndBoothTitle = boothService
+            .findAll()
+            .stream()
+            .collect(Collectors.toMap(BoothDTO::getId, BoothDTO::getTitle));
+
+        // Filter and map companies to exhibitorListDTO
         return companyService
             .findAll()
             .stream()
             .filter(company -> Boolean.TRUE.equals(company.getExhibitorList()))
-            .filter(company -> confirmedCompanyIds.contains(company.getId()))
+            .filter(company -> confirmedCompanyAndBoothId.containsKey(company.getId()))
             .sorted((c1, c2) -> Comparator.nullsFirst(String::compareTo).compare(c1.getName(), c2.getName()))
-            .map(
-                company ->
-                    new AusstellerlisteDTO(
-                        company.getId(),
-                        company.getName(),
-                        company.getLogo(),
-                        company.getDescription(),
-                        company.getExhibitorList(),
-                        boothTitlesByCompanyId.getOrDefault(company.getId(), "")
-                    )
-            )
+            .map(company -> {
+                Long boothId = confirmedCompanyAndBoothId.get(company.getId());
+                String boothTitle = boothIdAndBoothTitle.getOrDefault(boothId, "");
+                return new AusstellerlisteDTO(company.getId(), company.getName(), company.getLogo(), company.getDescription(), boothTitle);
+            })
             .collect(Collectors.toList());
     }
 }

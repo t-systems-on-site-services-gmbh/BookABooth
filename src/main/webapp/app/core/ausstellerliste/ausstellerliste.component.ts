@@ -9,11 +9,12 @@ export default defineComponent({
     const ausstellerService = new AusstellerService();
 
     const loadCompanies = async () => {
+      loading.value = true;
       try {
         const data = await ausstellerService.getPublicCompanies();
         companies.value = data.map(company => ({
           ...company,
-          booth: Array.isArray(company.boothTitles) ? company.boothTitles.join(', ') : company.boothTitles || '',
+          booth: company.boothTitle || '',
           collapsed: true,
         }));
       } catch (error) {

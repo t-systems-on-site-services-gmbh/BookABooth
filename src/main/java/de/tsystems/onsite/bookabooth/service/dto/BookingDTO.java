@@ -40,7 +40,7 @@ public class BookingDTO implements Serializable {
         this.received = received;
     }
 
-    public BookingStatus getStatus() { // Rückgabetyp angepasst
+    public BookingStatus getStatus() {
         return status;
     }
 

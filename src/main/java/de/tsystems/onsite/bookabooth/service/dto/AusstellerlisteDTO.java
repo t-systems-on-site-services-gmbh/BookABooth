@@ -6,16 +6,14 @@ public class AusstellerlisteDTO {
     private String name;
     private String logo;
     private String description;
-    private Boolean exhibitorList;
-    private String boothTitles;
+    private String boothTitle;
 
-    public AusstellerlisteDTO(Long id, String name, String logo, String description, Boolean exhibitorList, String boothTitles) {
+    public AusstellerlisteDTO(Long id, String name, String logo, String description, String boothTitle) {
         this.id = id;
         this.name = name;
         this.logo = logo;
         this.description = description;
-        this.exhibitorList = exhibitorList;
-        this.boothTitles = boothTitles;
+        this.boothTitle = boothTitle;
     }
 
     public Long getId() {
@@ -50,19 +48,11 @@ public class AusstellerlisteDTO {
         this.description = description;
     }
 
-    public Boolean getExhibitorList() {
-        return exhibitorList;
+    public String getBoothTitle() {
+        return boothTitle;
     }
 
-    public void setExhibitorList(Boolean exhibitorList) {
-        this.exhibitorList = exhibitorList;
-    }
-
-    public String getBoothTitles() {
-        return boothTitles;
-    }
-
-    public void setBoothTitles(String boothTitles) {
-        this.boothTitles = boothTitles;
+    public void setBoothTitle(String boothTitle) {
+        this.boothTitle = boothTitle;
     }
 }

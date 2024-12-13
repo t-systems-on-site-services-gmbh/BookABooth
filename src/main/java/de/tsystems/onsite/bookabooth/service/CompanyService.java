@@ -1,7 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Company;
-import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
@@ -24,12 +23,10 @@ public class CompanyService {
     private final Logger log = LoggerFactory.getLogger(CompanyService.class);
 
     private final CompanyRepository companyRepository;
-    private final BookingRepository bookingRepository;
     private final CompanyMapper companyMapper;
 
-    public CompanyService(CompanyRepository companyRepository, BookingRepository bookingRepository, CompanyMapper companyMapper) {
+    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
         this.companyRepository = companyRepository;
-        this.bookingRepository = bookingRepository;
         this.companyMapper = companyMapper;
     }
 
@@ -110,26 +107,6 @@ public class CompanyService {
     public void delete(Long id) {
         log.debug("Request to delete Company : {}", id);
 
-        removeDependencies(id);
-
         companyRepository.deleteById(id);
-    }
-
-    /**
-     * Entfernt alle Abhängigkeiten des Unternehmens (z. B. Buchungen).
-     *
-     * @param companyId Die ID des Unternehmens.
-     */
-    private void removeDependencies(Long companyId) {
-        log.debug("Removing dependencies for Company ID: {}", companyId);
-
-        bookingRepository
-            .findByCompanyId(companyId)
-            .ifPresent(booking -> {
-                log.debug("Removing booking with ID: {}", booking.getId());
-                bookingRepository.delete(booking);
-            });
-
-        log.debug("Removed all bookings associated with Company ID: {}", companyId);
     }
 }
