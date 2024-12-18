@@ -1,7 +1,11 @@
 package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Booking;
+import de.tsystems.onsite.bookabooth.domain.BoothUser;
+import de.tsystems.onsite.bookabooth.domain.Company;
+import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
+import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import java.util.LinkedList;
@@ -24,11 +28,22 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
 
+    private final BoothUserRepository boothUserRepository;
+
     private final BookingMapper bookingMapper;
 
-    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper) {
+    private final MailService mailService;
+
+    public BookingService(
+        BookingRepository bookingRepository,
+        BoothUserRepository boothUserRepository,
+        BookingMapper bookingMapper,
+        MailService mailService
+    ) {
         this.bookingRepository = bookingRepository;
+        this.boothUserRepository = boothUserRepository;
         this.bookingMapper = bookingMapper;
+        this.mailService = mailService;
     }
 
     /**
@@ -107,6 +122,20 @@ public class BookingService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Booking : {}", id);
+        User user = findUserByBookingId(id);
         bookingRepository.deleteById(id);
+        mailService.sendBookingDeletedEmail(user);
+    }
+
+    @Transactional
+    public User findUserByBookingId(Long id) {
+        Optional<Booking> optionalBooking = bookingRepository.findById(id);
+        if (optionalBooking.isEmpty()) {
+            throw new RuntimeException("Booking not found");
+        }
+        Booking booking = optionalBooking.get();
+        Company company = booking.getCompany();
+        BoothUser boothUser = boothUserRepository.findOneByCompanyId(company.getId());
+        return boothUser.getUser();
     }
 }

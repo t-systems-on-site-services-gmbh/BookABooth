@@ -65,7 +65,6 @@ public class CompanyAsserts {
     public static void assertCompanyUpdatableRelationshipsEquals(Company expected, Company actual) {
         assertThat(expected)
             .as("Verify Company relationships")
-            .satisfies(e -> assertThat(e.getDepartments()).as("check departments").isEqualTo(actual.getDepartments()))
-            .satisfies(e -> assertThat(e.getContacts()).as("check contacts").isEqualTo(actual.getContacts()));
+            .satisfies(e -> assertThat(e.getDepartments()).as("check departments").isEqualTo(actual.getDepartments()));
     }
 }

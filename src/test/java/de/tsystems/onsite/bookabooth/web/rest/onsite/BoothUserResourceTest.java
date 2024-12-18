@@ -1,8 +1,6 @@
 package de.tsystems.onsite.bookabooth.web.rest.onsite;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -10,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
-import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
 import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothUserMapper;
@@ -24,7 +21,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.IntPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -17,6 +17,7 @@ import java.util.Objects;
 import javax.security.auth.login.AccountNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -143,11 +144,13 @@ public class WaitinglistResource {
 
     @PutMapping("/add-waitinglist")
     public ResponseEntity<Void> addToWaitingList(@RequestBody UserProfileDTO userProfileDTO) throws AccountNotFoundException {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountNotFoundException("Current user login not found"));
+        SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new AccountNotFoundException("Current user login not found"));
         Company company = companyRepository
             .findById(userProfileDTO.getCompany().getId())
             .orElseThrow(() -> new AccountNotFoundException("Company could not be found"));
+        if (company.getWaitingList()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         companyService.addToWaitingList(userProfileDTO);
         return ResponseEntity.ok().build();
     }

@@ -51,13 +51,13 @@ export default defineComponent({
     const removeBooking = async () => {
       try {
         await bookingService().delete(removeId.value);
-        const message = 'A Booking is deleted with identifier ' + removeId.value;
+        const message = 'Buchung mit ID ' + removeId.value + ' erfolgreich storniert';
         alertService.showInfo(message, { variant: 'danger' });
-        removeId.value = null;
+        removeId.value = 0;
         retrieveBookings();
         closeDialog();
       } catch (error) {
-        alertService.showHttpError(error.response);
+        alertService.showHttpError(error);
       }
     };
 

@@ -35,7 +35,7 @@ public class Booking implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "bookings", "departments", "contacts" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "bookings", "departments" }, allowSetters = true)
     private Company company;
 
     @ManyToOne(optional = false)

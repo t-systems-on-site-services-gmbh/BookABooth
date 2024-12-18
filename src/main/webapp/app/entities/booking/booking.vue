@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="BookingHeading">
-      <span id="booking-heading">Bookings</span>
+      <span id="booking-heading">Buchungen</span>
       <div class="d-flex justify-content-end">
         <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>
@@ -14,14 +14,14 @@
             class="btn btn-primary jh-create-entity create-booking"
           >
             <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span>Booking erstellen</span>
+            <span>Buchung erstellen</span>
           </button>
         </router-link>
       </div>
     </h2>
     <br />
     <div class="alert alert-warning" v-if="!isFetching && bookings && bookings.length === 0">
-      <span>Keine Bookings gefunden</span>
+      <span>Keine Buchungen gefunden</span>
     </div>
     <div class="table-responsive" v-if="bookings && bookings.length > 0">
       <table class="table table-striped" aria-describedby="bookings">
@@ -78,7 +78,7 @@
                   v-b-modal.removeEntity
                 >
                   <font-awesome-icon icon="times"></font-awesome-icon>
-                  <span class="d-none d-md-inline">Löschen</span>
+                  <span class="d-none d-md-inline">Stornieren</span>
                 </b-button>
               </div>
             </td>
@@ -91,7 +91,10 @@
         <span id="bookaboothApp.booking.delete.question" data-cy="bookingDeleteDialogHeading">Löschen bestätigen</span>
       </template>
       <div class="modal-body">
-        <p id="jhi-delete-booking-heading">Soll Booking {{ removeId }} wirklich dauerhaft gelöscht werden?</p>
+        <p id="jhi-delete-booking-heading">
+          Wollen Sie Standbuchung {{ removeId }} wirklich stornieren? Die Stornierung kann nicht rückgängig gemacht werden und der
+          Aussteller wird per E-Mail benachrichtigt.
+        </p>
       </div>
       <template #modal-footer>
         <div>
@@ -103,7 +106,7 @@
             data-cy="entityConfirmDeleteButton"
             v-on:click="removeBooking()"
           >
-            Löschen
+            Stornieren
           </button>
         </div>
       </template>

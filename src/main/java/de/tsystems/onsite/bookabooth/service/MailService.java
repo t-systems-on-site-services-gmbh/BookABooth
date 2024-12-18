@@ -123,4 +123,10 @@ public class MailService {
         log.debug("Sending waiting list email to '{}'", user.getEmail());
         this.sendEmailFromTemplateSync(user, "mail/waitinglistEmail", "email.waitinglist.title");
     }
+
+    @Async
+    public void sendBookingDeletedEmail(User user) {
+        log.debug("Send email notification about deleted booking to '{}'", user.getEmail());
+        this.sendEmailFromTemplateSync(user, "mail/bookingDeleteEmail", "email.bookingDelete.title");
+    }
 }
