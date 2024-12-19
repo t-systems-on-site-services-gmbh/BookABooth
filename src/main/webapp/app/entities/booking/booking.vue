@@ -9,10 +9,13 @@
       </div>
     </h2>
     <br />
-    <div class="alert alert-warning" v-if="!isFetching && bookings && bookings.length === 0">
+    <div class="d-flex justify-content-end mb-3">
+      <input type="search" class="form-control" placeholder="Nach Unternehmen suchen" v-model="searchQuery" />
+    </div>
+    <div class="alert alert-warning" v-if="!isFetching && bookings && filteredBookings.length === 0">
       <span>Keine Buchungen gefunden</span>
     </div>
-    <div class="table-responsive" v-if="bookings && bookings.length > 0">
+    <div class="table-responsive" v-if="bookings && filteredBookings.length > 0">
       <table class="table table-striped" aria-describedby="bookings">
         <thead>
           <tr>
@@ -25,7 +28,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booking in sortedBookings" :key="booking.id" data-cy="entityTable">
+          <tr v-for="booking in filteredBookings" :key="booking.id" data-cy="entityTable">
             <td>
               <router-link :to="{ name: 'BookingView', params: { bookingId: booking.id } }">{{ booking.id }}</router-link>
             </td>

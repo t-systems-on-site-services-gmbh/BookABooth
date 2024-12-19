@@ -26,6 +26,7 @@ export default defineComponent({
     const booths: Ref<IBooth[]> = ref([]);
 
     const isFetching = ref(false);
+    const searchQuery = ref('');
 
     const clear = () => {};
 
@@ -52,6 +53,17 @@ export default defineComponent({
     const sortedBookings = computed(() => {
       const statusOrder = ['CONFIRMED', 'PREBOOKED', 'CANCELED'];
       return bookings.value.sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status));
+    });
+
+    const filteredBookings = computed(() => {
+      if (!searchQuery.value) {
+        return sortedBookings.value;
+      }
+      return sortedBookings.value.filter(booking => {
+        const company = companies.value.find(c => c.id === booking.company.id);
+        const companyName = company?.name?.toLowerCase();
+        return companyName && companyName.includes(searchQuery.value.toLowerCase());
+      });
     });
 
     const removeId: Ref<number> = ref(null);
@@ -102,9 +114,10 @@ export default defineComponent({
       prepareRemove,
       closeDialog,
       removeBooking,
-      sortedBookings,
+      filteredBookings,
       companies,
       booths,
+      searchQuery,
     };
   },
 });
