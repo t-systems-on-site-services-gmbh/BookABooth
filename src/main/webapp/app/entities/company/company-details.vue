@@ -55,15 +55,6 @@
               <router-link :to="{ name: 'DepartmentView', params: { departmentId: department.id } }">{{ department.id }}</router-link>
             </span>
           </dd>
-          <dt>
-            <span>Contact</span>
-          </dt>
-          <dd>
-            <span v-for="(contact, i) in company.contacts" :key="contact.id"
-              >{{ i > 0 ? ', ' : '' }}
-              <router-link :to="{ name: 'ContactView', params: { contactId: contact.id } }">{{ contact.id }}</router-link>
-            </span>
-          </dd>
         </dl>
         <button type="submit" v-on:click.prevent="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
           <font-awesome-icon icon="arrow-left"></font-awesome-icon>&nbsp;<span>Zurück</span>

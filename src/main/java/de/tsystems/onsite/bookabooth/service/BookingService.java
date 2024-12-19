@@ -1,11 +1,14 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CANCELED;
+
 import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
+import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import java.util.LinkedList;
@@ -30,6 +33,8 @@ public class BookingService {
 
     private final BoothUserRepository boothUserRepository;
 
+    private final CompanyRepository companyRepository;
+
     private final BookingMapper bookingMapper;
 
     private final MailService mailService;
@@ -37,11 +42,13 @@ public class BookingService {
     public BookingService(
         BookingRepository bookingRepository,
         BoothUserRepository boothUserRepository,
+        CompanyRepository companyRepository,
         BookingMapper bookingMapper,
         MailService mailService
     ) {
         this.bookingRepository = bookingRepository;
         this.boothUserRepository = boothUserRepository;
+        this.companyRepository = companyRepository;
         this.bookingMapper = bookingMapper;
         this.mailService = mailService;
     }
@@ -122,11 +129,32 @@ public class BookingService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Booking : {}", id);
-        User user = findUserByBookingId(id);
         bookingRepository.deleteById(id);
-        mailService.sendBookingDeletedEmail(user);
     }
 
+    // Admin sets booking status to canceled and user gets email notification
+    public void cancelBooking(Booking booking) {
+        if (booking != null) {
+            booking.setStatus(CANCELED);
+            bookingRepository.save(booking);
+            User user = findUserByBookingId(booking.getId());
+            mailService.sendBookingDeletedEmail(user);
+
+            // Removes user from exhibitor list
+            Optional<Company> optionalCompany = companyRepository.findById(booking.getCompany().getId());
+            optionalCompany.ifPresent(company -> {
+                company.setExhibitorList(false);
+                companyRepository.save(company);
+            });
+        }
+    }
+
+    /**
+     * It is important that the company whose booking gets deleted has a user assigned to it.
+     * This can be done in the table booth_user in the database.
+     * @param id booking id passed down from api endpoint.
+     * @return a user who can receive an email.
+     */
     @Transactional
     public User findUserByBookingId(Long id) {
         Optional<Booking> optionalBooking = bookingRepository.findById(id);

@@ -6,17 +6,6 @@
         <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>
         </button>
-        <router-link :to="{ name: 'BookingCreate' }" custom v-slot="{ navigate }">
-          <button
-            @click="navigate"
-            id="jh-create-entity"
-            data-cy="entityCreateButton"
-            class="btn btn-primary jh-create-entity create-booking"
-          >
-            <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span>Buchung erstellen</span>
-          </button>
-        </router-link>
       </div>
     </h2>
     <br />
@@ -28,15 +17,15 @@
         <thead>
           <tr>
             <th scope="row"><span>ID</span></th>
-            <th scope="row"><span>Received</span></th>
+            <th scope="row"><span>Eingegangen</span></th>
             <th scope="row"><span>Status</span></th>
-            <th scope="row"><span>Company</span></th>
-            <th scope="row"><span>Booth</span></th>
+            <th scope="row"><span>Unternehmen</span></th>
+            <th scope="row"><span>Stand</span></th>
             <th scope="row"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booking in bookings" :key="booking.id" data-cy="entityTable">
+          <tr v-for="booking in sortedBookings" :key="booking.id" data-cy="entityTable">
             <td>
               <router-link :to="{ name: 'BookingView', params: { bookingId: booking.id } }">{{ booking.id }}</router-link>
             </td>
@@ -44,12 +33,16 @@
             <td>{{ booking.status }}</td>
             <td>
               <div v-if="booking.company">
-                <router-link :to="{ name: 'CompanyView', params: { companyId: booking.company.id } }">{{ booking.company.id }}</router-link>
+                <router-link :to="{ name: 'CompanyView', params: { companyId: booking.company.id } }">{{
+                  companies.find(l => l.id == booking.company.id)?.name
+                }}</router-link>
               </div>
             </td>
             <td>
               <div v-if="booking.booth">
-                <router-link :to="{ name: 'BoothView', params: { boothId: booking.booth.id } }">{{ booking.booth.id }}</router-link>
+                <router-link :to="{ name: 'BoothView', params: { boothId: booking.booth.id } }">{{
+                  booths.find(l => l.id == booking.booth.id)?.title
+                }}</router-link>
               </div>
             </td>
             <td class="text-right">
@@ -62,18 +55,11 @@
                   <font-awesome-icon icon="eye"></font-awesome-icon>
                   <span class="d-none d-md-inline">Details</span>
                 </router-link>
-                <router-link
-                  :to="{ name: 'BookingEdit', params: { bookingId: booking.id } }"
-                  class="btn btn-primary btn-sm edit"
-                  data-cy="entityEditButton"
-                >
-                  <font-awesome-icon icon="pencil-alt"></font-awesome-icon>
-                  <span class="d-none d-md-inline">Bearbeiten</span>
-                </router-link>
                 <b-button
                   v-on:click="prepareRemove(booking)"
                   variant="danger"
                   class="btn btn-sm"
+                  :disabled="booking.status === 'CANCELED'"
                   data-cy="entityDeleteButton"
                   v-b-modal.removeEntity
                 >
@@ -88,12 +74,12 @@
     </div>
     <b-modal ref="removeEntity" id="removeEntity">
       <template #modal-title>
-        <span id="bookaboothApp.booking.delete.question" data-cy="bookingDeleteDialogHeading">Löschen bestätigen</span>
+        <span id="bookaboothApp.booking.delete.question" data-cy="bookingDeleteDialogHeading">Stornierung bestätigen</span>
       </template>
       <div class="modal-body">
         <p id="jhi-delete-booking-heading">
-          Wollen Sie Standbuchung {{ removeId }} wirklich stornieren? Die Stornierung kann nicht rückgängig gemacht werden und der
-          Aussteller wird per E-Mail benachrichtigt.
+          Wollen Sie die Standbuchung {{ removeId }} wirklich stornieren? Die Stornierung kann nicht rückgängig gemacht werden.<br />Der
+          Aussteller wird per E-Mail benachrichtigt und, wenn nötig, von der Ausstellerliste entfernt.
         </p>
       </div>
       <template #modal-footer>

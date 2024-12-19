@@ -44,6 +44,19 @@ export default class BookingService {
     });
   }
 
+  public cancel(id: number): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .put(`${baseApiUrl}/cancel/${id}`)
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   public create(entity: IBooking): Promise<IBooking> {
     return new Promise<IBooking>((resolve, reject) => {
       axios

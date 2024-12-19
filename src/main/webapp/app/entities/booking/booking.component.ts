@@ -1,9 +1,13 @@
-import { defineComponent, inject, onMounted, ref, type Ref } from 'vue';
+import { computed, defineComponent, inject, onMounted, ref, type Ref } from 'vue';
 
 import BookingService from './booking.service';
 import { type IBooking } from '@/shared/model/booking.model';
 import { useDateFormat } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
+import CompanyService from '@/entities/company/company.service';
+import type { ICompany } from '@/shared/model/company.model';
+import BoothService from '@/entities/booth/booth.service';
+import type { IBooth } from '@/shared/model/booth.model';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -14,6 +18,12 @@ export default defineComponent({
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const bookings: Ref<IBooking[]> = ref([]);
+
+    const companyService = inject('companyService', () => new CompanyService());
+    const companies: Ref<ICompany[]> = ref([]);
+
+    const boothService = inject('boothService', () => new BoothService());
+    const booths: Ref<IBooth[]> = ref([]);
 
     const isFetching = ref(false);
 
@@ -39,6 +49,11 @@ export default defineComponent({
       await retrieveBookings();
     });
 
+    const sortedBookings = computed(() => {
+      const statusOrder = ['CONFIRMED', 'PREBOOKED', 'CANCELED'];
+      return bookings.value.sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status));
+    });
+
     const removeId: Ref<number> = ref(null);
     const removeEntity = ref<any>(null);
     const prepareRemove = (instance: IBooking) => {
@@ -50,7 +65,7 @@ export default defineComponent({
     };
     const removeBooking = async () => {
       try {
-        await bookingService().delete(removeId.value);
+        await bookingService().cancel(removeId.value);
         const message = 'Buchung mit ID ' + removeId.value + ' erfolgreich storniert';
         alertService.showInfo(message, { variant: 'danger' });
         removeId.value = 0;
@@ -60,6 +75,20 @@ export default defineComponent({
         alertService.showHttpError(error);
       }
     };
+    const initRelationships = () => {
+      companyService()
+        .retrieve()
+        .then(res => {
+          companies.value = res.data;
+        });
+      boothService()
+        .retrieve()
+        .then(res => {
+          booths.value = res.data;
+        });
+    };
+
+    initRelationships();
 
     return {
       bookings,
@@ -73,6 +102,9 @@ export default defineComponent({
       prepareRemove,
       closeDialog,
       removeBooking,
+      sortedBookings,
+      companies,
+      booths,
     };
   },
 });
