@@ -1,19 +1,23 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.config.Constants;
+import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
+import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.CompanyService;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import javax.security.auth.login.AccountNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -135,6 +139,19 @@ public class WaitinglistResource {
 
         companyService.partialUpdate(companyDTO);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/add-waitinglist")
+    public ResponseEntity<Void> addToWaitingList(@RequestBody UserProfileDTO userProfileDTO) throws AccountNotFoundException {
+        SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new AccountNotFoundException("Current user login not found"));
+        Company company = companyRepository
+            .findById(userProfileDTO.getCompany().getId())
+            .orElseThrow(() -> new AccountNotFoundException("Company could not be found"));
+        if (company.getWaitingList()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        companyService.addToWaitingList(userProfileDTO);
         return ResponseEntity.ok().build();
     }
 }

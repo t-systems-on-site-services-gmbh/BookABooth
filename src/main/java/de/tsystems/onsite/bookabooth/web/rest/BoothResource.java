@@ -1,8 +1,9 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
+import de.tsystems.onsite.bookabooth.domain.Booth;
+import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.BoothService;
-import de.tsystems.onsite.bookabooth.service.ServicePackageService;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -38,9 +39,12 @@ public class BoothResource {
 
     private final BoothRepository boothRepository;
 
-    public BoothResource(BoothService boothService, BoothRepository boothRepository) {
+    private final BookingRepository bookingRepository;
+
+    public BoothResource(BoothService boothService, BoothRepository boothRepository, BookingRepository bookingRepository) {
         this.boothService = boothService;
         this.boothRepository = boothRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     /**
@@ -142,6 +146,21 @@ public class BoothResource {
     public List<BoothDTO> getAllBooths() {
         log.debug("REST request to get all Booths");
         return boothService.findAll();
+    }
+
+    /**
+     * Checks, if there are booths left to book.
+     * @return Returns a boolean, True when all booths are booked, False if booths are available
+     */
+    @GetMapping("/occupied")
+    public ResponseEntity<Boolean> areAllBoothsOccupied() {
+        List<Booth> booths = boothRepository.findByAvailable(true);
+        for (Booth booth : booths) {
+            if (!bookingRepository.existsByBooth(booth)) {
+                return ResponseEntity.ok(false);
+            }
+        }
+        return ResponseEntity.ok(true);
     }
 
     /**

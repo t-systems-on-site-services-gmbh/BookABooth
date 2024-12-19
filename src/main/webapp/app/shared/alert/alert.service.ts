@@ -18,10 +18,17 @@ export default class AlertService {
     this.bvToast = bvToast;
   }
 
+  /**
+   *
+   * Aktuell führt der Title dazu, dass das Pop-Up nicht angezeigt wird.
+   * Wenn der Title auskommentiert ist, funktioniert alles wie erwartet.
+   * Online habe ich nichts über dieses Verhalten gefunden.
+   *
+   */
   public showInfo(toastMessage: string, toastOptions?: any) {
     this.bvToast.toast(toastMessage, {
       toaster: 'b-toaster-top-center',
-      title: 'Info',
+      //title: 'Info',
       variant: 'info',
       solid: true,
       autoHideDelay: 5000,
@@ -32,7 +39,7 @@ export default class AlertService {
   public showSuccess(toastMessage: string) {
     this.bvToast.toast(toastMessage, {
       toaster: 'b-toaster-top-center',
-      title: 'Success',
+      //title: 'Success',
       variant: 'success',
       solid: true,
       autoHideDelay: 5000,
@@ -42,7 +49,7 @@ export default class AlertService {
   public showError(toastMessage: string) {
     this.bvToast.toast(toastMessage, {
       toaster: 'b-toaster-top-center',
-      title: 'Error',
+      //title: 'Error',
       variant: 'danger',
       solid: true,
       autoHideDelay: 5000,
@@ -76,7 +83,7 @@ export default class AlertService {
         break;
 
       default:
-        errorMessage = httpErrorResponse.data.message;
+        errorMessage = httpErrorResponse.message;
     }
     this.showError(errorMessage);
   }

@@ -167,7 +167,7 @@ public class AccountResource {
     /**
      *
      * @param userProfileDTO profile of the current user
-     * @return profiled with canceled booking
+     * @return profile with canceled booking
      */
     @PutMapping("/account/cancel-booking")
     public ResponseEntity<Void> cancelBooking(@RequestBody UserProfileDTO userProfileDTO) {

@@ -346,7 +346,7 @@
           </p>
           <p v-else>
             Sie befinden sich im Moment nicht auf der Warteliste.<br />
-            Unter "Ihre Buchung" können Sie sich zur Warteliste hinzufügen.
+            Wenn alle Stände gebucht sind, können Sie sich unter "Buchungsstatus" auf der Startseite eintragen.
           </p>
           <button
             type="button"

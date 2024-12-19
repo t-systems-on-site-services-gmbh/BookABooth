@@ -115,26 +115,6 @@
               </option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="company-contact">Contact</label>
-            <select
-              class="form-control"
-              id="company-contacts"
-              data-cy="contact"
-              multiple
-              name="contact"
-              v-if="company.contacts !== undefined"
-              v-model="company.contacts"
-            >
-              <option
-                v-bind:value="getSelected(company.contacts, contactOption, 'id')"
-                v-for="contactOption in contacts"
-                :key="contactOption.id"
-              >
-                {{ contactOption.id }}
-              </option>
-            </select>
-          </div>
         </div>
         <div>
           <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" v-on:click="previousState()">

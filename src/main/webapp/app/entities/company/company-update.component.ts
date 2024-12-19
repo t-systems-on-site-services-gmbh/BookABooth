@@ -5,11 +5,8 @@ import { useVuelidate } from '@vuelidate/core';
 import CompanyService from './company.service';
 import { useValidation } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
-
 import DepartmentService from '@/entities/department/department.service';
 import { type IDepartment } from '@/shared/model/department.model';
-import ContactService from '@/entities/contact/contact.service';
-import { type IContact } from '@/shared/model/contact.model';
 import { type ICompany, Company } from '@/shared/model/company.model';
 
 export default defineComponent({
@@ -25,9 +22,6 @@ export default defineComponent({
 
     const departments: Ref<IDepartment[]> = ref([]);
 
-    const contactService = inject('contactService', () => new ContactService());
-
-    const contacts: Ref<IContact[]> = ref([]);
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'de'), true);
 
@@ -55,11 +49,6 @@ export default defineComponent({
         .then(res => {
           departments.value = res.data;
         });
-      contactService()
-        .retrieve()
-        .then(res => {
-          contacts.value = res.data;
-        });
     };
 
     initRelationships();
@@ -76,7 +65,6 @@ export default defineComponent({
       waitingList: {},
       exhibitorList: {},
       departments: {},
-      contacts: {},
     };
     const v$ = useVuelidate(validationRules, company as any);
     v$.value.$validate();
@@ -89,13 +77,11 @@ export default defineComponent({
       isSaving,
       currentLanguage,
       departments,
-      contacts,
       v$,
     };
   },
   created(): void {
     this.company.departments = [];
-    this.company.contacts = [];
   },
   methods: {
     save(): void {
