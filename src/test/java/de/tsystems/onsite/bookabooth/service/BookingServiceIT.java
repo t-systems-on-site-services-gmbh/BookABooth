@@ -7,6 +7,7 @@ import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +35,7 @@ public class BookingServiceIT {
 
     @Test
     @Transactional
-    public void testFindUserByBookingId() {
+    public void testFindUsersByBookingId() {
         Long bookingId = 1L;
         String userLogin = "login";
         String userPassword = "$2a$12$rIIB8Sv9G/X/wXUHgESVbuUPFik7Hj3FPsCwKv7OUiH2EVN0u4M9q";
@@ -59,8 +60,8 @@ public class BookingServiceIT {
 
         bookingRepository.saveAndFlush(booking);
 
-        User foundUser = bookingService.findUserByBookingId(bookingId);
+        List<User> foundUsers = bookingService.findUsersByBookingId(bookingId);
 
-        assertNotNull(foundUser);
+        assertNotNull(foundUsers);
     }
 }

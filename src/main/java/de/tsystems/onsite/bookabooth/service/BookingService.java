@@ -132,13 +132,18 @@ public class BookingService {
         bookingRepository.deleteById(id);
     }
 
-    // Admin sets booking status to canceled and user gets email notification
+    /**
+     *
+     * @param booking Object passed down from api endpoint.
+     *                This method sets the booking to canceled and removes the company from the exhibitor list.
+     *                It also sends an email to all users associated with that company.
+     */
     public void cancelBooking(Booking booking) {
         if (booking != null) {
             booking.setStatus(CANCELED);
             bookingRepository.save(booking);
-            User user = findUserByBookingId(booking.getId());
-            mailService.sendBookingDeletedEmail(user);
+            List<User> users = findUsersByBookingId(booking.getId());
+            users.forEach(mailService::sendBookingDeletedEmail);
 
             // Removes user from exhibitor list
             Optional<Company> optionalCompany = companyRepository.findById(booking.getCompany().getId());
@@ -150,20 +155,18 @@ public class BookingService {
     }
 
     /**
-     * It is important that the company whose booking gets deleted has a user assigned to it.
-     * This can be done in the table booth_user in the database.
+     *
      * @param id booking id passed down from api endpoint.
-     * @return a user who can receive an email.
+     * @return a list of users that will receive an email.
      */
-    @Transactional
-    public User findUserByBookingId(Long id) {
+    public List<User> findUsersByBookingId(Long id) {
         Optional<Booking> optionalBooking = bookingRepository.findById(id);
         if (optionalBooking.isEmpty()) {
             throw new RuntimeException("Booking not found");
         }
         Booking booking = optionalBooking.get();
         Company company = booking.getCompany();
-        BoothUser boothUser = boothUserRepository.findOneByCompanyId(company.getId());
-        return boothUser.getUser();
+        List<BoothUser> boothUsers = boothUserRepository.findByCompanyId(company.getId());
+        return boothUsers.stream().map(BoothUser::getUser).collect(Collectors.toList());
     }
 }

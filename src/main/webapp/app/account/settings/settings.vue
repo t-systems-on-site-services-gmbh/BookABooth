@@ -153,7 +153,7 @@
                       v-if="!company.logo"
                       :disabled="!!settingsAccount.company.logo"
                     />
-                    Ich habe kein Logo
+                    Kein Logo vorhanden
                   </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">

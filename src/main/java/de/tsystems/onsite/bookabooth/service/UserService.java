@@ -396,7 +396,7 @@ public class UserService {
                         log.debug("Removing company with ID: {}", companyId);
                         companyRepository.deleteById(companyId);
                     } else {
-                        log.debug("Company with ID: {} has other users, not deleting company, contacts and booking", companyId);
+                        log.debug("Company with ID: {} has other users, not deleting company and booking", companyId);
                     }
 
                     log.debug("Removing user with ID: {}", userId);

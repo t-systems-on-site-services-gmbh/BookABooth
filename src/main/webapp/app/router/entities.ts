@@ -35,10 +35,6 @@ const BoothUser = () => import('@/entities/booth-user/booth-user.vue');
 const BoothUserUpdate = () => import('@/entities/booth-user/booth-user-update.vue');
 const BoothUserDetails = () => import('@/entities/booth-user/booth-user-details.vue');
 
-const Contact = () => import('@/entities/contact/contact.vue');
-const ContactUpdate = () => import('@/entities/contact/contact-update.vue');
-const ContactDetails = () => import('@/entities/contact/contact-details.vue');
-
 const Waitinglist = () => import('@/entities/waitinglist/waitinglist.vue');
 // jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
 
@@ -236,30 +232,6 @@ export default {
       path: 'booth-user/:boothUserId/view',
       name: 'BoothUserView',
       component: BoothUserDetails,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'contact',
-      name: 'Contact',
-      component: Contact,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'contact/new',
-      name: 'ContactCreate',
-      component: ContactUpdate,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'contact/:contactId/edit',
-      name: 'ContactEdit',
-      component: ContactUpdate,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'contact/:contactId/view',
-      name: 'ContactView',
-      component: ContactDetails,
       meta: { authorities: [Authority.USER] },
     },
     {
