@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
+import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.service.BookingService;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
@@ -167,5 +168,17 @@ public class BookingResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<Void> cancelBooking(@PathVariable Long id) {
+        Optional<Booking> optionalBooking = bookingRepository.findById(id);
+        if (optionalBooking.isPresent()) {
+            Booking booking = optionalBooking.get();
+            bookingService.cancelBooking(booking);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

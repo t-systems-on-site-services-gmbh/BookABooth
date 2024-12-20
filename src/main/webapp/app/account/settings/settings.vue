@@ -153,7 +153,7 @@
                       v-if="!company.logo"
                       :disabled="!!settingsAccount.company.logo"
                     />
-                    Ich habe kein Logo
+                    Kein Logo vorhanden
                   </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">
@@ -346,7 +346,7 @@
           </p>
           <p v-else>
             Sie befinden sich im Moment nicht auf der Warteliste.<br />
-            Unter "Ihre Buchung" können Sie sich zur Warteliste hinzufügen.
+            Wenn alle Stände gebucht sind, können Sie sich unter "Buchungsstatus" auf der Startseite eintragen.
           </p>
           <button
             type="button"

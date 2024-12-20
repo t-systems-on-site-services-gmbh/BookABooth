@@ -1,7 +1,14 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CANCELED;
+
 import de.tsystems.onsite.bookabooth.domain.Booking;
+import de.tsystems.onsite.bookabooth.domain.BoothUser;
+import de.tsystems.onsite.bookabooth.domain.Company;
+import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
+import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
+import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import java.util.LinkedList;
@@ -24,11 +31,26 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
 
+    private final BoothUserRepository boothUserRepository;
+
+    private final CompanyRepository companyRepository;
+
     private final BookingMapper bookingMapper;
 
-    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper) {
+    private final MailService mailService;
+
+    public BookingService(
+        BookingRepository bookingRepository,
+        BoothUserRepository boothUserRepository,
+        CompanyRepository companyRepository,
+        BookingMapper bookingMapper,
+        MailService mailService
+    ) {
         this.bookingRepository = bookingRepository;
+        this.boothUserRepository = boothUserRepository;
+        this.companyRepository = companyRepository;
         this.bookingMapper = bookingMapper;
+        this.mailService = mailService;
     }
 
     /**
@@ -108,5 +130,43 @@ public class BookingService {
     public void delete(Long id) {
         log.debug("Request to delete Booking : {}", id);
         bookingRepository.deleteById(id);
+    }
+
+    /**
+     *
+     * @param booking Object passed down from api endpoint.
+     *                This method sets the booking to canceled and removes the company from the exhibitor list.
+     *                It also sends an email to all users associated with that company.
+     */
+    public void cancelBooking(Booking booking) {
+        if (booking != null) {
+            booking.setStatus(CANCELED);
+            bookingRepository.save(booking);
+            List<User> users = findUsersByBookingId(booking.getId());
+            users.forEach(mailService::sendBookingDeletedEmail);
+
+            // Removes user from exhibitor list
+            Optional<Company> optionalCompany = companyRepository.findById(booking.getCompany().getId());
+            optionalCompany.ifPresent(company -> {
+                company.setExhibitorList(false);
+                companyRepository.save(company);
+            });
+        }
+    }
+
+    /**
+     *
+     * @param id booking id passed down from api endpoint.
+     * @return a list of users that will receive an email.
+     */
+    public List<User> findUsersByBookingId(Long id) {
+        Optional<Booking> optionalBooking = bookingRepository.findById(id);
+        if (optionalBooking.isEmpty()) {
+            throw new RuntimeException("Booking not found");
+        }
+        Booking booking = optionalBooking.get();
+        Company company = booking.getCompany();
+        List<BoothUser> boothUsers = boothUserRepository.findByCompanyId(company.getId());
+        return boothUsers.stream().map(BoothUser::getUser).collect(Collectors.toList());
     }
 }

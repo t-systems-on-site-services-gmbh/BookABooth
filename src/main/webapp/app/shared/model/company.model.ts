@@ -1,5 +1,4 @@
 import { type IDepartment } from '@/shared/model/department.model';
-import { type IContact } from '@/shared/model/contact.model';
 
 export interface ICompany {
   id?: number;
@@ -11,7 +10,6 @@ export interface ICompany {
   waitingList?: boolean | null;
   exhibitorList?: boolean | null;
   departments?: IDepartment[] | null;
-  contacts?: IContact[] | null;
 }
 
 export class Company implements ICompany {
@@ -25,7 +23,6 @@ export class Company implements ICompany {
     public waitingList?: boolean | null,
     public exhibitorList?: boolean | null,
     public departments?: IDepartment[] | null,
-    public contacts?: IContact[] | null,
   ) {
     this.waitingList = this.waitingList ?? false;
     this.exhibitorList = this.exhibitorList ?? false;

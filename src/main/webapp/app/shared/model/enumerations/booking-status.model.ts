@@ -1,7 +1,9 @@
 export enum BookingStatus {
+  BLOCKED = 'blocked',
+
   PREBOOKED = 'prebooked',
 
   CONFIRMED = 'confirmed',
 
-  REJECTED = 'rejected',
+  CANCELED = 'canceled',
 }

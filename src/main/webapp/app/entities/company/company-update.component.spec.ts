@@ -9,7 +9,6 @@ import CompanyService from './company.service';
 import AlertService from '@/shared/alert/alert.service';
 
 import DepartmentService from '@/entities/department/department.service';
-import ContactService from '@/entities/contact/contact.service';
 
 type CompanyUpdateComponentType = InstanceType<typeof CompanyUpdate>;
 
@@ -55,10 +54,6 @@ describe('Component Tests', () => {
           companyService: () => companyServiceStub,
           departmentService: () =>
             sinon.createStubInstance<DepartmentService>(DepartmentService, {
-              retrieve: sinon.stub().resolves({}),
-            } as any),
-          contactService: () =>
-            sinon.createStubInstance<ContactService>(ContactService, {
               retrieve: sinon.stub().resolves({}),
             } as any),
         },

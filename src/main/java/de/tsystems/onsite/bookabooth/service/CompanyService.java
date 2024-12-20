@@ -3,6 +3,7 @@ package de.tsystems.onsite.bookabooth.service;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,5 +109,16 @@ public class CompanyService {
         log.debug("Request to delete Company : {}", id);
 
         companyRepository.deleteById(id);
+    }
+
+    public void addToWaitingList(UserProfileDTO userProfileDTO) {
+        Optional.of(companyRepository.findById(userProfileDTO.getCompany().getId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(company -> {
+                company.setWaitingList(true);
+                companyRepository.save(company);
+                return userProfileDTO;
+            });
     }
 }

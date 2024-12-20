@@ -166,8 +166,14 @@
               </div>
               <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'PREBOOKED'">Bestätigen Sie Ihre Buchung per E-Mail-Link.</p>
               <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'CANCELED'">Ihre Buchung ist storniert.</p>
-              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null">
+              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && !allBoothsOccupied">
                 Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.
+              </p>
+              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && allBoothsOccupied && !account.company.waitingList">
+                Alle Stände gebucht. Sie können sich <span @click="addToWaitingList" class="link">hier</span> für die Warteliste eintragen.
+              </p>
+              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && allBoothsOccupied && account.company.waitingList">
+                Sie befinden sich auf der Warteliste. Sie erhalten eine E-Mail, wenn Stände wieder verfügbar sind.
               </p>
             </div>
           </div>
@@ -194,6 +200,17 @@
   font-weight: 600;
   margin-top: 50px;
   margin-left: 20px;
+}
+.link {
+  color: #3e8acc;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: bold;
+}
+.link:hover {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #286396;
 }
 </style>
 

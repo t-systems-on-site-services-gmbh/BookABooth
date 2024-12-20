@@ -1,6 +1,7 @@
 package de.tsystems.onsite.bookabooth.repository;
 
 import de.tsystems.onsite.bookabooth.domain.Booth;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface BoothRepository extends JpaRepository<Booth, Long> {}
+public interface BoothRepository extends JpaRepository<Booth, Long> {
+    List<Booth> findByAvailable(boolean available);
+}
