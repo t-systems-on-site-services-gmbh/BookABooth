@@ -1,6 +1,6 @@
-import { defineComponent, inject, onMounted, ref, type Ref } from 'vue';
+import { defineComponent, inject, onMounted, ref, type Ref, computed } from 'vue';
 
-import BoothService from './booth.service';
+import BoothService from './bookabooth.service';
 import { type IBooth } from '@/shared/model/booth.model';
 import { useAlertService } from '@/shared/alert/alert.service';
 import LocationService from '@/entities/location/location.service';
@@ -24,6 +24,8 @@ export default defineComponent({
     const booths: Ref<IBooth[]> = ref([]);
 
     const isFetching = ref(false);
+
+    const selectedLocation = ref('');
 
     const clear = () => {};
 
@@ -84,6 +86,14 @@ export default defineComponent({
       }
     };
 
+    const filteredBooths = computed(() => {
+      console.log(selectedLocation.value)
+      if (selectedLocation.value) {
+        return booths.value.filter(booth => booth.location.id === selectedLocation.value.id);
+      }
+      return booths.value;
+    });
+
     return {
       booths,
       handleSyncList,
@@ -97,6 +107,8 @@ export default defineComponent({
       removeBooth,
       locations,
       servicePackages,
+      filteredBooths,
+      selectedLocation,
     };
-  },
+  }
 });

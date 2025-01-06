@@ -1,24 +1,19 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="BoothHeading">
-      <span id="booth-heading">Messestände</span>
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
-          <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>
-        </button>
-        <router-link :to="{ name: 'BoothCreate' }" custom v-slot="{ navigate }">
-          <button
-            @click="navigate"
-            id="jh-create-entity"
-            data-cy="entityCreateButton"
-            class="btn btn-primary jh-create-entity create-booth"
-          >
-            <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span>Stand erstellen</span>
-          </button>
-        </router-link>
-      </div>
+      <span id="booth-heading">Stand Buchen</span>
     </h2>
+
+    <label for="location" class="mt-3">Ort</label>
+    <select id="location" class="custom-select mb-3" v-model="selectedLocation">
+      <option value="">Alle</option>
+      <option v-for="location in locations" :key="location.id" :value="location">{{ location.location }}</option>
+    </select>
+
+    <div v-if="selectedLocation">
+      <img :src="selectedLocation.imageUrl" style="width: 100%;" />
+    </div>
+    
     <br />
     <div class="alert alert-warning" v-if="!isFetching && booths && booths.length === 0">
       <span>Keine Stände gefunden</span>
@@ -37,7 +32,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booth in booths" :key="booth.id" data-cy="entityTable">
+          <tr v-for="booth in filteredBooths.filter(booth => booth.available === true)" :key="booth.id" data-cy="entityTable">
             <td>
               <router-link :to="{ name: 'BoothView', params: { boothId: booth.id } }">{{ booth.id }}</router-link>
             </td>
@@ -64,31 +59,13 @@
             <td class="text-right">
               <div class="btn-group">
                 <router-link
-                  :to="{ name: 'BoothView', params: { boothId: booth.id } }"
-                  class="btn btn-info btn-sm details"
-                  data-cy="entityDetailsButton"
-                >
-                  <font-awesome-icon icon="eye"></font-awesome-icon>
-                  <span class="d-none d-md-inline">Details</span>
-                </router-link>
-                <router-link
                   :to="{ name: 'BoothEdit', params: { boothId: booth.id } }"
                   class="btn btn-primary btn-sm edit"
                   data-cy="entityEditButton"
                 >
-                  <font-awesome-icon icon="pencil-alt"></font-awesome-icon>
-                  <span class="d-none d-md-inline">Bearbeiten</span>
+                  <font-awesome-icon icon="store"></font-awesome-icon>
+                  <span class="d-none d-md-inline">Stand buchen</span>
                 </router-link>
-                <b-button
-                  v-on:click="prepareRemove(booth)"
-                  variant="danger"
-                  class="btn btn-sm"
-                  data-cy="entityDeleteButton"
-                  v-b-modal.removeEntity
-                >
-                  <font-awesome-icon icon="times"></font-awesome-icon>
-                  <span class="d-none d-md-inline">Löschen</span>
-                </b-button>
               </div>
             </td>
           </tr>
@@ -120,4 +97,4 @@
   </div>
 </template>
 
-<script lang="ts" src="./booth.component.ts"></script>
+<script lang="ts" src="./bookabooth.component.ts"></script>

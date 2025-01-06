@@ -2,7 +2,7 @@
 import axios from 'axios';
 import sinon from 'sinon';
 
-import BoothService from './booth.service';
+import BoothService from './bookabooth.service';
 import { Booth } from '@/shared/model/booth.model';
 
 const error = {
