@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import ServicePackageService from './service-package.service';
 import { type IServicePackage } from '@/shared/model/service-package.model';
 import { useAlertService } from '@/shared/alert/alert.service';
+import type AccountService from '@/account/account.service';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -11,6 +12,8 @@ export default defineComponent({
   setup() {
     const servicePackageService = inject('servicePackageService', () => new ServicePackageService());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const accountService = inject<AccountService>('accountService');
+    const hasAnyAuthorityValues: Ref<any> = ref({});
 
     const route = useRoute();
     const router = useRouter();
@@ -34,8 +37,19 @@ export default defineComponent({
     return {
       alertService,
       servicePackage,
-
+      hasAnyAuthorityValues,
+      accountService,
       previousState,
     };
+  },
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
   },
 });

@@ -27,6 +27,8 @@ export default defineComponent({
 
     const selectedLocation = ref('');
 
+    const selectedBooth = ref();
+
     const clear = () => {};
 
     const retrieveBooths = async () => {
@@ -45,15 +47,23 @@ export default defineComponent({
       retrieveBooths();
     };
 
+    const calculatePrice = (booth: IBooth) => {
+      var boothPrice = 0;
+      booth.servicePackages.forEach((servicePackage: { id: number; }) => {
+        boothPrice += servicePackages.value.find(sp => sp.id === servicePackage.id).price;
+      });
+      return boothPrice;
+    };
+
     const initRelationships = () => {
       locationService()
         .retrieve()
-        .then(res => {
+        .then((res: { data: ILocation[]; }) => {
           locations.value = res.data;
         });
       servicePackageService()
         .retrieve()
-        .then(res => {
+        .then((res: { data: IServicePackage[]; }) => {
           servicePackages.value = res.data;
         });
     };
@@ -109,6 +119,44 @@ export default defineComponent({
       servicePackages,
       filteredBooths,
       selectedLocation,
+      selectedBooth,
+      calculatePrice
     };
+  },
+  methods: {
+    showConfirmationModal(booth: IBooth) {
+      this.$refs['confirmation-modal'].show();
+      this.selectedBooth = booth;
+    },
+    hideConfirmationModal() {
+      this.$refs['confirmation-modal'].hide();
+    },
+    resetConfirmationModal() {
+      this.passwordConfirm = '';
+      this.deleteError = false;
+    },
+    async confirmBooking(id: number) {
+      /*try {
+        const response = await axios.delete(`api/account/delete-account/${id}`, {
+          data: {
+            currentPassword: this.passwordConfirm,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.status === 200) {
+          this.deleteError = false;
+          console.log('Account wurde gelöscht');
+          sessionStorage.setItem('accountDeleted', 'true');
+          this.$router.push({ path: '/' }).then(() => {
+            this.$router.go(0);
+          });
+        }
+      } catch (ex) {
+        this.deleteError = true;
+        console.error('Fehler beim Löschen des Accounts:', ex);
+      }*/
+    }
   }
 });
