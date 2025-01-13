@@ -156,21 +156,22 @@
                 'list-group-item': true,
                 'list-group-item-action': true,
                 'list-group-item-success': bookingStatus === 'CONFIRMED',
-                'list-group-item-danger':
-                  bookingStatus === null || bookingStatus === 'CANCELED' || bookingStatus === 'BLOCKED' || bookingStatus === 'PREBOOKED',
+                'list-group-item-danger': bookingStatus === null || bookingStatus === 'CANCELED' || bookingStatus === 'BLOCKED',
               }"
             >
               <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Buchung</h5>
                 <small class="text-body-secondary" v-text="bookingStatus === 'CONFIRMED' ? 'erledigt' : 'offen'"></small>
               </div>
-              <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'PREBOOKED'">Bestätigen Sie Ihre Buchung per E-Mail-Link.</p>
-              <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'CANCELED'">Ihre Buchung ist storniert. Sie können <a href="bookabooth">hier</a> eine erneute Buchung vornehmen.</p>
+              <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'CANCELED'">
+                Ihre Buchung wurde storniert. Sie können <a href="bookabooth">hier</a> eine erneute Buchung vornehmen.
+              </p>
               <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && !allBoothsOccupied">
                 Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.
               </p>
               <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && allBoothsOccupied && !account.company.waitingList">
-                Alle Stände gebucht. Sie können sich <span @click="addToWaitingList" class="link">hier</span> für die Warteliste eintragen.
+                Alle Stände sind bereits gebucht. Sie können sich <span @click="addToWaitingList" class="link">hier</span> für die
+                Warteliste eintragen.
               </p>
               <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && allBoothsOccupied && account.company.waitingList">
                 Sie befinden sich auf der Warteliste. Sie erhalten eine E-Mail, wenn Stände wieder verfügbar sind.

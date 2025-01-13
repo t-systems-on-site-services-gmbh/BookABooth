@@ -7,6 +7,7 @@ import LocationService from '@/entities/location/location.service';
 import { type ILocation } from '@/shared/model/location.model';
 import ServicePackageService from '@/entities/service-package/service-package.service';
 import { type IServicePackage } from '@/shared/model/service-package.model';
+import { error } from 'console';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -49,7 +50,7 @@ export default defineComponent({
 
     const calculatePrice = (booth: IBooth) => {
       var boothPrice = 0;
-      booth.servicePackages.forEach((servicePackage: { id: number; }) => {
+      booth.servicePackages.forEach((servicePackage: { id: number }) => {
         boothPrice += servicePackages.value.find(sp => sp.id === servicePackage.id).price;
       });
       return boothPrice;
@@ -58,12 +59,12 @@ export default defineComponent({
     const initRelationships = () => {
       locationService()
         .retrieve()
-        .then((res: { data: ILocation[]; }) => {
+        .then((res: { data: ILocation[] }) => {
           locations.value = res.data;
         });
       servicePackageService()
         .retrieve()
-        .then((res: { data: IServicePackage[]; }) => {
+        .then((res: { data: IServicePackage[] }) => {
           servicePackages.value = res.data;
         });
     };
@@ -97,7 +98,7 @@ export default defineComponent({
     };
 
     const filteredBooths = computed(() => {
-      console.log(selectedLocation.value)
+      console.log(selectedLocation.value);
       if (selectedLocation.value) {
         return booths.value.filter(booth => booth.location.id === selectedLocation.value.id);
       }
@@ -120,43 +121,42 @@ export default defineComponent({
       filteredBooths,
       selectedLocation,
       selectedBooth,
-      calculatePrice
+      calculatePrice,
     };
   },
   methods: {
     showConfirmationModal(booth: IBooth) {
-      this.$refs['confirmation-modal'].show();
-      this.selectedBooth = booth;
+      this.bookingService()
+        .create(booth.id)
+        .then(() => {
+          this.$refs['confirmation-modal'].show();
+          this.selectedBooth = booth;
+        })
+        .catch(error => {
+          this.alertService.showHttpError(error.response);
+        });
     },
     hideConfirmationModal() {
       this.$refs['confirmation-modal'].hide();
     },
     resetConfirmationModal() {
-      this.passwordConfirm = '';
-      this.deleteError = false;
+      this.selectedBooth = null;
     },
-    async confirmBooking(id: number) {
-      /*try {
-        const response = await axios.delete(`api/account/delete-account/${id}`, {
-          data: {
-            currentPassword: this.passwordConfirm,
-          },
-          headers: {
-            'Content-Type': 'application/json',
-          },
+    async abortBooking(boothId: number) {
+      this.hideConfirmationModal();
+      this.BookingService.deleteByBooth(boothId);
+    },
+    async createBooking(boothId: number) {},
+    async confirmBooking(boothId: number) {
+      this.bookingService()
+        .confirmByBooth(boothId)
+        .then(() => {
+          this.hideConfirmationModal();
+          this.alertService.showSuccess('Buchung vorgenommen.');
+        })
+        .catch(error => {
+          this.alertService.showHttpError(error.response);
         });
-        if (response.status === 200) {
-          this.deleteError = false;
-          console.log('Account wurde gelöscht');
-          sessionStorage.setItem('accountDeleted', 'true');
-          this.$router.push({ path: '/' }).then(() => {
-            this.$router.go(0);
-          });
-        }
-      } catch (ex) {
-        this.deleteError = true;
-        console.error('Fehler beim Löschen des Accounts:', ex);
-      }*/
-    }
-  }
+    },
+  },
 });
