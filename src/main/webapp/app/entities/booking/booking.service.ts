@@ -44,6 +44,19 @@ export default class BookingService {
     });
   }
 
+  public deleteByBooth(boothId: number): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .delete(`${baseApiUrl}/booth/${boothId}`)
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   public cancel(id: number): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       axios
@@ -57,12 +70,25 @@ export default class BookingService {
     });
   }
 
-  public create(entity: IBooking): Promise<IBooking> {
+  public create(boothId: number): Promise<IBooking> {
     return new Promise<IBooking>((resolve, reject) => {
       axios
-        .post(`${baseApiUrl}`, entity)
+        .post(`${baseApiUrl}`, boothId)
         .then(res => {
           resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  public confirmByBooth(boothId: number): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .post(`${baseApiUrl}/booth/${boothId}`)
+        .then(res => {
+          resolve(res);
         })
         .catch(err => {
           reject(err);

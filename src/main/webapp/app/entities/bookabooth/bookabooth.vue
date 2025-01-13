@@ -11,9 +11,9 @@
     </select>
 
     <div v-if="selectedLocation">
-      <img :src="selectedLocation.imageUrl" style="width: 100%;" />
+      <img :src="selectedLocation.imageUrl" style="width: 100%" />
     </div>
-    
+
     <br />
     <div class="alert alert-warning" v-if="!isFetching && booths && booths.length === 0">
       <span>Keine Stände gefunden</span>
@@ -58,14 +58,10 @@
             </td>
             <td class="text-right">
               <div class="btn-group">
-                <button
-                  @click="showConfirmationModal(booth)"
-                  class="btn btn-primary btn-sm edit"
-                  data-cy="entityEditButton"
-                >
+                <button @click="showConfirmationModal(booth)" class="btn btn-primary btn-sm edit" data-cy="entityEditButton">
                   <font-awesome-icon icon="store"></font-awesome-icon>
                   <span class="d-none d-md-inline">Stand buchen</span>
-              </button>
+                </button>
               </div>
             </td>
           </tr>
@@ -74,24 +70,21 @@
     </div>
   </div>
   <b-modal ref="confirmation-modal" hide-footer title="Buchung bestätigen" @hidden="resetConfirmationModal">
-          <div class="d-block text-left">
-            <p>Sind Sie sich sicher, dass Sie diesen Stand kostenpflichtig buchen wollen?</p>
-            <p>
-              Stand: {{selectedBooth.title}}<br/>
-              Kosten: {{ calculatePrice(selectedBooth) }} €<br/>
-            </p>
-            <p>Bei Bestätigung der Buchung erkennen Sie die <a href="#todo">Ausstellerbedingungen</a> an.</p>
-            <form name="deleteForm" id="delete-form" @submit.prevent="confirmBooking(2)">
-
-            </form>
-          </div>
-          <div class="d-flex justify-content-end">
-            <b-button class="btn btn-secondary" @click="hideConfirmationModal">Abbrechen</b-button>
-            <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(2)"
-              >Buchung bestätigen</b-button
-            >
-          </div>
-        </b-modal>
+    <div class="d-block text-left">
+      <p>Sind Sie sich sicher, dass Sie diesen Stand kostenpflichtig buchen wollen?</p>
+      <p>
+        Stand: {{ selectedBooth.title }}<br />
+        Kosten: {{ calculatePrice(selectedBooth) }} €<br />
+      </p>
+      <p>Bei Bestätigung der Buchung erkennen Sie die <a href="#todo">Ausstellerbedingungen</a> an.</p>
+    </div>
+    <div class="d-flex justify-content-end">
+      <b-button class="btn btn-secondary" @click="abortBooking(selectedBooth.id)">Abbrechen</b-button>
+      <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(selectedBooth.id)"
+        >Buchung bestätigen</b-button
+      >
+    </div>
+  </b-modal>
 </template>
 
 <script lang="ts" src="./bookabooth.component.ts"></script>
