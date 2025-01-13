@@ -58,43 +58,40 @@
             </td>
             <td class="text-right">
               <div class="btn-group">
-                <router-link
-                  :to="{ name: 'BoothEdit', params: { boothId: booth.id } }"
+                <button
+                  @click="showConfirmationModal(booth)"
                   class="btn btn-primary btn-sm edit"
                   data-cy="entityEditButton"
                 >
                   <font-awesome-icon icon="store"></font-awesome-icon>
                   <span class="d-none d-md-inline">Stand buchen</span>
-                </router-link>
+              </button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <b-modal ref="removeEntity" id="removeEntity">
-      <template #modal-title>
-        <span id="bookaboothApp.booth.delete.question" data-cy="boothDeleteDialogHeading">Löschen bestätigen</span>
-      </template>
-      <div class="modal-body">
-        <p id="jhi-delete-booth-heading">Soll Booth {{ removeId }} wirklich dauerhaft gelöscht werden?</p>
-      </div>
-      <template #modal-footer>
-        <div>
-          <button type="button" class="btn btn-secondary" v-on:click="closeDialog()">Abbrechen</button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            id="jhi-confirm-delete-booth"
-            data-cy="entityConfirmDeleteButton"
-            v-on:click="removeBooth()"
-          >
-            Löschen
-          </button>
-        </div>
-      </template>
-    </b-modal>
   </div>
+  <b-modal ref="confirmation-modal" hide-footer title="Buchung bestätigen" @hidden="resetConfirmationModal">
+          <div class="d-block text-left">
+            <p>Sind Sie sich sicher, dass Sie diesen Stand kostenpflichtig buchen wollen?</p>
+            <p>
+              Stand: {{selectedBooth.title}}<br/>
+              Kosten: {{ calculatePrice(selectedBooth) }} €<br/>
+            </p>
+            <p>Bei Bestätigung der Buchung erkennen Sie die <a href="#todo">Ausstellerbedingungen</a> an.</p>
+            <form name="deleteForm" id="delete-form" @submit.prevent="confirmBooking(2)">
+
+            </form>
+          </div>
+          <div class="d-flex justify-content-end">
+            <b-button class="btn btn-secondary" @click="hideConfirmationModal">Abbrechen</b-button>
+            <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(2)"
+              >Buchung bestätigen</b-button
+            >
+          </div>
+        </b-modal>
 </template>
 
 <script lang="ts" src="./bookabooth.component.ts"></script>

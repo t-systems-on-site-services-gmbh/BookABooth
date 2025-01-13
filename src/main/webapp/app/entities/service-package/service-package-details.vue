@@ -41,7 +41,7 @@
           custom
           v-slot="{ navigate }"
         >
-          <button @click="navigate" class="btn btn-primary">
+          <button @click="navigate" class="btn btn-primary" v-if="hasAnyAuthority('ROLE_ADMIN')">
             <font-awesome-icon icon="pencil-alt"></font-awesome-icon>&nbsp;<span>Bearbeiten</span>
           </button>
         </router-link>
