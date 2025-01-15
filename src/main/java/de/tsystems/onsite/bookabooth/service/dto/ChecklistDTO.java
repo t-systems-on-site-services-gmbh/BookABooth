@@ -5,52 +5,52 @@ import java.util.Optional;
 
 public class ChecklistDTO {
 
-    private Boolean verified; // Verifizierte E-Mail-Adresse?
-    private Boolean address; // Rechnungsadresse hinterlegt?
-    private Boolean logo; // Logo hochgeladen?
-    private Boolean phoneNumber; // Telefonnummer hinterlegt?
-    private Boolean companyDescription; // Firmenbeschreibung hinterlegt?
+    private boolean verified; // Verifizierte E-Mail-Adresse?
+    private boolean address; // Rechnungsadresse hinterlegt?
+    private boolean logo; // Logo hochgeladen?
+    private boolean phoneNumber; // Telefonnummer hinterlegt?
+    private boolean companyDescription; // Firmenbeschreibung hinterlegt?
     private Optional<BookingStatus> bookingStatus; // Buchung abgeschlossen?
 
     public ChecklistDTO() {}
 
-    public Boolean getVerified() {
+    public boolean getVerified() {
         return verified;
     }
 
-    public void setVerified(Boolean verified) {
+    public void setVerified(boolean verified) {
         this.verified = verified;
     }
 
-    public Boolean getAddress() {
+    public boolean getAddress() {
         return address;
     }
 
-    public void setAddress(Boolean address) {
+    public void setAddress(boolean address) {
         this.address = address;
     }
 
-    public Boolean getLogo() {
+    public boolean getLogo() {
         return logo;
     }
 
-    public void setLogo(Boolean logo) {
+    public void setLogo(boolean logo) {
         this.logo = logo;
     }
 
-    public Boolean getPhoneNumber() {
+    public boolean getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(Boolean phoneNumber) {
+    public void setPhoneNumber(boolean phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    public Boolean getCompanyDescription() {
+    public boolean getCompanyDescription() {
         return companyDescription;
     }
 
-    public void setCompanyDescription(Boolean companyDescription) {
+    public void setCompanyDescription(boolean companyDescription) {
         this.companyDescription = companyDescription;
     }
 
@@ -60,5 +60,9 @@ public class ChecklistDTO {
 
     public void setBookingStatus(Optional<BookingStatus> bookingStatus) {
         this.bookingStatus = bookingStatus;
+    }
+
+    public boolean isMandatoryComplete() {
+        return verified && address;
     }
 }

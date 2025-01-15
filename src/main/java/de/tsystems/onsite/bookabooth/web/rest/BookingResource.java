@@ -2,12 +2,17 @@ package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
+import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.BookingService;
+import de.tsystems.onsite.bookabooth.service.BoothService;
+import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
+import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
+import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
+import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
@@ -15,13 +20,16 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link de.tsystems.onsite.bookabooth.domain.Booking}.
+ * REST controller for managing {@link Booking}.
  */
 @RestController
 @RequestMapping("/api/bookings")
@@ -38,27 +46,91 @@ public class BookingResource {
 
     private final BookingRepository bookingRepository;
 
-    public BookingResource(BookingService bookingService, BookingRepository bookingRepository) {
+    private final BoothService boothService;
+
+    private final BoothUserService boothUserService;
+
+    private final CompanyMapper companyMapper;
+
+    public BookingResource(
+        BookingService bookingService,
+        BookingRepository bookingRepository,
+        BoothService boothService,
+        BoothUserService boothUserService,
+        CompanyMapper companyMapper
+    ) {
         this.bookingService = bookingService;
         this.bookingRepository = bookingRepository;
+        this.boothService = boothService;
+        this.boothUserService = boothUserService;
+        this.companyMapper = companyMapper;
     }
 
     /**
      * {@code POST  /bookings} : Create a new booking.
      *
-     * @param bookingDTO the bookingDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking has already an ID.
+     * @param boothId of the booth for create a booking.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking was not created.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
-    public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingDTO bookingDTO) throws URISyntaxException {
-        log.debug("REST request to save Booking : {}", bookingDTO);
-        if (bookingDTO.getId() != null) {
-            throw new BadRequestAlertException("A new booking cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        bookingDTO = bookingService.save(bookingDTO);
-        return ResponseEntity.created(new URI("/api/bookings/" + bookingDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, bookingDTO.getId().toString()))
+    @PostMapping("/booth/{id}")
+    public ResponseEntity<BookingDTO> blockBooking(
+        @PathVariable(value = "id", required = true) final Long boothId,
+        Authentication authentication
+    ) throws URISyntaxException {
+        log.debug("REST request to save Booking : {}", boothId);
+
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
+        BookingDTO blockedBookingDTO = bookingService.blockABoothBooking(boothId, bUserDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, blockedBookingDTO.getId().toString()))
+            .body(blockedBookingDTO);
+    }
+
+    /**
+     * {@code PATCH  /bookings} : Confirm a blocked booking.
+     *
+     * @param bookingId og the booking to confirm.
+     * @return the {@link ResponseEntity} with status {@code 200 (Ok)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking was not confirmed.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping("/confirm/{id}")
+    public ResponseEntity<BookingDTO> confirmBooking(
+        @PathVariable(value = "id", required = true) final Long bookingId,
+        Authentication authentication
+    ) throws URISyntaxException {
+        log.debug("REST request to confirm Booking : {}", bookingId);
+
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
+
+        BookingDTO blockedBookingDTO = bookingService.confirmABoothBooking(bookingId, bUserDTO);
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, blockedBookingDTO.getId().toString()))
+            .body(blockedBookingDTO);
+    }
+
+    /**
+     * {@code PATCH  /bookings} : Confirm a blocked booking.
+     *
+     * @param bookingId of booking to cancel.
+     * @return the {@link ResponseEntity} with status {@code 200 (Ok)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking was not canceled.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping("/cancel/{id}")
+    public ResponseEntity<BookingDTO> cancelBooking(
+        @PathVariable(value = "id", required = true) final Long bookingId,
+        Authentication authentication
+    ) throws URISyntaxException {
+        log.debug("REST request to cancel a Booking : {}", bookingId);
+
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
+
+        BookingDTO bookingDTO = bookingService.cancelAConfirmedBoothBooking(bookingId, bUserDTO);
+
+        return ResponseEntity.accepted()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, bookingId.toString()))
             .body(bookingDTO);
     }
 
@@ -73,6 +145,7 @@ public class BookingResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BookingDTO> updateBooking(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody BookingDTO bookingDTO
@@ -107,6 +180,7 @@ public class BookingResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BookingDTO> partialUpdateBooking(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody BookingDTO bookingDTO
@@ -156,29 +230,30 @@ public class BookingResource {
     }
 
     /**
-     * {@code DELETE  /bookings/:id} : delete the "id" booking.
+     * {@code DELETE  /bookings/:bookingId} : delete the "bookingId" booking.
      *
-     * @param id the id of the bookingDTO to delete.
+     * @param bookingId the bookingId of the bookingDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable("id") Long id) {
-        log.debug("REST request to delete Booking : {}", id);
-        bookingService.delete(id);
+    public ResponseEntity<Void> deleteBooking(@PathVariable("id") Long bookingId, Authentication authentication) {
+        log.debug("REST request to delete Booking : {}", bookingId);
+
+        if (!isBookingOwnerOrAdmin(bookingId, authentication)) {
+            throw new ForbiddenException("You are not authorized to delete this booking");
+        }
+
+        bookingService.delete(bookingId);
+
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, bookingId.toString()))
             .build();
     }
 
-    @PutMapping("/cancel/{id}")
-    public ResponseEntity<Void> cancelBooking(@PathVariable Long id) {
-        Optional<Booking> optionalBooking = bookingRepository.findById(id);
-        if (optionalBooking.isPresent()) {
-            Booking booking = optionalBooking.get();
-            bookingService.cancelBooking(booking);
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    private boolean isBookingOwnerOrAdmin(Long bookingId, Authentication authentication) {
+        return (
+            bookingService.isOwner(bookingId, boothUserService.getCurrentBoothUser(authentication)) ||
+            SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN")
+        );
     }
 }

@@ -6,10 +6,15 @@ import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
+import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
+import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
+import de.tsystems.onsite.bookabooth.service.exception.BadRequestException;
+import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,18 +44,30 @@ public class BookingService {
 
     private final MailService mailService;
 
+    private final BoothService boothService;
+
+    private final SystemService systemService;
+
+    private final UserService userService;
+
     public BookingService(
         BookingRepository bookingRepository,
         BoothUserRepository boothUserRepository,
         CompanyRepository companyRepository,
         BookingMapper bookingMapper,
-        MailService mailService
+        MailService mailService,
+        BoothService boothService,
+        SystemService systemService,
+        UserService userService
     ) {
         this.bookingRepository = bookingRepository;
         this.boothUserRepository = boothUserRepository;
         this.companyRepository = companyRepository;
         this.bookingMapper = bookingMapper;
         this.mailService = mailService;
+        this.boothService = boothService;
+        this.systemService = systemService;
+        this.userService = userService;
     }
 
     /**
@@ -154,6 +171,8 @@ public class BookingService {
         }
     }
 
+    public void cancelBooking(BookingDTO bookingDTO) {}
+
     /**
      *
      * @param id booking id passed down from api endpoint.
@@ -168,5 +187,106 @@ public class BookingService {
         Company company = booking.getCompany();
         List<BoothUser> boothUsers = boothUserRepository.findByCompanyId(company.getId());
         return boothUsers.stream().map(BoothUser::getUser).collect(Collectors.toList());
+    }
+
+    /**
+     * Checks if a booking is present for booth
+     *
+     * @param boothId the id of the booth.
+     * @return booking if a booking is present for the booth. The check excludes bookings with status CANCELED.
+     */
+    public Optional<Booking> getNotCanceledBooking(Long boothId) {
+        return bookingRepository.findByBoothIdAndStatusNot(boothId, CANCELED);
+    }
+
+    public Optional<Booking> getBookingByCompanyId(Long id) {
+        return bookingRepository.findByCompanyId(id);
+    }
+
+    public BookingDTO blockABoothBooking(Long boothId, BoothUserDTO bUserDTO) {
+        BoothDTO boothDTO = boothService.findOne(boothId).orElseThrow(() -> new BadRequestException("Booth not found"));
+        return this.blockABoothBooking(boothDTO, bUserDTO);
+    }
+
+    public BookingDTO blockABoothBooking(BoothDTO boothDTO, BoothUserDTO bUserDTO) {
+        // check if system is enabled
+        if (!systemService.isSystemEnabled()) {
+            throw new ForbiddenException("System is disabled");
+        }
+
+        // Profile completed
+        String login = bUserDTO.getUser().getLogin();
+        boolean profileCompleted = userService.getChecklistDTO(login).isMandatoryComplete();
+        if (!profileCompleted) {
+            throw new BadRequestException("Profile is not complete");
+        }
+
+        // check if the booth is already booked or blocked
+        Optional<Booking> bookingforBoothId = this.getNotCanceledBooking(boothDTO.getId());
+        if (bookingforBoothId.isPresent()) {
+            throw new BadRequestException("Booth already booked or blocked");
+        }
+
+        // a BoothUser can only book one booth for his company
+        Optional<Booking> bookingforCompany = this.getNotCanceledBooking(bUserDTO.getCompany().getId());
+        if (bookingforCompany.isPresent()) {
+            throw new BadRequestException("Company already booked or blocked a booth");
+        }
+
+        // create booking
+        BookingDTO bookingDTO = new BookingDTO();
+        bookingDTO.setBooth(boothDTO);
+        bookingDTO.setStatus(BookingStatus.BLOCKED);
+        bookingDTO.setCompany(bUserDTO.getCompany());
+        bookingDTO = save(bookingDTO);
+
+        return bookingDTO;
+    }
+
+    public BookingDTO confirmABoothBooking(Long bookingId, BoothUserDTO bUserDTO) {
+        BookingDTO bookingDTO = this.findOne(bookingId).orElseThrow(() -> new BadRequestException("Booking not found"));
+        return this.confirmABoothBooking(bookingDTO, bUserDTO);
+    }
+
+    public BookingDTO confirmABoothBooking(BookingDTO bookingDTO, BoothUserDTO bUserDTO) {
+        // get booking by bookinId and check the owner
+        if (!bookingDTO.getCompany().getId().equals(bUserDTO.getCompany().getId())) {
+            throw new ForbiddenException("Company does not own the booking");
+        }
+
+        // update the booking status
+        bookingDTO.setStatus(BookingStatus.CONFIRMED);
+        bookingDTO = this.update(bookingDTO);
+
+        return bookingDTO;
+    }
+
+    public BookingDTO cancelAConfirmedBoothBooking(Long bookingId, BoothUserDTO bUserDTO) {
+        // get booking by bookinId and check the owner
+        BookingDTO bookingDTO = this.findOne(bookingId).orElseThrow(() -> new BadRequestException("Booking not found"));
+        return cancelAConfirmedBoothBooking(bookingDTO, bUserDTO);
+    }
+
+    public BookingDTO cancelAConfirmedBoothBooking(BookingDTO bookingDTO, BoothUserDTO bUserDTO) {
+        if (!bookingDTO.getCompany().getId().equals(bUserDTO.getCompany().getId())) {
+            throw new ForbiddenException("Company does not own the booking");
+        }
+
+        // update the booking status
+        bookingDTO.setStatus(BookingStatus.CANCELED);
+        return bookingDTO = this.update(bookingDTO);
+        // send email to all users associated with the company
+
+        // remove from exhibitor list
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isOwner(Long bookingId, BoothUserDTO currentBoothUser) {
+        BookingDTO bookingDTO = this.findOne(bookingId).orElseThrow(() -> new BadRequestException("Booking not found"));
+        if (currentBoothUser == null || currentBoothUser.getCompany() == null) {
+            return false;
+        } else {
+            return bookingDTO.getCompany().getId().equals(currentBoothUser.getCompany().getId());
+        }
     }
 }

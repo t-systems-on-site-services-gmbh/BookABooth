@@ -57,10 +57,10 @@ export default class BookingService {
     });
   }
 
-  public cancel(id: number): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
+  public cancel(id: number): Promise<IBooking> {
+    return new Promise<IBooking>((resolve, reject) => {
       axios
-        .put(`${baseApiUrl}/cancel/${id}`)
+        .patch(`${baseApiUrl}/cancel/${id}`)
         .then(res => {
           resolve(res);
         })

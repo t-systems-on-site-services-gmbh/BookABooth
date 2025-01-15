@@ -162,7 +162,7 @@ class BoothUserResourceTest {
         assertThat(boothUser.getUser().getPassword()).isNotNull(); // todo improvement: check password with password encoder
     }
 
-    private static @NotNull UserRegistrationDTO createDefaultUserRegistrationDTO(String name) {
+    protected static @NotNull UserRegistrationDTO createDefaultUserRegistrationDTO(String name) {
         UserRegistrationDTO userRegistrationDTO = new UserRegistrationDTO();
         userRegistrationDTO.setLogin(name);
         userRegistrationDTO.setCompanyName(name + "-company");

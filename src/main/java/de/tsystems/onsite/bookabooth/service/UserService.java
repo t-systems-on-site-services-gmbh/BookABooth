@@ -506,6 +506,7 @@ public class UserService {
     }
 
     // Set the booking status to canceled (from prebooked or confirmed)
+    // TODO: we have cancel method in booking service, should we use that?
     public void cancelBooking(UserProfileDTO userProfileDTO, Long bookingId) {
         Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
         optionalBooking.ifPresent(booking -> {
@@ -685,6 +686,7 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ChecklistDTO getChecklistDTO(String login) {
         ChecklistDTO cl = new ChecklistDTO();
         BoothUser bUser = boothUserRepository.findByUserLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
