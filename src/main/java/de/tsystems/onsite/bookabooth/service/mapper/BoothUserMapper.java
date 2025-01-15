@@ -20,6 +20,8 @@ public interface BoothUserMapper extends EntityMapper<BoothUserDTO, BoothUser> {
     @Named("userId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "login", source = "login")
+    @Mapping(target = "email", source = "email")
     UserDTO toDtoUserId(User user);
 
     @Named("companyId")

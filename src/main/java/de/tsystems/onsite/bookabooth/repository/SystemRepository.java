@@ -1,6 +1,7 @@
 package de.tsystems.onsite.bookabooth.repository;
 
 import de.tsystems.onsite.bookabooth.domain.System;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -11,5 +12,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SystemRepository extends JpaRepository<System, Long> {
     // find first entry as Optional
-    System findFirstByOrderById();
+    Optional<System> findFirstByOrderById();
 }

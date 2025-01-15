@@ -2,6 +2,7 @@ package de.tsystems.onsite.bookabooth.repository;
 
 import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.domain.Booth;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findByCompanyId(Long companyId);
 
     Boolean existsByBooth(Booth booth);
+
+    Optional<Booking> findByBoothIdAndStatusNot(long boothId, BookingStatus bookingStatus);
 }

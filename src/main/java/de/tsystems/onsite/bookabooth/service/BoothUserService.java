@@ -4,6 +4,7 @@ import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
+import de.tsystems.onsite.bookabooth.service.exception.BadRequestException;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothUserMapper;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,5 +116,19 @@ public class BoothUserService {
     public void delete(Long id) {
         log.debug("Request to delete BoothUser : {}", id);
         boothUserRepository.deleteById(id);
+    }
+
+    /**
+     * Get the boothUser by the current user.
+     *
+     * @return the entity.
+     */
+    @Transactional(readOnly = true)
+    public BoothUserDTO getCurrentBoothUser(Authentication authentication) {
+        String login = String.valueOf(authentication.getName());
+        return boothUserRepository
+            .findByUserLogin(login)
+            .map(boothUserMapper::toDto)
+            .orElseThrow(() -> new BadRequestException("BoothUser not found for user: " + login));
     }
 }

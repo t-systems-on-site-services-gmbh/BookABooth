@@ -3,6 +3,7 @@ package de.tsystems.onsite.bookabooth.service;
 import de.tsystems.onsite.bookabooth.domain.System;
 import de.tsystems.onsite.bookabooth.repository.SystemRepository;
 import de.tsystems.onsite.bookabooth.service.dto.SystemDTO;
+import de.tsystems.onsite.bookabooth.service.exception.BadRequestException;
 import de.tsystems.onsite.bookabooth.service.mapper.SystemMapper;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,17 +81,14 @@ public class SystemService {
     /**
      * Get all the systems.
      *
-     * @return the list of entities.
+     * @return systemDTO
      */
     @Transactional(readOnly = true)
     public SystemDTO findFirstSystemEntry() {
-        log.debug("Request to get all Systems");
+        log.debug("Request to get System");
         // return mapped system to systemMapper.toDto
-        System system = systemRepository.findFirstByOrderById();
-        if (system != null) {
-            return systemMapper.toDto(system);
-        }
-        return null;
+        System system = systemRepository.findFirstByOrderById().orElseThrow(() -> new BadRequestException("System not found"));
+        return systemMapper.toDto(system);
     }
 
     /**
@@ -124,5 +122,10 @@ public class SystemService {
     public void delete(Long id) {
         log.debug("Request to delete System : {}", id);
         systemRepository.deleteById(id);
+    }
+
+    public boolean isSystemEnabled() {
+        SystemDTO system = this.findFirstSystemEntry();
+        return system.getEnabled();
     }
 }
