@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.domain.*;
 import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
@@ -24,7 +25,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link AccountResource} REST controller.
@@ -34,6 +34,9 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc
 @ActiveProfiles("mytest")
 public class AccountResourceTest {
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private MockMvc mockMvc;
@@ -203,12 +206,13 @@ public class AccountResourceTest {
         requestUserProfileDTO.setCompany(companyDTO);
         requestUserProfileDTO.setBooking(userProfileDTO.getBooking());
 
-        // DTO zu JSON konvertieren
-        ObjectMapper objectMapper = new ObjectMapper();
-        String changesJson = objectMapper.writeValueAsString(requestUserProfileDTO);
-
         mockMvc
-            .perform(post("/api/account").contentType(MediaType.APPLICATION_JSON).content(changesJson).with(csrf()))
+            .perform(
+                post("/api/account")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(om.writeValueAsBytes(requestUserProfileDTO))
+                    .with(csrf())
+            )
             .andExpect(status().isOk());
 
         // Überprüfen, ob User in System aktualisiert wurde
