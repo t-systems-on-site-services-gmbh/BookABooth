@@ -14,6 +14,9 @@ import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.*;
 import de.tsystems.onsite.bookabooth.service.mapper.*;
 import de.tsystems.onsite.bookabooth.web.rest.AccountResource;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,21 +163,40 @@ public class AccountResourceTest {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
-    public void deleteOnlyAdminOverApiAndFail() throws Exception {
-        String requestJson = "{\"currentPassword\": \"user\"}";
+    @WithMockUser(username = "lastAdmin", authorities = AuthoritiesConstants.ADMIN)
+    public void atLeastOneAdminMustBePresent() throws Exception {
+        // find all users with admin role
+        List<User> admins = userRepository
+            .findAll()
+            .stream()
+            .filter(user -> user.getAuthorities().stream().anyMatch(authority -> authority.getName().equals(AuthoritiesConstants.ADMIN)))
+            .collect(Collectors.toList());
+        userRepository.deleteAll(admins);
+
+        // set admin authority for lastAdmin
+        Authority adminAuthority = new Authority();
+        adminAuthority.setName(AuthoritiesConstants.ADMIN);
+
+        User lastAdmin = new User();
+        lastAdmin.setLogin("lastAdmin");
+        lastAdmin.setEmail("last@admin.sw");
+        lastAdmin.setFirstName("Last");
+        lastAdmin.setLastName("Admin");
+        lastAdmin.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        lastAdmin.setActivated(true);
+        lastAdmin.setLangKey("en");
+        lastAdmin.setAuthorities(Set.of(adminAuthority));
+        lastAdmin = userRepository.saveAndFlush(lastAdmin);
+
+        // one admin is present
+        assertEquals(userRepository.countByAuthoritiesName(AuthoritiesConstants.ADMIN), 1);
 
         mockMvc
-            .perform(
-                delete("/api/account/delete-account/" + testUser.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestJson)
-                    .with(csrf())
-            )
+            .perform(delete("/api/account/delete-account/" + lastAdmin.getId()).contentType(MediaType.APPLICATION_JSON).with(csrf()))
             .andExpect(status().isBadRequest());
 
         // Der einzige Admin kann nicht gelöscht werden
-        assertTrue(userRepository.findById(testUser.getId()).isPresent());
+        assertTrue(userRepository.findById(lastAdmin.getId()).isPresent());
     }
 
     @Test
