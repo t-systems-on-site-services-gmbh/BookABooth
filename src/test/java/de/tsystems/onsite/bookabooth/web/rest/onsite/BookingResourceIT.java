@@ -3,8 +3,11 @@ package de.tsystems.onsite.bookabooth.web.rest.onsite;
 import static de.tsystems.onsite.bookabooth.domain.BookingAsserts.assertBookingAllPropertiesEquals;
 import static de.tsystems.onsite.bookabooth.domain.BookingAsserts.assertBookingAllUpdatablePropertiesEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,10 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.domain.Booth;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
+import de.tsystems.onsite.bookabooth.domain.System;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
+import de.tsystems.onsite.bookabooth.repository.SystemRepository;
 import de.tsystems.onsite.bookabooth.service.BoothUserService;
+import de.tsystems.onsite.bookabooth.service.SystemService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
@@ -84,6 +90,12 @@ class BookingResourceIT {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    SystemRepository systemRepository;
+
+    @Autowired
+    SystemService systemService;
 
     @BeforeEach
     void setup() {
@@ -179,6 +191,65 @@ class BookingResourceIT {
 
     @Test
     @Transactional
+    void SystemMustBeEnabledBeforeBlockingABooth() throws Exception {
+        // initialize the database
+        // System is not enabled
+        systemService.disableSystem();
+
+        long databaseSizeBeforeCreate = getRepositoryCount();
+
+        // Create the Booking
+        long boothId = 1L; // Assuming a valid boothId
+        restBookingMockMvc
+            .perform(post("/api/bookings/booth/{id}", boothId).with(csrf()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden())
+            .andReturn()
+            .getResponse()
+            .getContentAsString()
+            .contains("System is disabled");
+
+        // Validate the Booking in the database
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
+    }
+
+    @Test
+    @Transactional
+    void confirmBooking() throws Exception {
+        // initialize the database
+        this.blockABooth();
+        BoothUser boothUser = boothUserRepository.findByUserLogin("user").get();
+        Booking booking = bookingRepository.findByCompanyId(boothUser.getCompany().getId()).get();
+
+        assertEquals(BookingStatus.BLOCKED, booking.getStatus());
+
+        // Create the Booking
+        restBookingMockMvc
+            .perform(patch("/api/bookings/confirm/{id}", booking.getId()).with(csrf()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        assertEquals(BookingStatus.CONFIRMED, booking.getStatus());
+    }
+
+    @Test
+    @Transactional
+    public void cancelBooking() throws Exception {
+        // initialize the database
+        this.confirmBooking();
+        BoothUser boothUser = boothUserRepository.findByUserLogin("user").get();
+        Booking booking = bookingRepository.findByCompanyId(boothUser.getCompany().getId()).get();
+
+        assertEquals(BookingStatus.CONFIRMED, booking.getStatus());
+
+        // Create the Booking
+        restBookingMockMvc
+            .perform(patch("/api/bookings/cancel/{id}", booking.getId()).with(csrf()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isAccepted());
+
+        assertEquals(BookingStatus.CANCELED, booking.getStatus());
+    }
+
+    @Test
+    @Transactional
     void deleteBooking() throws Exception {
         // Initialize the database
         Booking booking = createBookingForUser("user");
@@ -247,11 +318,6 @@ class BookingResourceIT {
         BoothUser bUser = userService.registerUser(userRegistrationDTO);
         userService.activateRegistration(bUser.getUser().getActivationKey());
         return bUser;
-    }
-
-    private Booking createBooking() {
-        Booking booking = new Booking().status(DEFAULT_STATUS);
-        return booking;
     }
 
     protected long getRepositoryCount() {
