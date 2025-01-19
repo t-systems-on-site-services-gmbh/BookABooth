@@ -128,4 +128,16 @@ public class SystemService {
         SystemDTO system = this.findFirstSystemEntry();
         return system.getEnabled();
     }
+
+    public void disableSystem() {
+        System system = systemRepository.findFirstByOrderById().orElseThrow(() -> new IllegalStateException("System not found"));
+        system.setEnabled(false);
+        systemRepository.saveAndFlush(system);
+    }
+
+    public void enableSystem() {
+        System system = systemRepository.findFirstByOrderById().orElseThrow(() -> new IllegalStateException("System not found"));
+        system.setEnabled(true);
+        systemRepository.saveAndFlush(system);
+    }
 }
