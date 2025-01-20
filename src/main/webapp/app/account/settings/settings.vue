@@ -322,23 +322,9 @@
         <div class="form-group" v-if="!hasAnyAuthority('ROLE_ADMIN')">
           <!--- Aktueller Buchungsstaus -->
           <div>
-            <p v-if="settingsAccount?.booking?.status">
-              Ihr aktueller Buchungsstatus: <strong>{{ settingsAccount.booking?.status }}</strong>
-            </p>
-            <p v-else>Ihr aktueller Buchungsstaus: <strong>Keine Buchung vorhanden</strong></p>
+            <p v-if="settingsAccount?.booking?.status === 'CONFIRMED'">Sie haben eine <strong>bestätigte</strong> Buchung.</p>
+            <p v-else>Es liegt noch <strong>keine</strong> Buchung vor.</p>
           </div>
-          <!--- Standbuchung bestätigen -->
-          <p v-if="settingsAccount?.booking?.status === 'PREBOOKED'">Sie können Ihre vorgemerkte Standbuchung hier bestätigen.</p>
-          <p v-else>Sie haben im Moment keine vorgemerkte Buchung</p>
-          <button
-            type="button"
-            class="btn btn-primary"
-            :disabled="settingsAccount?.booking?.status != 'PREBOOKED'"
-            @click="confirmBooking"
-            data-cy="confirmbooking"
-          >
-            Standbuchung bestätigen
-          </button>
           <br /><br />
           <!--- Von Warteliste entfernen -->
           <p v-if="settingsAccount?.company?.waitingList">
@@ -359,10 +345,7 @@
           </button>
           <!--- Buchung stornieren -->
           <br /><br />
-          <p v-if="settingsAccount?.booking?.status === 'PREBOOKED'">
-            Falls Sie Ihre vorgemerkte Buchung stornieren möchten, können Sie dies hier tun.
-          </p>
-          <p v-else-if="settingsAccount?.booking?.status === 'CONFIRMED'">
+          <p v-if="settingsAccount?.booking?.status === 'CONFIRMED'">
             Falls Sie Ihre aktive Buchung stornieren möchten, können Sie dies hier tun.
           </p>
           <p v-else>Sie haben im Moment keine aktive Standbuchung.</p>

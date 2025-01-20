@@ -200,7 +200,7 @@ public class BookingService {
     }
 
     public Optional<Booking> getBookingByCompanyId(Long id) {
-        return bookingRepository.findByCompanyId(id);
+        return bookingRepository.findByCompanyIdOrderByReceivedDesc(id).stream().findFirst();
     }
 
     public BookingDTO blockABoothBooking(Long boothId, BoothUserDTO bUserDTO) {
