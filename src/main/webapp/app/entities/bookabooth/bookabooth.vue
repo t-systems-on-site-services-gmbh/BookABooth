@@ -58,7 +58,7 @@
             </td>
             <td class="text-right">
               <div class="btn-group">
-                <button @click="showConfirmationModal(booth)" class="btn btn-primary btn-sm edit" data-cy="entityEditButton">
+                <button @click="displayConfirmationModal(booth)" class="btn btn-primary btn-sm edit" data-cy="entityEditButton">
                   <font-awesome-icon icon="store"></font-awesome-icon>
                   <span class="d-none d-md-inline">Stand buchen</span>
                 </button>
@@ -79,8 +79,8 @@
       <p>Bei Bestätigung der Buchung erkennen Sie die <a href="#todo">Ausstellerbedingungen</a> an.</p>
     </div>
     <div class="d-flex justify-content-end">
-      <b-button class="btn btn-secondary" @click="abortBooking(selectedBooth.id)">Abbrechen</b-button>
-      <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(selectedBooth.id)"
+      <b-button class="btn btn-secondary" @click="abortBooking(currentBooking.id)">Abbrechen</b-button>
+      <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(currentBooking.id)"
         >Buchung bestätigen</b-button
       >
     </div>

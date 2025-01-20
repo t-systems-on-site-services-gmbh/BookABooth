@@ -387,7 +387,9 @@ public class UserService {
                     if (boothUserCount == 0) {
                         // Deletes bookings associated with the company
                         bookingRepository
-                            .findByCompanyId(companyId)
+                            .findByCompanyIdOrderByReceivedDesc(companyId)
+                            .stream()
+                            .findFirst()
                             .ifPresent(booking -> {
                                 log.debug("Removing booking with ID: {}", booking.getId());
                                 bookingRepository.delete(booking);
@@ -508,7 +510,10 @@ public class UserService {
     // Set the booking status to canceled (from prebooked or confirmed)
     // TODO: we have cancel method in booking service, should we use that?
     public void cancelBooking(UserProfileDTO userProfileDTO, Long bookingId) {
-        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        Optional<Booking> optionalBooking = bookingRepository
+            .findByCompanyIdOrderByReceivedDesc(userProfileDTO.getCompany().getId())
+            .stream()
+            .findFirst();
         optionalBooking.ifPresent(booking -> {
             if (booking.getId().equals(bookingId)) {
                 booking.setStatus(CANCELED);
@@ -525,7 +530,10 @@ public class UserService {
 
     // Set the booking status from prebooked to confirmed
     public void confirmBooking(UserProfileDTO userProfileDTO, Long bookingId) {
-        Optional<Booking> optionalBooking = bookingRepository.findByCompanyId(userProfileDTO.getCompany().getId());
+        Optional<Booking> optionalBooking = bookingRepository
+            .findByCompanyIdOrderByReceivedDesc(userProfileDTO.getCompany().getId())
+            .stream()
+            .findFirst();
         optionalBooking.ifPresent(booking -> {
             if (booking.getId().equals(bookingId)) {
                 booking.setStatus(CONFIRMED);
@@ -620,7 +628,7 @@ public class UserService {
 
             CompanyDTO companyDTO = companyMapper.toDto(company);
 
-            Optional<Booking> booking = bookingRepository.findByCompanyId(company.getId());
+            Optional<Booking> booking = bookingRepository.findByCompanyIdOrderByReceivedDesc(company.getId()).stream().findFirst();
             BookingDTO bookingDTO = booking.map(bookingMapper::toDto).orElse(null);
 
             String phoneNumber = boothUser.getPhone();
@@ -690,7 +698,7 @@ public class UserService {
     public ChecklistDTO getChecklistDTO(String login) {
         ChecklistDTO cl = new ChecklistDTO();
         BoothUser bUser = boothUserRepository.findByUserLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Optional<Booking> booking = bookingRepository.findByCompanyId(bUser.getCompany().getId());
+        Optional<Booking> booking = bookingRepository.findByCompanyIdOrderByReceivedDesc(bUser.getCompany().getId()).stream().findFirst();
 
         if (bUser.getUser().isActivated()) {
             cl.setVerified(true);

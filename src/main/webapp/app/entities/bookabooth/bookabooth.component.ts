@@ -7,7 +7,8 @@ import LocationService from '@/entities/location/location.service';
 import { type ILocation } from '@/shared/model/location.model';
 import ServicePackageService from '@/entities/service-package/service-package.service';
 import { type IServicePackage } from '@/shared/model/service-package.model';
-import { error } from 'console';
+import BookingService from '@/entities/booking/booking.service';
+import { type IBooking } from '@/shared/model/booking.model';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -15,6 +16,7 @@ export default defineComponent({
   setup() {
     const boothService = inject('boothService', () => new BoothService());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const bookingService = inject('bookingService', () => new BookingService());
 
     const locationService = inject('locationService', () => new LocationService());
     const locations: Ref<ILocation[]> = ref([]);
@@ -28,7 +30,8 @@ export default defineComponent({
 
     const selectedLocation = ref('');
 
-    const selectedBooth = ref();
+    const selectedBooth: Ref<IBooth> = ref();
+    const currentBooking: Ref<IBooking> = ref();
 
     const clear = () => {};
 
@@ -121,35 +124,44 @@ export default defineComponent({
       filteredBooths,
       selectedLocation,
       selectedBooth,
+      currentBooking,
       calculatePrice,
+      bookingService,
     };
   },
   methods: {
-    showConfirmationModal(booth: IBooth) {
+    displayConfirmationModal(booth: IBooth) {
       this.bookingService()
         .create(booth.id)
-        .then(() => {
-          this.$refs['confirmation-modal'].show();
+        .then((res: { data: IBooking }) => {
+          this.currentBooking = res;
+          console.log(res);
+          debugger;
           this.selectedBooth = booth;
+          this.showConfirmationModal();
         })
         .catch(error => {
-          this.alertService.showHttpError(error.response);
+          console.log(error);
         });
+    },
+    showConfirmationModal() {
+      this.$refs['confirmation-modal'].show();
     },
     hideConfirmationModal() {
       this.$refs['confirmation-modal'].hide();
     },
     resetConfirmationModal() {
       this.selectedBooth = null;
+      this.currentBooking = null;
     },
-    async abortBooking(boothId: number) {
+    async abortBooking(bookingId: number) {
       this.hideConfirmationModal();
-      this.BookingService.deleteByBooth(boothId);
+      this.bookingService().delete(bookingId);
     },
     async createBooking(boothId: number) {},
-    async confirmBooking(boothId: number) {
+    async confirmBooking(bookingId: number) {
       this.bookingService()
-        .confirmByBooth(boothId)
+        .confirm(bookingId)
         .then(() => {
           this.hideConfirmationModal();
           this.alertService.showSuccess('Buchung vorgenommen.');
