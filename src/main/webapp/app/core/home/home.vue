@@ -1,6 +1,6 @@
 <template>
   <div class="home row">
-    <div class="col-md-3">
+    <div class="col-12 col-md-3 mb-3 mb-md-0">
       <span><img class="logo" src="https://www.jade-hs.de/typo3conf/ext/jhs_site/Resources/Public/Images/jadehs-logo.png" /></span>
       <div class="news">
         ++ Jade Karrieretag 2024 ++ <br />
@@ -10,7 +10,7 @@
     <div class="col-md-9">
       <h1 class="display-4">Willkommen!</h1>
       <p class="lead">Hier können Sie Ihren Stand für den Karrieretag buchen.</p>
-      <div class="alert alert-success w-50" v-if="authenticated">
+      <div class="alert alert-success width-on-pc" v-if="authenticated">
         <span v-if="username">Sie sind als Benutzer "{{ username }}" angemeldet.</span>
       </div>
       <div v-if="!authenticated">
@@ -37,7 +37,7 @@
             </div>
           </div>
 
-          <div v-if="verified === true" class="list-group w-50">
+          <div v-if="verified === true" class="list-group width-on-pc">
             <div
               v-bind:class="{
                 'mb-0': true,
@@ -188,7 +188,8 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '.\\src\\main\\webapp\\content\\scss\\_bootstrap-variables.scss';
 .logo {
   max-width: 100%;
   height: auto;
@@ -198,8 +199,10 @@
 .news {
   font-size: 11pt;
   font-weight: 600;
-  margin-top: 50px;
-  margin-left: 20px;
+  margin-top: 25px;
+  text-align: center;
+  color: white;
+  background-color: $jhs_color_red;
 }
 .link {
   color: #3e8acc;
@@ -211,6 +214,11 @@
   cursor: pointer;
   text-decoration: underline;
   color: #286396;
+}
+.width-on-pc {
+  @media (min-width: 768px) {
+    width: 50%;
+  }
 }
 </style>
 

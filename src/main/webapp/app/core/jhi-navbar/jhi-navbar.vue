@@ -96,7 +96,8 @@
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+@import '.\\src\\main\\webapp\\content\\scss\\_bootstrap-variables.scss';
 /* ==========================================================================
     Navbar
     ========================================================================== */
@@ -106,7 +107,7 @@
 }
 
 .jh-navbar {
-  background-color: #353d47;
+  background-color: $jhs_color_grey;
   padding: 0.2em 1em;
 }
 
