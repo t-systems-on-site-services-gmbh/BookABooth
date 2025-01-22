@@ -62,7 +62,7 @@
                   @click="displayConfirmationModal(booth)"
                   class="btn btn-primary btn-sm edit"
                   data-cy="entityEditButton"
-                  :disabled="!booth.available"
+                  :disabled="!booth.available || unavailableBooths?.find(b => b.id === booth.id)"
                 >
                   <font-awesome-icon icon="store"></font-awesome-icon>
                   <span class="d-none d-md-inline">Stand buchen</span>

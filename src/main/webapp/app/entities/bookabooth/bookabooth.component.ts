@@ -17,19 +17,15 @@ export default defineComponent({
     const boothService = inject('boothService', () => new BoothService());
     const alertService = inject('alertService', () => useAlertService(), true);
     const bookingService = inject('bookingService', () => new BookingService());
-
     const locationService = inject('locationService', () => new LocationService());
-    const locations: Ref<ILocation[]> = ref([]);
-
     const servicePackageService = inject('servicePackageService', () => new ServicePackageService());
+
+    const locations: Ref<ILocation[]> = ref([]);
     const servicePackages: Ref<IServicePackage[]> = ref([]);
-
     const booths: Ref<IBooth[]> = ref([]);
-
+    const unavailableBooths: Ref<IBooth[]> = ref([]);
     const isFetching = ref(false);
-
     const selectedLocation = ref('');
-
     const selectedBooth: Ref<IBooth> = ref();
     const currentBooking: Ref<IBooking> = ref();
 
@@ -47,8 +43,21 @@ export default defineComponent({
       }
     };
 
+    const getUnavailableBooths = async () => {
+      isFetching.value = true;
+      try {
+        const res = await bookingService().retrieveUnavailableBooths();
+        unavailableBooths.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      } finally {
+        isFetching.value = false;
+      }
+    };
+
     const handleSyncList = () => {
       retrieveBooths();
+      getUnavailableBooths();
     };
 
     const calculatePrice = (booth: IBooth) => {
@@ -76,6 +85,7 @@ export default defineComponent({
 
     onMounted(async () => {
       await retrieveBooths();
+      await getUnavailableBooths();
     });
 
     const removeId: Ref<number> = ref(null);
@@ -110,6 +120,7 @@ export default defineComponent({
 
     return {
       booths,
+      unavailableBooths,
       handleSyncList,
       isFetching,
       retrieveBooths,

@@ -16,6 +16,7 @@ import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
 import de.tsystems.onsite.bookabooth.service.exception.BadRequestException;
 import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,8 @@ public class BookingService {
 
     private final BookingMapper bookingMapper;
 
+    private final BoothMapper boothMapper;
+
     private final MailService mailService;
 
     private final BoothService boothService;
@@ -55,6 +58,7 @@ public class BookingService {
         BoothUserRepository boothUserRepository,
         CompanyRepository companyRepository,
         BookingMapper bookingMapper,
+        BoothMapper boothMapper,
         MailService mailService,
         BoothService boothService,
         SystemService systemService,
@@ -64,6 +68,7 @@ public class BookingService {
         this.boothUserRepository = boothUserRepository;
         this.companyRepository = companyRepository;
         this.bookingMapper = bookingMapper;
+        this.boothMapper = boothMapper;
         this.mailService = mailService;
         this.boothService = boothService;
         this.systemService = systemService;
@@ -187,6 +192,20 @@ public class BookingService {
         Company company = booking.getCompany();
         List<BoothUser> boothUsers = boothUserRepository.findByCompanyId(company.getId());
         return boothUsers.stream().map(BoothUser::getUser).collect(Collectors.toList());
+    }
+
+    public List<BoothDTO> getBoothsUnavailableForBooking(BoothUserDTO currentBoothUser) {
+        var bookings = bookingRepository
+            .findByStatusNot(CANCELED)
+            .stream()
+            .filter(
+                b ->
+                    (b.getStatus() == BookingStatus.CONFIRMED) ||
+                    ((b.getStatus() == BookingStatus.BLOCKED) && !b.getCompany().getId().equals(currentBoothUser.getCompany().getId()))
+            )
+            .map(Booking::getBooth)
+            .map(boothMapper::toDto);
+        return bookings.toList();
     }
 
     /**
