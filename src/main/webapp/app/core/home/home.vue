@@ -163,17 +163,26 @@
                 <h5 class="mb-1">Buchung</h5>
                 <small class="text-body-secondary" v-text="bookingStatus === 'CONFIRMED' ? 'erledigt' : 'offen'"></small>
               </div>
-              <p class="mb-1 font-weight-normal" v-if="bookingStatus === 'CANCELED'">
+              <p v-if="!system.enabled">
+                Die Standbuchung ist systemseitig noch nicht freigegeben.
+                <span v-if="!address || !logo || !phoneNumber || !companyDescription"
+                  >Nutzen Sie die Zeit, um Ihre Kontaktdaten zu komplettieren.</span
+                >
+              </p>
+              <p v-else-if="!address || !logo || !phoneNumber || !companyDescription">
+                Bitte vervollständigen Sie Ihre Kontaktdaten, einen Stand buchen zu können.
+              </p>
+              <p v-else-if="bookingStatus === 'CANCELED'" class="mb-1 font-weight-normal">
                 Ihre Buchung wurde storniert. Sie können <a href="bookabooth">hier</a> eine erneute Buchung vornehmen.
               </p>
-              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && !allBoothsOccupied">
+              <p v-else-if="bookingStatus === null && !allBoothsOccupied" class="mb-1 font-weight-normal">
                 Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.
               </p>
-              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && allBoothsOccupied && !account.company.waitingList">
+              <p v-else-if="bookingStatus === null && allBoothsOccupied && !account.company.waitingList" class="mb-1 font-weight-normal">
                 Alle Stände sind bereits gebucht. Sie können sich <span @click="addToWaitingList" class="link">hier</span> für die
                 Warteliste eintragen.
               </p>
-              <p class="mb-1 font-weight-normal" v-if="bookingStatus === null && allBoothsOccupied && account.company.waitingList">
+              <p v-else-if="bookingStatus === null && allBoothsOccupied && account.company.waitingList" class="mb-1 font-weight-normal">
                 Sie befinden sich auf der Warteliste. Sie erhalten eine E-Mail, wenn Stände wieder verfügbar sind.
               </p>
             </div>

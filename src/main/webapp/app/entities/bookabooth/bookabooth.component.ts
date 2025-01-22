@@ -158,7 +158,6 @@ export default defineComponent({
       this.hideConfirmationModal();
       this.bookingService().delete(bookingId);
     },
-    async createBooking(boothId: number) {},
     async confirmBooking(bookingId: number) {
       this.bookingService()
         .confirm(bookingId)

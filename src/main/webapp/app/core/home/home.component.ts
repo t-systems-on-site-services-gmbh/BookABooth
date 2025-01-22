@@ -2,6 +2,8 @@ import { computed, type ComputedRef, defineComponent, inject, onBeforeUnmount, o
 import { useAlertService } from '@/shared/alert/alert.service';
 import type LoginService from '@/account/login.service';
 import type AccountService from '@/account/account.service';
+import SystemService from '@/entities/system/system.service';
+import { type ISystem } from '@/shared/model/system.model';
 import axios from 'axios';
 import { useStore } from '@/store';
 import { useRouter } from 'vue-router';
@@ -10,6 +12,7 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   setup() {
     const store = useStore();
+    const systemService = inject('systemService', () => new SystemService());
     const loginService = inject<LoginService>('loginService');
     const accountService = inject<AccountService>('accountService');
     const account = computed(() => store.account);
@@ -26,6 +29,7 @@ export default defineComponent({
     const allBoothsOccupied = ref(false);
     const isOnWaitingList = ref(false);
     const router = useRouter();
+    const system: Ref<ISystem> = ref();
 
     const fetchUserChecklist = async () => {
       try {
@@ -63,6 +67,7 @@ export default defineComponent({
 
     // Rufen Sie die Methode auf, wenn die Komponente geupdated wird
     onUpdated(() => {
+      retrieveSystem();
       fetchUserChecklist();
       // Außerdem Methoden für die Einblendung beim Löschen des Accounts
       const accountDeleted = sessionStorage.getItem('accountDeleted');
@@ -98,6 +103,15 @@ export default defineComponent({
       }
     };
 
+    const retrieveSystem = async () => {
+      try {
+        const res = await systemService().retrieve();
+        system.value = res.data;
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
     return {
       authenticated,
       accountService,
@@ -114,6 +128,7 @@ export default defineComponent({
       allBoothsOccupied,
       isOnWaitingList,
       addToWaitingList,
+      system,
     };
   },
   methods: {
