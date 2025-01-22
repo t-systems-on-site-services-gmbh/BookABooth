@@ -88,28 +88,6 @@ export default defineComponent({
       await getUnavailableBooths();
     });
 
-    const removeId: Ref<number> = ref(null);
-    const removeEntity = ref<any>(null);
-    const prepareRemove = (instance: IBooth) => {
-      removeId.value = instance.id;
-      removeEntity.value.show();
-    };
-    const closeDialog = () => {
-      removeEntity.value.hide();
-    };
-    const removeBooth = async () => {
-      try {
-        await boothService().delete(removeId.value);
-        const message = 'A Booth is deleted with identifier ' + removeId.value;
-        alertService.showInfo(message, { variant: 'danger' });
-        removeId.value = null;
-        retrieveBooths();
-        closeDialog();
-      } catch (error) {
-        alertService.showHttpError(error.response);
-      }
-    };
-
     const filteredBooths = computed(() => {
       console.log(selectedLocation.value);
       if (selectedLocation.value) {
