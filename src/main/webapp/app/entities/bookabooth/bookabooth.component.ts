@@ -103,7 +103,7 @@ export default defineComponent({
     const filteredBooths = computed(() => {
       console.log(selectedLocation.value);
       if (selectedLocation.value) {
-        return booths.value.filter(booth => booth.location.id === selectedLocation.value.id);
+        return booths.value.filter(booth => booth.location?.id === selectedLocation.value.id);
       }
       return booths.value;
     });

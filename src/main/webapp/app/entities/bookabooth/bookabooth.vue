@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="BoothHeading">
-      <span id="booth-heading">Stand Buchen</span>
+      <span id="booth-heading">Stand buchen</span>
     </h2>
 
     <label for="location" class="mt-3">Ort</label>
@@ -32,7 +32,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booth in filteredBooths.filter(booth => booth.available === true)" :key="booth.id" data-cy="entityTable">
+          <tr v-for="booth in filteredBooths" :key="booth.id" data-cy="entityTable">
             <td>
               <router-link :to="{ name: 'BoothView', params: { boothId: booth.id } }">{{ booth.id }}</router-link>
             </td>
@@ -58,7 +58,12 @@
             </td>
             <td class="text-right">
               <div class="btn-group">
-                <button @click="displayConfirmationModal(booth)" class="btn btn-primary btn-sm edit" data-cy="entityEditButton">
+                <button
+                  @click="displayConfirmationModal(booth)"
+                  class="btn btn-primary btn-sm edit"
+                  data-cy="entityEditButton"
+                  :disabled="!booth.available"
+                >
                   <font-awesome-icon icon="store"></font-awesome-icon>
                   <span class="d-none d-md-inline">Stand buchen</span>
                 </button>
