@@ -15,8 +15,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByCompanyIdOrderByReceivedDesc(Long companyId);
-
     Boolean existsByBooth(Booth booth);
-
     Optional<Booking> findByBoothIdAndStatusNot(long boothId, BookingStatus bookingStatus);
+    List<Booking> findByStatusNot(BookingStatus bookingStatus);
 }

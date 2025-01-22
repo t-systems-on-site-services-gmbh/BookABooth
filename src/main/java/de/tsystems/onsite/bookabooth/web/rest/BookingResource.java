@@ -7,6 +7,7 @@ import de.tsystems.onsite.bookabooth.service.BookingService;
 import de.tsystems.onsite.bookabooth.service.BoothService;
 import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
+import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
 import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
@@ -227,6 +228,12 @@ public class BookingResource {
         log.debug("REST request to get Booking : {}", id);
         Optional<BookingDTO> bookingDTO = bookingService.findOne(id);
         return ResponseUtil.wrapOrNotFound(bookingDTO);
+    }
+
+    @GetMapping("/unavailable")
+    public List<BoothDTO> getUnavailableBooths(Authentication authentication) {
+        log.debug("REST request to get all unavailable Booths");
+        return bookingService.getBoothsUnavailableForBooking(boothUserService.getCurrentBoothUser(authentication));
     }
 
     /**

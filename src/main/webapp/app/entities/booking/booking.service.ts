@@ -31,6 +31,19 @@ export default class BookingService {
     });
   }
 
+  public retrieveUnavailableBooths(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}/unavailable`)
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   public delete(id: number): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       axios
