@@ -3,8 +3,8 @@
     <div class="col-md-3">
       <span><img class="logo" src="https://www.jade-hs.de/typo3conf/ext/jhs_site/Resources/Public/Images/jadehs-logo.png" /></span>
       <div class="news">
-        ++ Jade Karrieretag 2024 ++ <br />
-        Nächster Termin: Mittwoch, 20. November 2024 <br />
+        ++ Jade Karrieretag 2025 ++ <br />
+        Nächster Termin: Mittwoch, 19. November 2025 <br />
       </div>
     </div>
     <div class="col-md-9">
@@ -163,8 +163,12 @@
                 <h5 class="mb-1">Buchung</h5>
                 <small class="text-body-secondary" v-text="bookingStatus === 'CONFIRMED' ? 'erledigt' : 'offen'"></small>
               </div>
-              <p v-if="!system.enabled">
-                Die Standbuchung ist systemseitig noch nicht freigegeben.
+              <p v-if="bookingStatus === 'CONFIRMED'" class="mb-1 font-weight-normal">
+                Sie haben einen Stand gebucht. Details finden Sie <a href="bookabooth">hier</a>. <br />
+                Sie können Ihre Buchung über Ihr <a href="/account/settings">Profil</a> stornieren.
+              </p>
+              <p v-else-if="!system.enabled">
+                Die Standbuchung ist systemseitig nicht freigegeben.
                 <span v-if="!address || !logo || !phoneNumber || !companyDescription"
                   >Nutzen Sie die Zeit, um Ihre Kontaktdaten zu komplettieren.</span
                 >
@@ -174,9 +178,6 @@
               </p>
               <p v-else-if="bookingStatus === 'CANCELED'" class="mb-1 font-weight-normal">
                 Ihre Buchung wurde storniert. Sie können <a href="bookabooth">hier</a> eine erneute Buchung vornehmen.
-              </p>
-              <p v-else-if="bookingStatus === 'CONFIRMED'" class="mb-1 font-weight-normal">
-                Sie haben einen Stand gebucht. Sie können Ihre Buchung über Ihr <a href="/account/settings">Profil</a> stornieren.
               </p>
               <p v-else-if="bookingStatus === null && !allBoothsOccupied" class="mb-1 font-weight-normal">
                 Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.

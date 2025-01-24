@@ -9,11 +9,15 @@ import ServicePackageService from '@/entities/service-package/service-package.se
 import { type IServicePackage } from '@/shared/model/service-package.model';
 import BookingService from '@/entities/booking/booking.service';
 import { type IBooking } from '@/shared/model/booking.model';
+import SystemService from '@/entities/system/system.service';
+import { type ISystem } from '@/shared/model/system.model';
+import axios from 'axios';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Booth',
   setup() {
+    const systemService = inject('systemService', () => new SystemService());
     const boothService = inject('boothService', () => new BoothService());
     const alertService = inject('alertService', () => useAlertService(), true);
     const bookingService = inject('bookingService', () => new BookingService());
@@ -28,8 +32,9 @@ export default defineComponent({
     const selectedLocation = ref('');
     const selectedBooth: Ref<IBooth> = ref();
     const currentBooking: Ref<IBooking> = ref();
-
-    const clear = () => {};
+    const isBookingAllowed = ref(false);
+    const system: Ref<ISystem> = ref();
+    const boothId = ref(null);
 
     const retrieveBooths = async () => {
       isFetching.value = true;
@@ -81,7 +86,37 @@ export default defineComponent({
         });
     };
 
+    const retrieveSystem = async () => {
+      try {
+        const res = await systemService().retrieve();
+        system.value = res.data;
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const fetchUserChecklist = async () => {
+      try {
+        const response = await axios.get('api/checklist');
+        const checklist = response.data;
+
+        isBookingAllowed.value =
+          checklist.verified && checklist.address && checklist.logo && checklist.phoneNumber && checklist.companyDescription;
+
+        boothId.value = checklist.boothId;
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Checkliste:', error);
+      }
+    };
+
+    const checkBookingAllowed = async () => {
+      await retrieveSystem();
+      await fetchUserChecklist();
+      isBookingAllowed.value = isBookingAllowed.value && system.value.enabled;
+    };
+
     initRelationships();
+    checkBookingAllowed();
 
     onMounted(async () => {
       await retrieveBooths();
@@ -103,7 +138,6 @@ export default defineComponent({
       handleSyncList,
       isFetching,
       retrieveBooths,
-      clear,
       locations,
       servicePackages,
       filteredBooths,
@@ -112,6 +146,9 @@ export default defineComponent({
       currentBooking,
       calculatePrice,
       bookingService,
+      isBookingAllowed,
+      system,
+      boothId,
     };
   },
   methods: {
