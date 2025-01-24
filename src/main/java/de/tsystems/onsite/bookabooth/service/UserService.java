@@ -716,6 +716,9 @@ public class UserService {
             cl.setCompanyDescription(true);
         }
         cl.setBookingStatus(booking.map(Booking::getStatus));
+        if (booking.isPresent() && booking.get().getStatus() == CONFIRMED) {
+            cl.setBoothId(booking.get().getBooth().getId());
+        }
 
         return cl;
     }

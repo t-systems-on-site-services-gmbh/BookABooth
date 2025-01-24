@@ -4,6 +4,12 @@
       <span id="booth-heading">Stand buchen</span>
     </h2>
 
+    <div v-if="!isFetching && !system.enabled" class="alert alert-danger">Die Standbuchung ist systemseitig nicht freigegeben.</div>
+    <div v-else-if="!isFetching && !isBookingAllowed" class="alert alert-danger">
+      Es fehlen Daten von Ihnen. Prüfen Sie die Checkliste auf der <a href="/">Startseite</a>.
+    </div>
+    <div v-if="boothId !== null && boothId > 0" class="alert alert-success">Sie haben Stand {{ boothId }} gebucht.</div>
+
     <label for="location" class="mt-3">Ort</label>
     <select id="location" class="custom-select mb-3" v-model="selectedLocation">
       <option value="">Alle</option>
@@ -31,7 +37,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booth in filteredBooths" :key="booth.id" data-cy="entityTable">
+          <tr v-for="booth in filteredBooths" :key="booth.id" data-cy="entityTable" :class="booth.id === boothId ? 'alert-success' : ''">
             <td>
               <router-link :to="{ name: 'BoothView', params: { boothId: booth.id } }">{{ booth.id }}</router-link>
             </td>
@@ -60,7 +66,12 @@
                   @click="displayConfirmationModal(booth)"
                   class="btn btn-primary btn-sm edit"
                   data-cy="entityEditButton"
-                  :disabled="!booth.available || unavailableBooths?.find(b => b.id === booth.id)"
+                  :disabled="
+                    !booth.available ||
+                    unavailableBooths?.find(b => b.id === booth.id) ||
+                    !isBookingAllowed ||
+                    (boothId != null && boothId > 0)
+                  "
                 >
                   <font-awesome-icon icon="store"></font-awesome-icon>
                   <span class="d-none d-md-inline">Stand buchen</span>

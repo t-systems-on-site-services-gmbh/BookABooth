@@ -11,6 +11,7 @@ public class ChecklistDTO {
     private boolean phoneNumber; // Telefonnummer hinterlegt?
     private boolean companyDescription; // Firmenbeschreibung hinterlegt?
     private Optional<BookingStatus> bookingStatus; // Buchung abgeschlossen?
+    private Long boothId;
 
     public ChecklistDTO() {}
 
@@ -60,6 +61,14 @@ public class ChecklistDTO {
 
     public void setBookingStatus(Optional<BookingStatus> bookingStatus) {
         this.bookingStatus = bookingStatus;
+    }
+
+    public Long getBoothId() {
+        return boothId;
+    }
+
+    public void setBoothId(Long id) {
+        boothId = id;
     }
 
     public boolean isMandatoryComplete() {
