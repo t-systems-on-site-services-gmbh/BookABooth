@@ -24,10 +24,9 @@
           <tr>
             <th scope="row"><span>ID</span></th>
             <th scope="row"><span>Name</span></th>
-            <th scope="row"><span>Deckenhöhe</span></th>
-            <th scope="row"><span>Verfügbar</span></th>
+            <th scope="row"><span>Deckenhöhe in m</span></th>
             <th scope="row"><span>Ort</span></th>
-            <th scope="row"><span>Service Paket</span></th>
+            <th scope="row"><span>Service Pakete</span></th>
             <th scope="row"></th>
           </tr>
         </thead>
@@ -38,7 +37,6 @@
             </td>
             <td>{{ booth.title }}</td>
             <td>{{ booth.ceilingHeight }}</td>
-            <td>{{ booth.available }}</td>
             <td>
               <div v-if="booth.location">
                 <router-link :to="{ name: 'LocationView', params: { locationId: booth.location.id } }">{{
