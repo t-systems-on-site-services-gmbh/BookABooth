@@ -325,6 +325,25 @@
             <p v-if="settingsAccount?.booking?.status === 'CONFIRMED'">Sie haben eine <strong>bestätigte</strong> Buchung.</p>
             <p v-else>Es liegt noch <strong>keine</strong> Buchung vor.</p>
           </div>
+          <!--- Buchung stornieren -->
+          <p v-if="settingsAccount?.booking?.status === 'CONFIRMED'">
+            Falls Sie Ihre aktive Buchung stornieren möchten, können Sie dies hier tun.
+          </p>
+          <p v-else>Sie haben im Moment keine aktive Standbuchung.</p>
+          <button
+            type="button"
+            class="btn btn-primary"
+            :disabled="
+              settingsAccount?.booking?.status == 'CANCELED' ||
+              settingsAccount?.booking?.status == null ||
+              settingsAccount?.booking?.status == 'BLOCKED'
+            "
+            @click="showCancelBooking"
+            data-cy="cancel"
+          >
+            Standbuchung stornieren
+          </button>
+
           <br /><br />
           <!--- Von Warteliste entfernen -->
           <p v-if="settingsAccount?.company?.waitingList">
@@ -343,25 +362,7 @@
           >
             Von Warteliste entfernen
           </button>
-          <!--- Buchung stornieren -->
-          <br /><br />
-          <p v-if="settingsAccount?.booking?.status === 'CONFIRMED'">
-            Falls Sie Ihre aktive Buchung stornieren möchten, können Sie dies hier tun.
-          </p>
-          <p v-else>Sie haben im Moment keine aktive Standbuchung.</p>
-          <button
-            type="button"
-            class="btn btn-primary"
-            :disabled="
-              settingsAccount?.booking?.status == 'CANCELED' ||
-              settingsAccount?.booking?.status == null ||
-              settingsAccount?.booking?.status == 'BLOCKED'
-            "
-            @click="showCancelBooking"
-            data-cy="cancel"
-          >
-            Standbuchung stornieren
-          </button>
+
           <b-modal ref="cancelBooking-modal" hide-footer title="Standbuchung stornieren">
             <div class="d-block text-left">
               <h4>Sind Sie sicher, dass Sie Ihre Standbuchung stornieren wollen?</h4>

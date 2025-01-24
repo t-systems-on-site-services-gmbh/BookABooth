@@ -170,10 +170,13 @@
                 >
               </p>
               <p v-else-if="!address || !logo || !phoneNumber || !companyDescription">
-                Bitte vervollständigen Sie Ihre Kontaktdaten, einen Stand buchen zu können.
+                Bitte vervollständigen Sie Ihre Kontaktdaten, um einen Stand buchen zu können.
               </p>
               <p v-else-if="bookingStatus === 'CANCELED'" class="mb-1 font-weight-normal">
                 Ihre Buchung wurde storniert. Sie können <a href="bookabooth">hier</a> eine erneute Buchung vornehmen.
+              </p>
+              <p v-else-if="bookingStatus === 'CONFIRMED'" class="mb-1 font-weight-normal">
+                Sie haben einen Stand gebucht. Sie können Ihre Buchung über Ihr <a href="/account/settings">Profil</a> stornieren.
               </p>
               <p v-else-if="bookingStatus === null && !allBoothsOccupied" class="mb-1 font-weight-normal">
                 Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.
