@@ -99,15 +99,11 @@ export default defineComponent({
     return {
       booths,
       unavailableBooths,
+      getUnavailableBooths,
       handleSyncList,
       isFetching,
       retrieveBooths,
       clear,
-      removeId,
-      removeEntity,
-      prepareRemove,
-      closeDialog,
-      removeBooth,
       locations,
       servicePackages,
       filteredBooths,
@@ -120,6 +116,11 @@ export default defineComponent({
   },
   methods: {
     displayConfirmationModal(booth: IBooth) {
+      this.getUnavailableBooths();
+      if (this.unavailableBooths.find(b => b.id === booth.id)) {
+        this.alertService.showError('Der Stand ist bereits belegt.');
+        return;
+      }
       this.bookingService()
         .create(booth.id)
         .then((res: { data: IBooking }) => {
