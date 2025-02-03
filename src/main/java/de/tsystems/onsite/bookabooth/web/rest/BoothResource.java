@@ -1,7 +1,6 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.Booth;
-import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.BoothService;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
@@ -39,12 +38,9 @@ public class BoothResource {
 
     private final BoothRepository boothRepository;
 
-    private final BookingRepository bookingRepository;
-
-    public BoothResource(BoothService boothService, BoothRepository boothRepository, BookingRepository bookingRepository) {
+    public BoothResource(BoothService boothService, BoothRepository boothRepository) {
         this.boothService = boothService;
         this.boothRepository = boothRepository;
-        this.bookingRepository = bookingRepository;
     }
 
     /**
@@ -155,13 +151,13 @@ public class BoothResource {
     // TODO: This method should be improved. Its not a good idea to iterate through the repository.
     @GetMapping("/occupied")
     public ResponseEntity<Boolean> areAllBoothsOccupied() {
-        List<Booth> booths = boothRepository.findByAvailable(true);
-        for (Booth booth : booths) {
-            if (!bookingRepository.existsByBooth(booth)) {
-                return ResponseEntity.ok(false);
-            }
+        List<Booth> bookableBooths = boothService.getBookableBooths();
+
+        if (bookableBooths.isEmpty()) {
+            return ResponseEntity.ok(true);
         }
-        return ResponseEntity.ok(true);
+
+        return ResponseEntity.ok(false);
     }
 
     /**

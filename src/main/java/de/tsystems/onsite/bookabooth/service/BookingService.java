@@ -247,6 +247,7 @@ public class BookingService {
         }
 
         // a BoothUser can only book one booth for his company
+        // TODO: here i using a wrong method
         Optional<Booking> bookingforCompany = this.getNotCanceledBooking(bUserDTO.getCompany().getId());
         if (bookingforCompany.isPresent()) {
             throw new BadRequestException("Company already booked or blocked a booth");
@@ -280,14 +281,15 @@ public class BookingService {
         return bookingDTO;
     }
 
-    public BookingDTO cancelAConfirmedBoothBooking(Long bookingId, BoothUserDTO bUserDTO) {
+    public BookingDTO cancelAConfirmedBoothBooking(Long bookingId, BoothUserDTO bUserDTO, boolean force) {
         // get booking by bookinId and check the owner
         BookingDTO bookingDTO = this.findOne(bookingId).orElseThrow(() -> new BadRequestException("Booking not found"));
-        return cancelAConfirmedBoothBooking(bookingDTO, bUserDTO);
+        return cancelAConfirmedBoothBooking(bookingDTO, bUserDTO, force);
     }
 
-    public BookingDTO cancelAConfirmedBoothBooking(BookingDTO bookingDTO, BoothUserDTO bUserDTO) {
-        if (!bookingDTO.getCompany().getId().equals(bUserDTO.getCompany().getId())) {
+    public BookingDTO cancelAConfirmedBoothBooking(BookingDTO bookingDTO, BoothUserDTO bUserDTO, boolean force) {
+        // update the booking status
+        if (!force && !bookingDTO.getCompany().getId().equals(bUserDTO.getCompany().getId())) {
             throw new ForbiddenException("Company does not own the booking");
         }
 
