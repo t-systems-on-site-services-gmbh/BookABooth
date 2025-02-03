@@ -67,14 +67,12 @@ export default defineComponent({
 
     // Rufen Sie die Methode auf, wenn die Komponente geupdated wird
     onUpdated(() => {
-      retrieveSystem();
       fetchUserChecklist();
       // Außerdem Methoden für die Einblendung beim Löschen des Accounts
       const accountDeleted = sessionStorage.getItem('accountDeleted');
       if (accountDeleted === 'true') {
         showAccountDeletedToast();
       }
-      checkBooths();
     });
 
     onBeforeUnmount(() => {
@@ -111,6 +109,9 @@ export default defineComponent({
         alertService.showHttpError(error.response);
       }
     };
+
+    retrieveSystem();
+    checkBooths();
 
     return {
       authenticated,

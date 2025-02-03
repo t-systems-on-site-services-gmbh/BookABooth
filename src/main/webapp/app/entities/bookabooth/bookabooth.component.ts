@@ -132,6 +132,7 @@ export default defineComponent({
     });
 
     return {
+      alertService,
       booths,
       unavailableBooths,
       getUnavailableBooths,
