@@ -1,6 +1,7 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.Booking;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.BookingService;
@@ -128,7 +129,9 @@ public class BookingResource {
 
         BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
 
-        BookingDTO bookingDTO = bookingService.cancelAConfirmedBoothBooking(bookingId, bUserDTO);
+        boolean force = SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN");
+
+        BookingDTO bookingDTO = bookingService.cancelAConfirmedBoothBooking(bookingId, bUserDTO, force);
 
         return ResponseEntity.accepted()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, bookingId.toString()))
@@ -250,7 +253,13 @@ public class BookingResource {
             throw new ForbiddenException("You are not authorized to delete this booking");
         }
 
-        bookingService.delete(bookingId);
+        Optional<BookingDTO> booking = bookingService.findOne(bookingId);
+
+        if (SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN") || BookingStatus.BLOCKED.equals(booking.get().getStatus())) {
+            bookingService.delete(bookingId);
+        } else {
+            throw new ForbiddenException("You are not authorized to delete this booking");
+        }
 
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, bookingId.toString()))

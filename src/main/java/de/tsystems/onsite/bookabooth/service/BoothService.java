@@ -1,6 +1,7 @@
 package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Booth;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
@@ -133,5 +134,12 @@ public class BoothService {
                     servicePackageService.addBooth(servicePackageDTO, booth);
                 });
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Booth> getBookableBooths() {
+        List<BookingStatus> excludedStatus = List.of(BookingStatus.BLOCKED, BookingStatus.CONFIRMED);
+        List<Booth> bookableBooths = boothRepository.findAvailableBoothsWithoutBookingStatus(excludedStatus);
+        return bookableBooths;
     }
 }
