@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, defineComponent, inject, onBeforeUnmount, onUpdated, ref, type Ref } from 'vue';
+import { computed, type ComputedRef, defineComponent, inject, onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
 import { useAlertService } from '@/shared/alert/alert.service';
 import type LoginService from '@/account/login.service';
 import type AccountService from '@/account/account.service';
@@ -65,9 +65,10 @@ export default defineComponent({
       }
     };
 
-    // Rufen Sie die Methode auf, wenn die Komponente geupdated wird
-    onUpdated(() => {
-      fetchUserChecklist();
+    onMounted(async () => {
+      await fetchUserChecklist();
+      await checkBooths();
+      await retrieveSystem();
       // Außerdem Methoden für die Einblendung beim Löschen des Accounts
       const accountDeleted = sessionStorage.getItem('accountDeleted');
       if (accountDeleted === 'true') {
@@ -109,9 +110,6 @@ export default defineComponent({
         alertService.showHttpError(error.response);
       }
     };
-
-    retrieveSystem();
-    checkBooths();
 
     return {
       authenticated,
