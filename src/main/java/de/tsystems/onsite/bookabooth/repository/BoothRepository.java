@@ -19,4 +19,12 @@ public interface BoothRepository extends JpaRepository<Booth, Long> {
         "SELECT b FROM Booth b WHERE b.available = true AND b.id NOT IN (SELECT bk.booth.id FROM Booking bk WHERE bk.status IN :excludedStatus)"
     )
     List<Booth> findAvailableBoothsWithoutBookingStatus(@Param("excludedStatus") List<BookingStatus> excludedStatus);
+
+    @Query(
+        "SELECT b, c.name " +
+        "FROM Booth b " +
+        "LEFT JOIN Booking bk ON bk.booth = b AND bk.status = 'CONFIRMED' " +
+        "LEFT JOIN Company c ON bk.company = c AND c.exhibitorList = true"
+    )
+    List<Object[]> findAllBoothsWithCompanyName();
 }
