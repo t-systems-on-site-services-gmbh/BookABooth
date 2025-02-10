@@ -28,6 +28,8 @@ public class BoothDTO implements Serializable {
 
     private Set<ServicePackageDTO> servicePackages = new HashSet<>();
 
+    private String companyName;
+
     public Long getId() {
         return id;
     }
@@ -74,6 +76,14 @@ public class BoothDTO implements Serializable {
 
     public void setServicePackages(Set<ServicePackageDTO> servicePackages) {
         this.servicePackages = servicePackages;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     @Override

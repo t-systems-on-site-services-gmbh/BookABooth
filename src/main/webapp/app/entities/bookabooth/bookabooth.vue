@@ -33,11 +33,12 @@
             <th scope="row"><span>Deckenhöhe in m</span></th>
             <th scope="row"><span>Ort</span></th>
             <th scope="row"><span>Service Pakete</span></th>
+            <th scope="row"><span>Firma</span></th>
             <th scope="row"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booth in filteredBooths" :key="booth.id" data-cy="entityTable" :class="booth.id === boothId ? 'alert-success' : ''">
+          <tr v-for="booth in filteredBooths" :key="booth.id" data-cy="entityTable" :class="booth.id === boothId ? 'bg-warning' : ''">
             <td>
               <router-link :to="{ name: 'BoothView', params: { boothId: booth.id } }">{{ booth.id }}</router-link>
             </td>
@@ -60,6 +61,7 @@
                 >
               </span>
             </td>
+            <td>{{ booth.companyName }}</td>
             <td class="text-right">
               <div class="btn-group">
                 <button

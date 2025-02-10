@@ -89,7 +89,17 @@ public class BoothService {
     @Transactional(readOnly = true)
     public List<BoothDTO> findAll() {
         log.debug("Request to get all Booths");
-        return boothRepository.findAll().stream().map(boothMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        //return boothRepository.findAll().stream().map(boothMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        var result = boothRepository
+            .findAllBoothsWithCompanyName()
+            .stream()
+            .map(o -> {
+                BoothDTO dto = boothMapper.toDto((Booth) o[0]);
+                dto.setCompanyName((String) o[1]);
+                return dto;
+            })
+            .toList();
+        return result;
     }
 
     /**
