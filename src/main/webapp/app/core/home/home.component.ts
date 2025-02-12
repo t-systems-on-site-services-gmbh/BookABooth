@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, defineComponent, inject, onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
+import { computed, type ComputedRef, defineComponent, inject, onBeforeUnmount, onUpdated, ref, type Ref } from 'vue';
 import { useAlertService } from '@/shared/alert/alert.service';
 import type LoginService from '@/account/login.service';
 import type AccountService from '@/account/account.service';
@@ -65,7 +65,7 @@ export default defineComponent({
       }
     };
 
-    onMounted(async () => {
+    onUpdated(async () => {
       await fetchUserChecklist();
       await checkBooths();
       await retrieveSystem();
@@ -105,9 +105,9 @@ export default defineComponent({
     const retrieveSystem = async () => {
       try {
         const res = await systemService().retrieve();
-        system.value = res.data;
+        system.value = res?.data;
       } catch (error) {
-        alertService.showHttpError(error.response);
+        console.error('Fehler beim Abrufen des Systems:', error);
       }
     };
 
