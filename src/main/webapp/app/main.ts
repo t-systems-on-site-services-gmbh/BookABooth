@@ -96,7 +96,8 @@ const app = createApp({
             !url.endsWith('api/account') &&
             !url.endsWith('api/authentication') &&
             !url.endsWith('api/checklist') &&
-            !url.endsWith('api/booths/occupied')
+            !url.endsWith('api/booths/occupied') &&
+            !url.endsWith('api/systems')
           ) {
             // Ask for a new authentication
             loginService.openLogin();
