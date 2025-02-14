@@ -233,6 +233,14 @@ public class BookingResource {
         return ResponseUtil.wrapOrNotFound(bookingDTO);
     }
 
+    @GetMapping("/mybooking")
+    public ResponseEntity<BookingDTO> getMyBooking(Authentication authentication) {
+        log.debug("REST request to get my own Booking");
+        var boothUser = boothUserService.getCurrentBoothUser(authentication);
+        Optional<BookingDTO> bookingDTO = bookingService.getBookingByCompanyId(boothUser.getCompany().getId());
+        return bookingDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.ok().build());
+    }
+
     @GetMapping("/unavailable")
     public List<BoothDTO> getUnavailableBooths(Authentication authentication) {
         log.debug("REST request to get all unavailable Booths");

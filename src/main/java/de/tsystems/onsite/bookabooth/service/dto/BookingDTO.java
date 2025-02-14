@@ -3,6 +3,7 @@ package de.tsystems.onsite.bookabooth.service.dto;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -23,6 +24,8 @@ public class BookingDTO implements Serializable {
 
     @NotNull
     private BoothDTO booth;
+
+    private BigDecimal price = BigDecimal.valueOf(1000);
 
     public Long getId() {
         return id;
@@ -63,6 +66,14 @@ public class BookingDTO implements Serializable {
 
     public void setBooth(BoothDTO booth) {
         this.booth = booth;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     @Override

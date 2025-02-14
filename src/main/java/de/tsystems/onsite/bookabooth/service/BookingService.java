@@ -198,11 +198,7 @@ public class BookingService {
         var bookings = bookingRepository
             .findByStatusNot(CANCELED)
             .stream()
-            .filter(
-                b ->
-                    (b.getStatus() == BookingStatus.CONFIRMED) ||
-                    ((b.getStatus() == BookingStatus.BLOCKED) && !b.getCompany().getId().equals(currentBoothUser.getCompany().getId()))
-            )
+            .filter(b -> (b.getStatus() == BookingStatus.CONFIRMED) || (b.getStatus() == BookingStatus.BLOCKED))
             .map(Booking::getBooth)
             .map(boothMapper::toDto);
         return bookings.toList();
@@ -218,8 +214,8 @@ public class BookingService {
         return bookingRepository.findByBoothIdAndStatusNot(boothId, CANCELED);
     }
 
-    public Optional<Booking> getBookingByCompanyId(Long id) {
-        return bookingRepository.findByCompanyIdOrderByReceivedDesc(id).stream().findFirst();
+    public Optional<BookingDTO> getBookingByCompanyId(Long id) {
+        return bookingRepository.findByCompanyIdOrderByReceivedDesc(id).stream().findFirst().map(bookingMapper::toDto);
     }
 
     public BookingDTO blockABoothBooking(Long boothId, BoothUserDTO bUserDTO) {

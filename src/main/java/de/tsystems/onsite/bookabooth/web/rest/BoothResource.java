@@ -148,16 +148,11 @@ public class BoothResource {
      * Checks, if there are booths left to book.
      * @return Returns a boolean, True when all booths are booked, False if booths are available
      */
-    // TODO: This method should be improved. Its not a good idea to iterate through the repository.
     @GetMapping("/occupied")
     public ResponseEntity<Boolean> areAllBoothsOccupied() {
         List<Booth> bookableBooths = boothService.getBookableBooths();
-
-        if (bookableBooths.isEmpty()) {
-            return ResponseEntity.ok(true);
-        }
-
-        return ResponseEntity.ok(false);
+        boolean allBoothsAreOccupied = bookableBooths.isEmpty();
+        return ResponseEntity.ok(allBoothsAreOccupied);
     }
 
     /**

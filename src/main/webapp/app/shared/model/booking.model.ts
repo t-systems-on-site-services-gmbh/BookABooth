@@ -8,6 +8,7 @@ export interface IBooking {
   status?: keyof typeof BookingStatus | null;
   company?: ICompany;
   booth?: IBooth;
+  price?: number | null;
 }
 
 export class Booking implements IBooking {
@@ -17,5 +18,6 @@ export class Booking implements IBooking {
     public status?: keyof typeof BookingStatus | null,
     public company?: ICompany,
     public booth?: IBooth,
+    public price?: number | null,
   ) {}
 }

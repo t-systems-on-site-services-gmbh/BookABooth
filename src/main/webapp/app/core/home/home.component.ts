@@ -30,6 +30,7 @@ export default defineComponent({
     const isOnWaitingList = ref(false);
     const router = useRouter();
     const system: Ref<ISystem> = ref();
+    const alreadyFetched = ref(false);
 
     const fetchUserChecklist = async () => {
       try {
@@ -65,10 +66,13 @@ export default defineComponent({
       }
     };
 
-    onUpdated(async () => {
-      await fetchUserChecklist();
-      await checkBooths();
-      await retrieveSystem();
+    onUpdated(() => {
+      if (authenticated.value && !alreadyFetched.value) {
+        fetchUserChecklist();
+        checkBooths();
+        retrieveSystem();
+        alreadyFetched.value = true;
+      }
       // Außerdem Methoden für die Einblendung beim Löschen des Accounts
       const accountDeleted = sessionStorage.getItem('accountDeleted');
       if (accountDeleted === 'true') {

@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.domain.System;
 import de.tsystems.onsite.bookabooth.repository.SystemRepository;
 import de.tsystems.onsite.bookabooth.service.dto.SystemDTO;
@@ -22,12 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class SystemService {
 
     private final Logger log = LoggerFactory.getLogger(SystemService.class);
+    private final ApplicationProperties applicationProperties;
 
     private final SystemRepository systemRepository;
-
     private final SystemMapper systemMapper;
 
-    public SystemService(SystemRepository systemRepository, SystemMapper systemMapper) {
+    public SystemService(ApplicationProperties applicationProperties, SystemRepository systemRepository, SystemMapper systemMapper) {
+        this.applicationProperties = applicationProperties;
         this.systemRepository = systemRepository;
         this.systemMapper = systemMapper;
     }
@@ -42,7 +44,7 @@ public class SystemService {
         log.debug("Request to save System : {}", systemDTO);
         System system = systemMapper.toEntity(systemDTO);
         system = systemRepository.save(system);
-        return systemMapper.toDto(system);
+        return enrichDto(systemMapper.toDto(system));
     }
 
     /**
@@ -55,7 +57,7 @@ public class SystemService {
         log.debug("Request to update System : {}", systemDTO);
         System system = systemMapper.toEntity(systemDTO);
         system = systemRepository.save(system);
-        return systemMapper.toDto(system);
+        return enrichDto(systemMapper.toDto(system));
     }
 
     /**
@@ -75,7 +77,9 @@ public class SystemService {
                 return existingSystem;
             })
             .map(systemRepository::save)
-            .map(systemMapper::toDto);
+            .map(s -> {
+                return enrichDto(systemMapper.toDto(s));
+            });
     }
 
     /**
@@ -88,7 +92,7 @@ public class SystemService {
         log.debug("Request to get System");
         // return mapped system to systemMapper.toDto
         System system = systemRepository.findFirstByOrderById().orElseThrow(() -> new BadRequestException("System not found"));
-        return systemMapper.toDto(system);
+        return enrichDto(systemMapper.toDto(system));
     }
 
     /**
@@ -99,7 +103,13 @@ public class SystemService {
     @Transactional(readOnly = true)
     public List<SystemDTO> findAll() {
         log.debug("Request to get all Systems");
-        return systemRepository.findAll().stream().map(systemMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return systemRepository
+            .findAll()
+            .stream()
+            .map(s -> {
+                return enrichDto(systemMapper.toDto(s));
+            })
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     /**
@@ -111,7 +121,11 @@ public class SystemService {
     @Transactional(readOnly = true)
     public Optional<SystemDTO> findOne(Long id) {
         log.debug("Request to get System : {}", id);
-        return systemRepository.findById(id).map(systemMapper::toDto);
+        return systemRepository
+            .findById(id)
+            .map(s -> {
+                return enrichDto(systemMapper.toDto(s));
+            });
     }
 
     /**
@@ -139,5 +153,11 @@ public class SystemService {
         System system = systemRepository.findFirstByOrderById().orElseThrow(() -> new IllegalStateException("System not found"));
         system.setEnabled(true);
         systemRepository.saveAndFlush(system);
+    }
+
+    private SystemDTO enrichDto(SystemDTO dto) {
+        dto.setCancellationReimbursement(applicationProperties.getCancellationReimbursement());
+        dto.setCancellationReimbursementUntil(applicationProperties.getCancellationReimbursementUntil());
+        return dto;
     }
 }

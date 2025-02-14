@@ -1,6 +1,9 @@
 package de.tsystems.onsite.bookabooth.config;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * Properties specific to Bookabooth.
@@ -44,5 +47,26 @@ public class ApplicationProperties {
 
     public void setUploadFolder(String uploadFolder) {
         this.uploadFolder = uploadFolder;
+    }
+
+    private Integer cancellationReimbursement;
+
+    public Integer getCancellationReimbursement() {
+        return cancellationReimbursement;
+    }
+
+    public void setCancellationReimbursement(Integer cancellationReimbursement) {
+        this.cancellationReimbursement = cancellationReimbursement;
+    }
+
+    @DateTimeFormat(pattern = "dd.MM.yyyy")
+    private Date cancellationReimbursementUntil;
+
+    public Date getCancellationReimbursementUntil() {
+        return cancellationReimbursementUntil;
+    }
+
+    public void setCancellationReimbursementUntil(Date cancellationReimbursementUntil) {
+        this.cancellationReimbursementUntil = cancellationReimbursementUntil;
     }
 }
