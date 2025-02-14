@@ -1,6 +1,7 @@
 package de.tsystems.onsite.bookabooth.service.dto;
 
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -17,6 +18,8 @@ public class BookingDTO implements Serializable {
 
     private ZonedDateTime received;
 
+    private ZonedDateTime confirmed;
+
     private BookingStatus status;
 
     @NotNull
@@ -25,7 +28,9 @@ public class BookingDTO implements Serializable {
     @NotNull
     private BoothDTO booth;
 
-    private BigDecimal price = BigDecimal.valueOf(1000);
+    private BigDecimal price;
+
+    private BigDecimal cancellationFee;
 
     public Long getId() {
         return id;
@@ -41,6 +46,14 @@ public class BookingDTO implements Serializable {
 
     public void setReceived(ZonedDateTime received) {
         this.received = received;
+    }
+
+    public ZonedDateTime getConfirmed() {
+        return this.confirmed;
+    }
+
+    public void setConfirmed(ZonedDateTime confirmed) {
+        this.confirmed = confirmed;
     }
 
     public BookingStatus getStatus() {
@@ -74,6 +87,14 @@ public class BookingDTO implements Serializable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getCancellationFee() {
+        return cancellationFee;
+    }
+
+    public void setCancellationFee(BigDecimal cancellationFee) {
+        this.cancellationFee = cancellationFee;
     }
 
     @Override

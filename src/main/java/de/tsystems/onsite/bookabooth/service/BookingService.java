@@ -2,6 +2,7 @@ package de.tsystems.onsite.bookabooth.service;
 
 import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CANCELED;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
@@ -13,10 +14,13 @@ import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
 import de.tsystems.onsite.bookabooth.service.exception.BadRequestException;
 import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookingService {
 
     private final Logger log = LoggerFactory.getLogger(BookingService.class);
+
+    private final ApplicationProperties applicationProperties;
 
     private final BookingRepository bookingRepository;
 
@@ -54,6 +60,7 @@ public class BookingService {
     private final UserService userService;
 
     public BookingService(
+        ApplicationProperties applicationProperties,
         BookingRepository bookingRepository,
         BoothUserRepository boothUserRepository,
         CompanyRepository companyRepository,
@@ -64,6 +71,7 @@ public class BookingService {
         SystemService systemService,
         UserService userService
     ) {
+        this.applicationProperties = applicationProperties;
         this.bookingRepository = bookingRepository;
         this.boothUserRepository = boothUserRepository;
         this.companyRepository = companyRepository;
@@ -243,7 +251,6 @@ public class BookingService {
         }
 
         // a BoothUser can only book one booth for his company
-        // TODO: here i using a wrong method
         Optional<Booking> bookingforCompany = this.getNotCanceledBooking(bUserDTO.getCompany().getId());
         if (bookingforCompany.isPresent()) {
             throw new BadRequestException("Company already booked or blocked a booth");
@@ -254,6 +261,7 @@ public class BookingService {
         bookingDTO.setBooth(boothDTO);
         bookingDTO.setStatus(BookingStatus.BLOCKED);
         bookingDTO.setCompany(bUserDTO.getCompany());
+        bookingDTO.setPrice(calculatePrice(boothDTO));
         bookingDTO = save(bookingDTO);
 
         return bookingDTO;
@@ -272,6 +280,7 @@ public class BookingService {
 
         // update the booking status
         bookingDTO.setStatus(BookingStatus.CONFIRMED);
+        bookingDTO.setConfirmed(java.time.ZonedDateTime.now());
         bookingDTO = this.update(bookingDTO);
 
         return bookingDTO;
@@ -291,9 +300,9 @@ public class BookingService {
 
         // update the booking status
         bookingDTO.setStatus(BookingStatus.CANCELED);
+        bookingDTO.setCancellationFee(calculateCancellationFee(bookingDTO.getPrice()));
         return bookingDTO = this.update(bookingDTO);
         // send email to all users associated with the company
-
         // remove from exhibitor list
     }
 
@@ -305,5 +314,19 @@ public class BookingService {
         } else {
             return bookingDTO.getCompany().getId().equals(currentBoothUser.getCompany().getId());
         }
+    }
+
+    private BigDecimal calculateCancellationFee(BigDecimal price) {
+        var now = new Date(System.currentTimeMillis());
+        if (now.after(applicationProperties.getCancellationReimbursementUntil())) {
+            return price;
+        }
+
+        var multiplier = (100 - applicationProperties.getCancellationReimbursement()) / 100;
+        return price.multiply(BigDecimal.valueOf(multiplier));
+    }
+
+    private BigDecimal calculatePrice(BoothDTO booth) {
+        return boothService.getPriceForBooth(booth.getId());
     }
 }

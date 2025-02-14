@@ -10,7 +10,9 @@
     </div>
     <div v-if="boothId !== null && boothId > 0" class="alert alert-success">
       Sie haben Stand {{ booths.find(b => b.id === boothId)?.title }} gebucht.
-      <span v-if="myBooking != null"><br />Kosten: {{ formatCurrency(myBooking.price) }}</span>
+      <span v-if="myBooking != null">
+        <br />Kosten: {{ formatCurrency(myBooking.price) }} <br />Buchungsdatum: {{ formatDate(myBooking.confirmed) }}
+      </span>
     </div>
 
     <label for="location" class="mt-3">Ort</label>

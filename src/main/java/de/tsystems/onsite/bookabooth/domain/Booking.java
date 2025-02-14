@@ -5,6 +5,7 @@ import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -29,6 +30,9 @@ public class Booking implements Serializable {
     @Column(name = "received")
     private ZonedDateTime received;
 
+    @Column(name = "confirmed")
+    private ZonedDateTime confirmed;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private BookingStatus status;
@@ -42,6 +46,12 @@ public class Booking implements Serializable {
     @NotNull
     @JsonIgnoreProperties(value = { "location", "servicePackages" }, allowSetters = true)
     private Booth booth;
+
+    @Column(name = "price", precision = 21, scale = 2)
+    private BigDecimal price;
+
+    @Column(name = "cancellationfee", precision = 21, scale = 2)
+    private BigDecimal cancellationFee;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -65,6 +75,14 @@ public class Booking implements Serializable {
     public Booking received(ZonedDateTime received) {
         this.setReceived(received);
         return this;
+    }
+
+    public ZonedDateTime getConfirmed() {
+        return this.confirmed;
+    }
+
+    public void setConfirmed(ZonedDateTime confirmed) {
+        this.confirmed = confirmed;
     }
 
     public void setReceived(ZonedDateTime received) {
@@ -108,6 +126,22 @@ public class Booking implements Serializable {
     public Booking booth(Booth booth) {
         this.setBooth(booth);
         return this;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getCancellationFee() {
+        return cancellationFee;
+    }
+
+    public void setCancellationFee(BigDecimal cancellationFee) {
+        this.cancellationFee = cancellationFee;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
