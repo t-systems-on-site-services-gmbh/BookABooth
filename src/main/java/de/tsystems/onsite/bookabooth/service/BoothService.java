@@ -1,10 +1,13 @@
 package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Booth;
+import de.tsystems.onsite.bookabooth.domain.ServicePackage;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
+import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -151,5 +154,21 @@ public class BoothService {
         List<BookingStatus> excludedStatus = List.of(BookingStatus.BLOCKED, BookingStatus.CONFIRMED);
         List<Booth> bookableBooths = boothRepository.findAvailableBoothsWithoutBookingStatus(excludedStatus);
         return bookableBooths;
+    }
+
+    public BigDecimal getPriceForBooth(Long id) {
+        var packages = servicePackageService.findAll();
+        Optional<BigDecimal> price = packages
+            .stream()
+            .filter(p -> p.getBooths().stream().map(BoothDTO::getId).toList().contains(id))
+            .map(p -> {
+                if (p.getPrice() == null) {
+                    return BigDecimal.ZERO;
+                } else {
+                    return p.getPrice();
+                }
+            })
+            .reduce(BigDecimal::add);
+        return price.orElse(BigDecimal.ZERO);
     }
 }
