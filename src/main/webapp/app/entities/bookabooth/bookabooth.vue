@@ -8,7 +8,10 @@
     <div v-else-if="!isFetching && !isBookingAllowed" class="alert alert-danger">
       Es fehlen Daten von Ihnen. Prüfen Sie die Checkliste auf der <a href="/">Startseite</a>.
     </div>
-    <div v-if="boothId !== null && boothId > 0" class="alert alert-success">Sie haben Stand {{ boothId }} gebucht.</div>
+    <div v-if="boothId !== null && boothId > 0" class="alert alert-success">
+      Sie haben Stand {{ booths.find(b => b.id === boothId)?.title }} gebucht.
+      <span v-if="myBooking != null"><br />Kosten: {{ formatCurrency(myBooking.price) }}</span>
+    </div>
 
     <label for="location" class="mt-3">Ort</label>
     <select id="location" class="custom-select mb-3" v-model="selectedLocation">
@@ -90,15 +93,19 @@
       <p>Sind Sie sich sicher, dass Sie diesen Stand kostenpflichtig buchen wollen?</p>
       <p>
         Stand: {{ selectedBooth.title }}<br />
-        Kosten: {{ calculatePrice(selectedBooth) }} €<br />
+        Kosten: {{ formatCurrency(calculatePrice(selectedBooth)) }}<br />
+      </p>
+      <p>
+        Es fallen Stornogebühren in Höhe von {{ 100 - system.cancellationReimbursement }}% des Buchungspreises an. Bei einer Stornierung
+        nach dem {{ formatDate(system.cancellationReimbursementUntil) }} wird der gesamte Betrag fällig.
       </p>
       <p>Bei Bestätigung der Buchung erkennen Sie die <a href="#todo">Ausstellerbedingungen</a> an.</p>
     </div>
     <div class="d-flex justify-content-end">
       <b-button class="btn btn-secondary" @click="abortBooking(currentBooking.id)">Abbrechen</b-button>
-      <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(currentBooking.id)"
-        >Buchung bestätigen</b-button
-      >
+      <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(currentBooking.id)">
+        Buchung bestätigen
+      </b-button>
     </div>
   </b-modal>
 </template>

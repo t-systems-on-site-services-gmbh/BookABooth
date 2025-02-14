@@ -31,6 +31,19 @@ export default class BookingService {
     });
   }
 
+  public retrieveMyBooking(): Promise<IBooking> {
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}/mybooking`)
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   public retrieveUnavailableBooths(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       axios

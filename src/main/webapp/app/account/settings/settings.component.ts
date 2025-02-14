@@ -8,6 +8,8 @@ import { useAlertService } from '@/shared/alert/alert.service';
 import { type ICompany, Company } from '@/shared/model/company.model';
 import CompanyService from '@/entities/company/company.service';
 import type AccountService from 'account/account.service';
+import SystemService from '@/entities/system/system.service';
+import { type ISystem } from '@/shared/model/system.model';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -20,6 +22,8 @@ export default defineComponent({
     const company: Ref<ICompany> = ref(new Company());
     const companyService = inject('companyService', () => new CompanyService());
     const accountService = inject<AccountService>('accountService');
+    const systemService = inject('systemService', () => new SystemService());
+    const system: Ref<ISystem> = ref();
     const success: Ref<string> = ref(null);
     const error: Ref<string> = ref(null);
     const errorEmailExists: Ref<string> = ref(null);
@@ -30,7 +34,6 @@ export default defineComponent({
     const exhibitorList = inject<ComputedRef<Boolean>>('exhibitorList', () => computed(() => store.account.company?.exhibitorList), true);
     const authorities = inject<ComputedRef<Set<String>>>('authorities', () => computed(() => store.account?.authorities), true);
     const preview = ref(null);
-    const bookingStatus = ref(null);
     const deleteAccount = ref(null);
     const passwordConfirm = ref('');
     const deleteError: Ref<boolean> = ref(false);
@@ -77,9 +80,19 @@ export default defineComponent({
       }
     };
 
+    const retrieveSystem = async () => {
+      try {
+        const res = await systemService().retrieve();
+        system.value = res?.data;
+      } catch (error) {
+        console.error('Fehler beim Abrufen des Systems:', error);
+      }
+    };
+
     onMounted(() => {
       fetchAdminCount();
       checkNoLogo();
+      retrieveSystem();
     });
 
     const validations = {
@@ -139,7 +152,6 @@ export default defineComponent({
       username,
       preview,
       waitingList,
-      bookingStatus,
       exhibitorList,
       authorities,
       onExhibitorList,
@@ -157,6 +169,7 @@ export default defineComponent({
       onlyOneAdmin,
       noLogoCheckbox,
       enableExhibitorCheckbox,
+      system,
     };
   },
   computed: {
@@ -310,6 +323,20 @@ export default defineComponent({
       } else {
         console.log('Es ist ein Fehler aufgetreten');
       }
+    },
+    formatDate(dateString: string): string {
+      const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+      return new Date(dateString).toLocaleDateString('de-DE', options);
+    },
+    calculateCancellationFee(): number {
+      var multiplier = 1;
+      if (Date.now() <= new Date(this.system.cancellationReimbursementUntil).getTime()) {
+        multiplier = (100 - this.system.cancellationReimbursement) / 100;
+      }
+      return this.settingsAccount.booking.price * multiplier;
+    },
+    formatCurrency(value: number): string {
+      return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
     },
   },
 });

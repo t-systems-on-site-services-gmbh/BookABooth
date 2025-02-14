@@ -84,7 +84,8 @@ public class SystemResource {
     @GetMapping("")
     public SystemDTO getSystem() {
         log.debug("REST request to get System");
-        return systemService.findFirstSystemEntry();
+        var dto = systemService.findFirstSystemEntry();
+        return dto;
     }
 
     /**

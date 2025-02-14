@@ -365,8 +365,14 @@
 
           <b-modal ref="cancelBooking-modal" hide-footer title="Standbuchung stornieren">
             <div class="d-block text-left">
-              <h4>Sind Sie sicher, dass Sie Ihre Standbuchung stornieren wollen?</h4>
+              <h3>Sind Sie sicher, dass Sie Ihre Standbuchung stornieren wollen?</h3>
               <p>Wenn Sie fortfahren, kann Ihr gewählter Stand von anderen Unternehmen gebucht werden.</p>
+              <p>
+                Es fallen Stornogebühren in Höhe von {{ 100 - system.cancellationReimbursement }}% des Buchungspreises an. Bei einer
+                Stornierung nach dem {{ formatDate(system.cancellationReimbursementUntil) }} wird der gesamte Betrag fällig.
+                <br />
+                Ihnen entstehen <strong>{{ formatCurrency(calculateCancellationFee()) }}</strong> Stornogebühren.
+              </p>
               <p>Ihr Benutzerkonto bleibt bestehen und Sie haben die Möglichkeit, andere freie Stände zu buchen.</p>
             </div>
             <div class="d-flex justify-content-end">
@@ -410,7 +416,7 @@
                 Bitte überprüfen Sie Ihr Passwort und versuchen Sie es erneut.
               </b-alert>
             </div>
-            <h4>Sind Sie sich sicher, dass Sie Ihr Konto löschen wollen?</h4>
+            <h3>Sind Sie sich sicher, dass Sie Ihr Konto löschen wollen?</h3>
             <p>Beachten Sie, dass dies nicht rückgängig gemacht werden kann.</p>
             <form name="deleteForm" id="delete-form" @submit.prevent="confirmDelete(settingsAccount.user.id)">
               <b-form-group label="Bestätigen Sie mit Ihrem Passwort." label-for="passwordConfirm">

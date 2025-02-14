@@ -31,10 +31,24 @@ export default defineComponent({
     const isFetching = ref(false);
     const selectedLocation = ref('');
     const selectedBooth: Ref<IBooth> = ref();
+    const myBooking: Ref<IBooking> = ref();
     const currentBooking: Ref<IBooking> = ref();
     const isBookingAllowed = ref(false);
     const system: Ref<ISystem> = ref();
     const boothId = ref(null);
+    const componentKey = ref(new Date().getTime());
+
+    const getMyBooking = async () => {
+      isFetching.value = true;
+      try {
+        const res = await bookingService().retrieveMyBooking();
+        myBooking.value = res;
+      } catch (err) {
+        console.error(err.response);
+      } finally {
+        isFetching.value = false;
+      }
+    };
 
     const retrieveBooths = async () => {
       isFetching.value = true;
@@ -117,6 +131,7 @@ export default defineComponent({
 
     initRelationships();
     checkBookingAllowed();
+    getMyBooking();
 
     onMounted(async () => {
       await retrieveBooths();
@@ -138,6 +153,7 @@ export default defineComponent({
       getUnavailableBooths,
       handleSyncList,
       isFetching,
+      myBooking,
       retrieveBooths,
       locations,
       servicePackages,
@@ -150,6 +166,7 @@ export default defineComponent({
       isBookingAllowed,
       system,
       boothId,
+      componentKey,
     };
   },
   methods: {
@@ -163,8 +180,6 @@ export default defineComponent({
         .create(booth.id)
         .then((res: { data: IBooking }) => {
           this.currentBooking = res;
-          console.log(res);
-          debugger;
           this.selectedBooth = booth;
           this.showConfirmationModal();
         })
@@ -190,12 +205,25 @@ export default defineComponent({
       this.bookingService()
         .confirm(bookingId)
         .then(() => {
+          console.log('Buchung vorgenommen 1.');
           this.hideConfirmationModal();
           this.alertService.showSuccess('Buchung vorgenommen.');
+          console.log('Buchung vorgenommen 2.');
+          this.$router.push({ path: '/' }).then(() => {
+            console.log('Buchung vorgenommen 3.');
+            this.$router.go(0);
+          });
         })
         .catch(error => {
           this.alertService.showHttpError(error.response);
         });
+    },
+    formatDate(dateString: string): string {
+      const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+      return new Date(dateString).toLocaleDateString('de-DE', options);
+    },
+    formatCurrency(value: number): string {
+      return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
     },
   },
 });

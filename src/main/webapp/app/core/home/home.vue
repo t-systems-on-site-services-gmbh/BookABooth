@@ -169,15 +169,19 @@
               </p>
               <p v-else-if="!system.enabled">
                 Die Standbuchung ist systemseitig nicht freigegeben.
-                <span v-if="!address || !logo || !phoneNumber || !companyDescription"
-                  >Nutzen Sie die Zeit, um Ihre Kontaktdaten zu komplettieren.</span
-                >
+                <span v-if="!address || !logo || !phoneNumber || !companyDescription">
+                  Nutzen Sie die Zeit, um Ihre Kontaktdaten zu komplettieren.
+                </span>
               </p>
               <p v-else-if="!address || !logo || !phoneNumber || !companyDescription">
                 Bitte vervollständigen Sie Ihre Kontaktdaten, um einen Stand buchen zu können.
               </p>
               <p v-else-if="bookingStatus === 'CANCELED'" class="mb-1 font-weight-normal">
                 Ihre Buchung wurde storniert. Sie können <a href="bookabooth">hier</a> eine erneute Buchung vornehmen.
+              </p>
+              <p v-else-if="bookingStatus === 'BLOCKED'" class="mb-1 font-weight-normal">
+                Es wird gerade eine Buchung für Ihre Firma vorgenommen. Bitte warten Sie, bis die Buchung abgeschlossen ist. Sollten Sie
+                eine Standbuchung abgebrochen haben, so wird der ausgewählte Stand nach einiger Zeit automatisch freigegeben.
               </p>
               <p v-else-if="bookingStatus === null && !allBoothsOccupied" class="mb-1 font-weight-normal">
                 Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.
