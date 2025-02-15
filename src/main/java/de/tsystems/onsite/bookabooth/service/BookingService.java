@@ -14,7 +14,6 @@ import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
-import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
 import de.tsystems.onsite.bookabooth.service.exception.BadRequestException;
 import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
@@ -183,8 +182,6 @@ public class BookingService {
             });
         }
     }
-
-    public void cancelBooking(BookingDTO bookingDTO) {}
 
     /**
      *

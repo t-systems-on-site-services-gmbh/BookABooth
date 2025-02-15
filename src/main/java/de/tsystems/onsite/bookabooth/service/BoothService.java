@@ -1,17 +1,13 @@
 package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Booth;
-import de.tsystems.onsite.bookabooth.domain.ServicePackage;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
-import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
 import java.math.BigDecimal;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -93,7 +89,7 @@ public class BoothService {
     public List<BoothDTO> findAll() {
         log.debug("Request to get all Booths");
         //return boothRepository.findAll().stream().map(boothMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
-        var result = boothRepository
+        return boothRepository
             .findAllBoothsWithCompanyName()
             .stream()
             .map(o -> {
@@ -102,7 +98,6 @@ public class BoothService {
                 return dto;
             })
             .toList();
-        return result;
     }
 
     /**
@@ -138,22 +133,15 @@ public class BoothService {
         if (optionalBooth.isPresent()) {
             Booth booth = optionalBooth.get();
             var servicePackages = booth.getServicePackages();
-            servicePackages.forEach(servicePackage -> {
-                servicePackageService.removeBooth(servicePackage, booth);
-            });
-            boothDTO
-                .getServicePackages()
-                .forEach(servicePackageDTO -> {
-                    servicePackageService.addBooth(servicePackageDTO, booth);
-                });
+            servicePackages.forEach(servicePackage -> servicePackageService.removeBooth(servicePackage, booth));
+            boothDTO.getServicePackages().forEach(servicePackageDTO -> servicePackageService.addBooth(servicePackageDTO, booth));
         }
     }
 
     @Transactional(readOnly = true)
     public List<Booth> getBookableBooths() {
         List<BookingStatus> excludedStatus = List.of(BookingStatus.BLOCKED, BookingStatus.CONFIRMED);
-        List<Booth> bookableBooths = boothRepository.findAvailableBoothsWithoutBookingStatus(excludedStatus);
-        return bookableBooths;
+        return boothRepository.findAvailableBoothsWithoutBookingStatus(excludedStatus);
     }
 
     public BigDecimal getPriceForBooth(Long id) {
