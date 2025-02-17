@@ -43,10 +43,6 @@ export default defineComponent({
     const onlyOneAdmin = ref<boolean>(true);
     const noLogoCheckbox = ref<boolean>(false);
 
-    const onExhibitorList = computed(() => {
-      return exhibitorList.value ? 'Sie befinden sich auf der Ausstellerliste' : 'Sie befinden sich nicht auf der Ausstellerliste';
-    });
-
     const isAdmin = computed(() => {
       if (authorities.value && Array.isArray(authorities.value)) {
         return authorities.value.includes('ROLE_ADMIN');
@@ -67,11 +63,6 @@ export default defineComponent({
         console.error('Fehler beim Abrufen der Admin-Anzahl:', error);
       }
     };
-
-    // Bedingungen, um die Ausstellerliste-Checkbox zu aktivieren
-    const enableExhibitorCheckbox = computed(() => {
-      return !(settingsAccount.value.company.logo || noLogoCheckbox.value) || settingsAccount.value.booking?.status !== 'CONFIRMED';
-    });
 
     // Setzt die "kein Logo"-Checkbox neu, wenn der User die Seite verlässt
     const checkNoLogo = () => {
@@ -154,7 +145,6 @@ export default defineComponent({
       waitingList,
       exhibitorList,
       authorities,
-      onExhibitorList,
       passwordConfirm,
       deleteAccount,
       deleteError,
@@ -168,7 +158,6 @@ export default defineComponent({
       adminCount,
       onlyOneAdmin,
       noLogoCheckbox,
-      enableExhibitorCheckbox,
       system,
     };
   },

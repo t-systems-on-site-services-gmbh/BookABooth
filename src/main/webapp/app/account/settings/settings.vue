@@ -157,21 +157,7 @@
                   </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">
-                    <label class="form-control-label" for="company.exhibitorList">
-                      <p v-if="settingsAccount.company.logo && settingsAccount?.booking?.status === 'CONFIRMED'">
-                        Hier können Sie Ihre Freigabe in der Austellerliste verwalten
-                      </p>
-                      <p v-else-if="!settingsAccount.company.logo && !noLogoCheckbox && settingsAccount?.booking?.status === 'CONFIRMED'">
-                        Bitte laden Sie ein Logo hoch, um sich in die Ausstellerliste einzutragen
-                      </p>
-                      <p v-else-if="!settingsAccount.company.logo && noLogoCheckbox && settingsAccount?.booking?.status === 'CONFIRMED'">
-                        Sie können sich in die Ausstellerliste eintragen, aber es wird kein Logo verwendet
-                      </p>
-                      <p v-else-if="settingsAccount.company.logo || (noLogoCheckbox && settingsAccount?.booking?.status !== 'CONFIRMED')">
-                        Bitte buchen Sie einen Stand, um sich in die Ausstellerliste einzutragen
-                      </p>
-                      <p v-else>Bitte buchen Sie einen Stand und laden ein Logo hoch, um sich in die Ausstellerliste einzutragen</p>
-                    </label>
+                    <label class="form-control-label" for="company.exhibitorList"> Freigabe Ausstellerliste </label>
                     <br />
                     <input
                       type="checkbox"
@@ -181,20 +167,13 @@
                         valid: !v$.settingsAccount.company.exhibitorList.$invalid,
                         invalid: v$.settingsAccount.company.exhibitorList.$invalid,
                       }"
-                      :disabled="enableExhibitorCheckbox"
                       v-model="v$.settingsAccount.company.exhibitorList.$model"
                       data-cy="exhibitorlist"
                     />
-                    {{ onExhibitorList }}
-                    <br /><br />
-                    <p v-if="settingsAccount.company.logo && settingsAccount?.booking?.status === 'CONFIRMED'">
-                      <strong>HINWEIS: </strong>Wenn Sie auf der Ausstellerliste stehen, können Dritte Ihren Firmennamen, Ihr Logo, Ihre
-                      Firmenbeschreibung und Ihren gebuchten Stand einsehen!
-                    </p>
-                    <p v-else-if="!enableExhibitorCheckbox">
-                      <strong>HINWEIS: </strong>Wenn Sie auf der Ausstellerliste stehen, können Dritte Ihren Firmennamen, Ihre
-                      Firmenbeschreibung und Ihren gebuchten Stand einsehen!
-                    </p>
+                    Hiermit bestägtige ich, dass mein Unternehmen öffentlich auf der Ausstellerliste und der Standauswahl während des
+                    Buchungsprozesses erscheinen darf. Dritte sehen dadurch den Firmennamen, die Firmenbeschreibung, das Logo und den
+                    gebuchten Stand. Wurde noch keine Buchung getätigt oder eine bestehende Buchung storniert, können diese Informationen
+                    nicht eingesehen werden. Eine Standbuchung kann auch ohne die <i>Freigabe Ausstellerliste</i> erfolgen.
                   </div>
                 </div>
               </div>
