@@ -95,26 +95,6 @@
               v-model="v$.exhibitorList.$model"
             />
           </div>
-          <div class="form-group">
-            <label for="company-department">Department</label>
-            <select
-              class="form-control"
-              id="company-departments"
-              data-cy="department"
-              multiple
-              name="department"
-              v-if="company.departments !== undefined"
-              v-model="company.departments"
-            >
-              <option
-                v-bind:value="getSelected(company.departments, departmentOption, 'id')"
-                v-for="departmentOption in departments"
-                :key="departmentOption.id"
-              >
-                {{ departmentOption.id }}
-              </option>
-            </select>
-          </div>
         </div>
         <div>
           <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" v-on:click="previousState()">

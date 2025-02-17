@@ -4,7 +4,6 @@ import SystemService from './system/system.service';
 import BoothService from './booth/booth.service';
 import LocationService from './location/location.service';
 import CompanyService from './company/company.service';
-import DepartmentService from './department/department.service';
 import ServicePackageService from './service-package/service-package.service';
 import BookingService from './booking/booking.service';
 import BoothUserService from './booth-user/booth-user.service';
@@ -20,7 +19,6 @@ export default defineComponent({
     provide('boothService', () => new BoothService());
     provide('locationService', () => new LocationService());
     provide('companyService', () => new CompanyService());
-    provide('departmentService', () => new DepartmentService());
     provide('servicePackageService', () => new ServicePackageService());
     provide('bookingService', () => new BookingService());
     provide('boothUserService', () => new BoothUserService());
