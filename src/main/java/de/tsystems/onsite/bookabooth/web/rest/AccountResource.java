@@ -4,12 +4,10 @@ import de.tsystems.onsite.bookabooth.domain.*;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
+import de.tsystems.onsite.bookabooth.service.BookingService;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
-import de.tsystems.onsite.bookabooth.service.dto.ChecklistDTO;
-import de.tsystems.onsite.bookabooth.service.dto.PasswordChangeDTO;
-import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
-import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
+import de.tsystems.onsite.bookabooth.service.dto.*;
 import de.tsystems.onsite.bookabooth.service.exception.CompanyAlreadyUsedException;
 import de.tsystems.onsite.bookabooth.web.rest.errors.*;
 import de.tsystems.onsite.bookabooth.web.rest.vm.KeyAndPasswordVM;
@@ -48,6 +46,8 @@ public class AccountResource {
 
     private final UserService userService;
 
+    private final BookingService bookingService;
+
     private final MailService mailService;
 
     private final PersistentTokenRepository persistentTokenRepository;
@@ -55,11 +55,13 @@ public class AccountResource {
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
+        BookingService bookingService,
         MailService mailService,
         PersistentTokenRepository persistentTokenRepository
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.bookingService = bookingService;
         this.mailService = mailService;
         this.persistentTokenRepository = persistentTokenRepository;
     }
@@ -177,24 +179,9 @@ public class AccountResource {
         if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
-        userService.cancelBooking(userProfileDTO, userProfileDTO.getBooking().getId());
-        return ResponseEntity.ok().build();
-    }
 
-    /**
-     *
-     * @param userProfileDTO profile of the current user
-     * @return profile with confirmed booking
-     */
-    @PutMapping("/account/confirm-booking")
-    public ResponseEntity<Void> confirmBooking(@RequestBody UserProfileDTO userProfileDTO) {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
-        if (!user.getEmail().equalsIgnoreCase(userProfileDTO.getUser().getEmail())) {
-            throw new InvalidEmailException("Provided email does not match the existing email");
-        }
-        userService.confirmBooking(userProfileDTO, userProfileDTO.getBooking().getId());
+        BoothUserDTO bUserDTO = userService.getBoothUser(user);
+        bookingService.cancelAConfirmedBoothBooking(userProfileDTO.getBooking().getId(), bUserDTO, false);
         return ResponseEntity.ok().build();
     }
 

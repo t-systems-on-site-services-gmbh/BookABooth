@@ -294,16 +294,6 @@ export default defineComponent({
         console.error('Fehler beim Löschen des Accounts:', ex);
       }
     },
-    async confirmBooking() {
-      const response = await axios.put('api/account/confirm-booking', this.settingsAccount);
-      console.log(response);
-      if (response && response.status === 200) {
-        console.log('Buchung wurde erfolgreich bestätigt');
-        this.$router.go();
-      } else {
-        console.log('Es ist ein Fehler aufgetreten');
-      }
-    },
     async removeWaitingList() {
       const response = await axios.put('api/account/remove-waitinglist', this.settingsAccount);
       console.log(response);

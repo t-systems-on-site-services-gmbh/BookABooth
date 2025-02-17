@@ -19,6 +19,7 @@ import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserRegistrationDTO;
 import de.tsystems.onsite.bookabooth.service.exception.*;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.BoothUserMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
 import jakarta.validation.ConstraintViolation;
@@ -60,6 +61,8 @@ public class UserService {
 
     private final BoothUserRepository boothUserRepository;
 
+    private final BoothUserMapper boothUserMapper;
+
     private final UserMapper userMapper;
 
     private final CompanyMapper companyMapper;
@@ -83,6 +86,7 @@ public class UserService {
         UserRepository userRepository,
         CompanyRepository companyRepository,
         BoothUserRepository boothUserRepository,
+        BoothUserMapper boothUserMapper,
         UserMapper userMapper,
         CompanyMapper companyMapper,
         BookingMapper bookingMapper,
@@ -97,6 +101,7 @@ public class UserService {
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
         this.boothUserRepository = boothUserRepository;
+        this.boothUserMapper = boothUserMapper;
         this.userMapper = userMapper;
         this.companyMapper = companyMapper;
         this.bookingMapper = bookingMapper;
@@ -528,20 +533,6 @@ public class UserService {
         });
     }
 
-    // Set the booking status from prebooked to confirmed
-    public void confirmBooking(UserProfileDTO userProfileDTO, Long bookingId) {
-        Optional<Booking> optionalBooking = bookingRepository
-            .findByCompanyIdOrderByReceivedDesc(userProfileDTO.getCompany().getId())
-            .stream()
-            .findFirst();
-        optionalBooking.ifPresent(booking -> {
-            if (booking.getId().equals(bookingId)) {
-                booking.setStatus(CONFIRMED);
-                bookingRepository.save(booking);
-            }
-        });
-    }
-
     // Checks the password of the current user
     public Boolean checkPassword(String currentClearTextPassword) {
         return SecurityUtils.getCurrentUserLogin()
@@ -731,5 +722,9 @@ public class UserService {
     public List<User> findUsersByCompanyId(Long companyId) {
         var boothUsers = boothUserRepository.findByCompanyId(companyId);
         return boothUsers.stream().map(BoothUser::getUser).toList();
+    }
+
+    public BoothUserDTO getBoothUser(User user) {
+        return boothUserRepository.findById(user.getId()).map(boothUserMapper::toDto).orElseThrow();
     }
 }

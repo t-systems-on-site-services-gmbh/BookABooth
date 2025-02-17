@@ -19,6 +19,7 @@ import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
 import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,6 +92,7 @@ public class BookingService {
     public BookingDTO save(BookingDTO bookingDTO) {
         log.debug("Request to save Booking : {}", bookingDTO);
         Booking booking = bookingMapper.toEntity(bookingDTO);
+        booking.setReceived(ZonedDateTime.now());
         booking = bookingRepository.save(booking);
         return bookingMapper.toDto(booking);
     }
@@ -104,6 +106,7 @@ public class BookingService {
     public BookingDTO update(BookingDTO bookingDTO) {
         log.debug("Request to update Booking : {}", bookingDTO);
         Booking booking = bookingMapper.toEntity(bookingDTO);
+        booking.setReceived(ZonedDateTime.now());
         booking = bookingRepository.save(booking);
         return bookingMapper.toDto(booking);
     }
@@ -121,7 +124,7 @@ public class BookingService {
             .findById(bookingDTO.getId())
             .map(existingBooking -> {
                 bookingMapper.partialUpdate(existingBooking, bookingDTO);
-
+                existingBooking.setReceived(ZonedDateTime.now());
                 return existingBooking;
             })
             .map(bookingRepository::save)
@@ -161,26 +164,17 @@ public class BookingService {
         bookingRepository.deleteById(id);
     }
 
-    /**
-     *
-     * @param booking Object passed down from api endpoint.
-     *                This method sets the booking to canceled and removes the company from the exhibitor list.
-     *                It also sends an email to all users associated with that company.
-     */
-    public void cancelBooking(Booking booking) {
-        if (booking != null) {
-            booking.setStatus(CANCELED);
-            bookingRepository.save(booking);
-            List<User> users = findUsersByBookingId(booking.getId());
-            users.forEach(mailService::sendBookingDeletedEmail);
+    private void sendBookingCancelledEmail(Long bookingId) {
+        List<User> users = findUsersByBookingId(bookingId);
+        users.forEach(mailService::sendBookingDeletedEmail);
+    }
 
-            // Removes user from exhibitor list
-            Optional<Company> optionalCompany = companyRepository.findById(booking.getCompany().getId());
-            optionalCompany.ifPresent(company -> {
-                company.setExhibitorList(false);
-                companyRepository.save(company);
-            });
-        }
+    private void removeCompanyFromExhibitorList(Long bookingId) {
+        Optional<Company> optionalCompany = companyRepository.findById(bookingId);
+        optionalCompany.ifPresent(company -> {
+            company.setExhibitorList(false);
+            companyRepository.save(company);
+        });
     }
 
     /**
@@ -258,6 +252,7 @@ public class BookingService {
         bookingDTO.setBooth(boothDTO);
         bookingDTO.setStatus(BookingStatus.BLOCKED);
         bookingDTO.setCompany(bUserDTO.getCompany());
+        bookingDTO.setReceived(ZonedDateTime.now());
         bookingDTO.setPrice(calculatePrice(boothDTO));
         bookingDTO = save(bookingDTO);
 
@@ -275,9 +270,11 @@ public class BookingService {
             throw new ForbiddenException("Company does not own the booking");
         }
 
+        var now = ZonedDateTime.now();
         // update the booking status
         bookingDTO.setStatus(BookingStatus.CONFIRMED);
-        bookingDTO.setConfirmed(java.time.ZonedDateTime.now());
+        bookingDTO.setConfirmed(now);
+        bookingDTO.setReceived(now);
         bookingDTO = this.update(bookingDTO);
 
         return bookingDTO;
@@ -297,10 +294,14 @@ public class BookingService {
 
         // update the booking status
         bookingDTO.setStatus(BookingStatus.CANCELED);
+        bookingDTO.setReceived(ZonedDateTime.now());
         bookingDTO.setCancellationFee(calculateCancellationFee(bookingDTO.getPrice()));
-        return bookingDTO = this.update(bookingDTO);
-        // send email to all users associated with the company
-        // remove from exhibitor list
+        var updatedDto = this.update(bookingDTO);
+
+        sendBookingCancelledEmail(updatedDto.getId());
+        removeCompanyFromExhibitorList(updatedDto.getId());
+
+        return updatedDto;
     }
 
     @Transactional(readOnly = true)
@@ -319,7 +320,7 @@ public class BookingService {
             return price;
         }
 
-        var multiplier = (100 - applicationProperties.getCancellationReimbursement()) / 100;
+        double multiplier = (100.0 - applicationProperties.getCancellationReimbursement()) / 100.0;
         return price.multiply(BigDecimal.valueOf(multiplier));
     }
 
