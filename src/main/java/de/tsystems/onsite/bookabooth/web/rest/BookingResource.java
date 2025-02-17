@@ -105,7 +105,6 @@ public class BookingResource {
         log.debug("REST request to confirm Booking : {}", bookingId);
 
         BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
-
         BookingDTO blockedBookingDTO = bookingService.confirmABoothBooking(bookingId, bUserDTO);
 
         return ResponseEntity.ok()
@@ -127,10 +126,9 @@ public class BookingResource {
     ) throws URISyntaxException {
         log.debug("REST request to cancel a Booking : {}", bookingId);
 
-        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
-
         boolean force = SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN");
 
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
         BookingDTO bookingDTO = bookingService.cancelAConfirmedBoothBooking(bookingId, bUserDTO, force);
 
         return ResponseEntity.accepted()

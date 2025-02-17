@@ -62,7 +62,6 @@ public class BookingDTO implements Serializable {
 
     public void setStatus(BookingStatus status) {
         this.status = status;
-        this.setReceived(ZonedDateTime.now());
     }
 
     public CompanyDTO getCompany() {
