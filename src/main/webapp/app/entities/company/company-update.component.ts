@@ -5,8 +5,6 @@ import { useVuelidate } from '@vuelidate/core';
 import CompanyService from './company.service';
 import { useValidation } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
-import DepartmentService from '@/entities/department/department.service';
-import { type IDepartment } from '@/shared/model/department.model';
 import { type ICompany, Company } from '@/shared/model/company.model';
 
 export default defineComponent({
@@ -17,10 +15,6 @@ export default defineComponent({
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const company: Ref<ICompany> = ref(new Company());
-
-    const departmentService = inject('departmentService', () => new DepartmentService());
-
-    const departments: Ref<IDepartment[]> = ref([]);
 
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'de'), true);
@@ -43,13 +37,7 @@ export default defineComponent({
       retrieveCompany(route.params.companyId);
     }
 
-    const initRelationships = () => {
-      departmentService()
-        .retrieve()
-        .then(res => {
-          departments.value = res.data;
-        });
-    };
+    const initRelationships = () => {};
 
     initRelationships();
 
@@ -64,7 +52,6 @@ export default defineComponent({
       description: {},
       waitingList: {},
       exhibitorList: {},
-      departments: {},
     };
     const v$ = useVuelidate(validationRules, company as any);
     v$.value.$validate();
@@ -76,12 +63,8 @@ export default defineComponent({
       previousState,
       isSaving,
       currentLanguage,
-      departments,
       v$,
     };
-  },
-  created(): void {
-    this.company.departments = [];
   },
   methods: {
     save(): void {

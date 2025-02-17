@@ -29,8 +29,6 @@ public class CompanyDTO implements Serializable {
 
     private Boolean exhibitorList;
 
-    private Set<DepartmentDTO> departments = new HashSet<>();
-
     public Long getId() {
         return id;
     }
@@ -95,14 +93,6 @@ public class CompanyDTO implements Serializable {
         this.exhibitorList = exhibitorList;
     }
 
-    public Set<DepartmentDTO> getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(Set<DepartmentDTO> departments) {
-        this.departments = departments;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -136,7 +126,6 @@ public class CompanyDTO implements Serializable {
             ", description='" + getDescription() + "'" +
             ", waitingList='" + getWaitingList() + "'" +
             ", exhibitorList='" + getExhibitorList() + "'" +
-            ", departments=" + getDepartments() +
             "}";
     }
 }

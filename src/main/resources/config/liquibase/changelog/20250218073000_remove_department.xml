@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Drop table Department.
+    -->
+    <changeSet id="20250218073000-1" author="gricklom">
+        <dropForeignKeyConstraint baseTableName="rel_department__company" constraintName="fk_rel_department__company__department_id"/>
+        <dropForeignKeyConstraint baseTableName="rel_department__company" constraintName="fk_rel_department__company__company_id"/>
+        <dropTable tableName="department"/>
+        <dropTable tableName="rel_department__company"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+
+</databaseChangeLog>
