@@ -169,12 +169,9 @@ public class BookingService {
         users.forEach(mailService::sendBookingDeletedEmail);
     }
 
-    private void removeCompanyFromExhibitorList(Long bookingId) {
-        Optional<Company> optionalCompany = companyRepository.findById(bookingId);
-        optionalCompany.ifPresent(company -> {
-            company.setExhibitorList(false);
-            companyRepository.save(company);
-        });
+    private void sendBookingConfirmedEmail(Long bookingId) {
+        List<User> users = findUsersByBookingId(bookingId);
+        users.forEach(mailService::sendBookingConfirmedEmail);
     }
 
     /**
@@ -277,6 +274,8 @@ public class BookingService {
         bookingDTO.setReceived(now);
         bookingDTO = this.update(bookingDTO);
 
+        sendBookingConfirmedEmail(bookingDTO.getId());
+
         return bookingDTO;
     }
 
@@ -299,7 +298,6 @@ public class BookingService {
         var updatedDto = this.update(bookingDTO);
 
         sendBookingCancelledEmail(updatedDto.getId());
-        removeCompanyFromExhibitorList(updatedDto.getId());
 
         return updatedDto;
     }
