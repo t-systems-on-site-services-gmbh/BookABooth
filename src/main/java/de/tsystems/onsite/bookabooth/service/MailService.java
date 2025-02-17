@@ -129,4 +129,10 @@ public class MailService {
         log.debug("Send email notification about deleted booking to '{}'", user.getEmail());
         this.sendEmailFromTemplateSync(user, "mail/bookingDeleteEmail", "email.bookingDelete.title");
     }
+
+    @Async
+    public void sendBookingConfirmedEmail(User user) {
+        log.debug("Send email notification about confirmed booking to '{}'", user.getEmail());
+        this.sendEmailFromTemplateSync(user, "mail/bookingConfirmedEmail", "email.bookingConfirmed.title");
+    }
 }
