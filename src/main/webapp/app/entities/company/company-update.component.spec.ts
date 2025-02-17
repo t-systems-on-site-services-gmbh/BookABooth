@@ -8,8 +8,6 @@ import CompanyUpdate from './company-update.vue';
 import CompanyService from './company.service';
 import AlertService from '@/shared/alert/alert.service';
 
-import DepartmentService from '@/entities/department/department.service';
-
 type CompanyUpdateComponentType = InstanceType<typeof CompanyUpdate>;
 
 let route: Partial<RouteLocation>;
@@ -52,10 +50,6 @@ describe('Component Tests', () => {
         provide: {
           alertService,
           companyService: () => companyServiceStub,
-          departmentService: () =>
-            sinon.createStubInstance<DepartmentService>(DepartmentService, {
-              retrieve: sinon.stub().resolves({}),
-            } as any),
         },
       };
     });

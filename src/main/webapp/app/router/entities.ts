@@ -21,10 +21,6 @@ const Company = () => import('@/entities/company/company.vue');
 const CompanyUpdate = () => import('@/entities/company/company-update.vue');
 const CompanyDetails = () => import('@/entities/company/company-details.vue');
 
-const Department = () => import('@/entities/department/department.vue');
-const DepartmentUpdate = () => import('@/entities/department/department-update.vue');
-const DepartmentDetails = () => import('@/entities/department/department-details.vue');
-
 const ServicePackage = () => import('@/entities/service-package/service-package.vue');
 const ServicePackageUpdate = () => import('@/entities/service-package/service-package-update.vue');
 const ServicePackageDetails = () => import('@/entities/service-package/service-package-details.vue');
@@ -144,30 +140,6 @@ export default {
       path: 'company/:companyId/view',
       name: 'CompanyView',
       component: CompanyDetails,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'department',
-      name: 'Department',
-      component: Department,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'department/new',
-      name: 'DepartmentCreate',
-      component: DepartmentUpdate,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'department/:departmentId/edit',
-      name: 'DepartmentEdit',
-      component: DepartmentUpdate,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'department/:departmentId/view',
-      name: 'DepartmentView',
-      component: DepartmentDetails,
       meta: { authorities: [Authority.USER] },
     },
     {

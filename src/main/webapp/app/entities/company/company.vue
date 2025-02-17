@@ -35,7 +35,6 @@
             <th scope="row"><span>Description</span></th>
             <th scope="row"><span>Waiting List</span></th>
             <th scope="row"><span>Exhibitor List</span></th>
-            <th scope="row"><span>Department</span></th>
             <th scope="row"></th>
           </tr>
         </thead>
@@ -51,14 +50,6 @@
             <td>{{ company.description }}</td>
             <td>{{ company.waitingList }}</td>
             <td>{{ company.exhibitorList }}</td>
-            <td>
-              <span v-for="(department, i) in company.departments" :key="department.id"
-                >{{ i > 0 ? ', ' : '' }}
-                <router-link class="form-control-static" :to="{ name: 'DepartmentView', params: { departmentId: department.id } }">{{
-                  department.id
-                }}</router-link>
-              </span>
-            </td>
             <td class="text-right">
               <div class="btn-group">
                 <router-link

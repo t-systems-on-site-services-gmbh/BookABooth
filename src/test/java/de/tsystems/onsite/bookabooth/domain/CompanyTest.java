@@ -2,7 +2,6 @@ package de.tsystems.onsite.bookabooth.domain;
 
 import static de.tsystems.onsite.bookabooth.domain.BookingTestSamples.*;
 import static de.tsystems.onsite.bookabooth.domain.CompanyTestSamples.*;
-import static de.tsystems.onsite.bookabooth.domain.DepartmentTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.tsystems.onsite.bookabooth.web.rest.TestUtil;
@@ -50,27 +49,5 @@ class CompanyTest {
         company.setBookings(new HashSet<>());
         assertThat(company.getBookings()).doesNotContain(bookingBack);
         assertThat(bookingBack.getCompany()).isNull();
-    }
-
-    @Test
-    void departmentTest() throws Exception {
-        Company company = getCompanyRandomSampleGenerator();
-        Department departmentBack = getDepartmentRandomSampleGenerator();
-
-        company.addDepartment(departmentBack);
-        assertThat(company.getDepartments()).containsOnly(departmentBack);
-        assertThat(departmentBack.getCompanies()).containsOnly(company);
-
-        company.removeDepartment(departmentBack);
-        assertThat(company.getDepartments()).doesNotContain(departmentBack);
-        assertThat(departmentBack.getCompanies()).doesNotContain(company);
-
-        company.departments(new HashSet<>(Set.of(departmentBack)));
-        assertThat(company.getDepartments()).containsOnly(departmentBack);
-        assertThat(departmentBack.getCompanies()).containsOnly(company);
-
-        company.setDepartments(new HashSet<>());
-        assertThat(company.getDepartments()).doesNotContain(departmentBack);
-        assertThat(departmentBack.getCompanies()).doesNotContain(company);
     }
 }

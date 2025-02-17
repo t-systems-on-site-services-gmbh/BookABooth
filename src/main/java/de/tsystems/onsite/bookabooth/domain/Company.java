@@ -53,11 +53,6 @@ public class Company implements Serializable {
     @JsonIgnoreProperties(value = { "company", "booth" }, allowSetters = true)
     private Set<Booking> bookings = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "companies")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "companies" }, allowSetters = true)
-    private Set<Department> departments = new HashSet<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -192,37 +187,6 @@ public class Company implements Serializable {
     public Company removeBookings(Booking booking) {
         this.bookings.remove(booking);
         booking.setCompany(null);
-        return this;
-    }
-
-    public Set<Department> getDepartments() {
-        return this.departments;
-    }
-
-    public void setDepartments(Set<Department> departments) {
-        if (this.departments != null) {
-            this.departments.forEach(i -> i.removeCompany(this));
-        }
-        if (departments != null) {
-            departments.forEach(i -> i.addCompany(this));
-        }
-        this.departments = departments;
-    }
-
-    public Company departments(Set<Department> departments) {
-        this.setDepartments(departments);
-        return this;
-    }
-
-    public Company addDepartment(Department department) {
-        this.departments.add(department);
-        department.getCompanies().add(this);
-        return this;
-    }
-
-    public Company removeDepartment(Department department) {
-        this.departments.remove(department);
-        department.getCompanies().remove(this);
         return this;
     }
 
