@@ -1,17 +1,17 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="de">
   <head>
-    <title th:text="#{email.bookingDelete.title}">Jade Karrieretag Buchungsbestätigung</title>
+    <title>Jade Karrieretag Buchungsbestätigung</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}" />
   </head>
   <body>
-    <p th:text="#{email.bookingDelete.greeting}">Sehr geehrte Damen und Herren,</p>
-    <p th:text="#{email.bookingDelete.text1}">hiermit bestätigen wir Ihre Standbuchung beim diesjährigen Jade Karrieretag.</p>
+    <p>Sehr geehrte Damen und Herren,</p>
+    <p>hiermit bestätigen wir Ihre Standbuchung beim diesjährigen Jade Karrieretag.</p>
     <p>
-      <span th:text="#{email.bookingDelete.text2}">Mit freundlichen Grüßen</span>
+      <span>Mit freundlichen Grüßen</span>
       <br />
-      <em th:text="#{email.signature}">Ihre Jade Hochschule</em>
+      <em>Ihre Jade Hochschule</em>
     </p>
   </body>
 </html>
