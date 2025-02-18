@@ -123,9 +123,9 @@ export default defineComponent({
       }
     };
 
-    const checkBookingAllowed = async () => {
-      await retrieveSystem();
-      await fetchUserChecklist();
+    const checkBookingAllowed = () => {
+      retrieveSystem();
+      fetchUserChecklist();
       isBookingAllowed.value = isBookingAllowed.value && system.value.enabled;
     };
 
@@ -139,7 +139,6 @@ export default defineComponent({
     });
 
     const filteredBooths = computed(() => {
-      console.log(selectedLocation.value);
       if (selectedLocation.value) {
         return booths.value.filter(booth => booth.location?.id === selectedLocation.value.id);
       }
