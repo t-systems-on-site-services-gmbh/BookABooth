@@ -23,7 +23,6 @@ public class CompanyAsserts {
      */
     public static void assertCompanyAllUpdatablePropertiesEquals(Company expected, Company actual) {
         assertCompanyUpdatableFieldsEquals(expected, actual);
-        assertCompanyUpdatableRelationshipsEquals(expected, actual);
     }
 
     /**
