@@ -2,7 +2,7 @@
   <b-navbar data-cy="navbar" toggleable="md" type="dark" class="jh-navbar">
     <b-navbar-brand class="logo" b-link to="/">
       <span class="logo-img"></span>
-      <span class="navbar-title">Bookabooth</span> <span class="navbar-version">{{ version }}</span>
+      <span class="navbar-title">BookABooth</span>
     </b-navbar-brand>
     <b-navbar-toggle
       right
@@ -184,7 +184,7 @@
 
 .logo-img {
   height: 100%;
-  background: url('/content/images/logo-jhipster.png') no-repeat center center;
+  background: url('/content/images/jhs-logo.png') no-repeat center center;
   background-size: contain;
   width: 100%;
   filter: drop-shadow(0 0 0.05rem white);
