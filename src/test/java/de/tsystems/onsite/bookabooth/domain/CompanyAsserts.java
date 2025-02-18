@@ -55,16 +55,4 @@ public class CompanyAsserts {
             .satisfies(e -> assertThat(e.getWaitingList()).as("check waitingList").isEqualTo(actual.getWaitingList()))
             .satisfies(e -> assertThat(e.getExhibitorList()).as("check exhibitorList").isEqualTo(actual.getExhibitorList()));
     }
-
-    /**
-     * Asserts that the entity has all the updatable relationships set.
-     *
-     * @param expected the expected entity
-     * @param actual the actual entity
-     */
-    public static void assertCompanyUpdatableRelationshipsEquals(Company expected, Company actual) {
-        assertThat(expected)
-            .as("Verify Company relationships")
-            .satisfies(e -> assertThat(e.getDepartments()).as("check departments").isEqualTo(actual.getDepartments()));
-    }
 }
