@@ -6,7 +6,7 @@
     <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}" />
   </head>
   <body>
-    <p>Sehr geehrte Damen und Herren,</p>
+    <p>Moin <span th:text="${user.login}">onsite</span>,</p>
     <p>
       Sie stehen für den diesjährigen Jade Karrieretag auf der Warteliste. Soeben sind wieder Stände zur Buchung frei geworden. Eine
       Reservierung kann über das <a th:with="url=(@{|${baseUrl}|})" th:href="${url}" th:text="${url}">Buchungssystem</a> erfolgen.
