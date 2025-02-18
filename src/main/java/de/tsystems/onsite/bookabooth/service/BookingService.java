@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -324,5 +325,18 @@ public class BookingService {
 
     private BigDecimal calculatePrice(BoothDTO booth) {
         return boothService.getPriceForBooth(booth.getId());
+    }
+
+    @Scheduled(cron = "0 0/1 * * * *") // every minute
+    public void removeBlockedBookings() {
+        ZonedDateTime threshold = ZonedDateTime.now().minusSeconds(applicationProperties.getBookingRemovalInterval());
+
+        List<Booking> bookings = bookingRepository
+            .findByStatus(BookingStatus.BLOCKED)
+            .stream()
+            .filter(b -> b.getReceived().isBefore(threshold))
+            .toList();
+
+        bookings.forEach(bookingRepository::delete);
     }
 }
