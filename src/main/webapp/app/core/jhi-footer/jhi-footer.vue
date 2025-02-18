@@ -1,6 +1,8 @@
 <template>
   <div id="footer" class="footer">
-    <p></p>
+    <p>Impressum</p>
+    <p>Datenschutzerklärung</p>
+    <p>Ausstellerinformation</p>
   </div>
 </template>
 
