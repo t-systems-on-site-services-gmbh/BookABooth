@@ -69,4 +69,14 @@ public class ApplicationProperties {
     public void setCancellationReimbursementUntil(Date cancellationReimbursementUntil) {
         this.cancellationReimbursementUntil = cancellationReimbursementUntil;
     }
+
+    private Long bookingRemovalInterval;
+
+    public Long getBookingRemovalInterval() {
+        return bookingRemovalInterval;
+    }
+
+    public void setBookingRemovalInterval(Long bookingRemovalInterval) {
+        this.bookingRemovalInterval = bookingRemovalInterval;
+    }
 }
