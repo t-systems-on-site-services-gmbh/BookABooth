@@ -218,55 +218,6 @@ public class UserService {
         return newBoothUser;
     }
 
-    @Deprecated
-    public User old_registerUser(AdminUserDTO userDTO, String password) {
-        userRepository
-            .findOneByLogin(userDTO.getLogin().toLowerCase())
-            .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
-                if (!removed) {
-                    throw new UsernameAlreadyUsedException();
-                }
-            });
-        userRepository
-            .findOneByEmailIgnoreCase(userDTO.getEmail())
-            .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
-                if (!removed) {
-                    throw new EmailAlreadyUsedException();
-                }
-            });
-        companyRepository
-            .findOneByNameIgnoreCase(userDTO.getCompanyName())
-            .ifPresent(c -> {
-                throw new CompanyAlreadyUsedException();
-            });
-
-        User newUser = new User();
-        String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setLogin(userDTO.getLogin().toLowerCase());
-        // new user gets initially a generated password
-        newUser.setPassword(encryptedPassword);
-        newUser.setFirstName(userDTO.getFirstName());
-        newUser.setLastName(userDTO.getLastName());
-        if (userDTO.getEmail() != null) {
-            newUser.setEmail(userDTO.getEmail().toLowerCase());
-        }
-        newUser.setImageUrl(userDTO.getImageUrl());
-        newUser.setLangKey(userDTO.getLangKey());
-        // new user is not active
-        newUser.setActivated(false);
-        // new user gets registration key
-        newUser.setActivationKey(RandomUtil.generateActivationKey());
-        Set<Authority> authorities = new HashSet<>();
-        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
-        newUser.setAuthorities(authorities);
-        userRepository.save(newUser);
-        this.clearUserCaches(newUser);
-        log.debug("Created Information for User: {}", newUser);
-        return newUser;
-    }
-
     private boolean removeNonActivatedUser(User existingUser) {
         if (existingUser.isActivated()) {
             return false;
@@ -510,27 +461,6 @@ public class UserService {
                 companyRepository.save(company);
                 return userProfileDTO;
             });
-    }
-
-    // Set the booking status to canceled (from prebooked or confirmed)
-    // TODO: we have cancel method in booking service, should we use that?
-    public void cancelBooking(UserProfileDTO userProfileDTO, Long bookingId) {
-        Optional<Booking> optionalBooking = bookingRepository
-            .findByCompanyIdOrderByReceivedDesc(userProfileDTO.getCompany().getId())
-            .stream()
-            .findFirst();
-        optionalBooking.ifPresent(booking -> {
-            if (booking.getId().equals(bookingId)) {
-                booking.setStatus(CANCELED);
-                bookingRepository.save(booking);
-            }
-        });
-        // Removes the user from the exhibitor list
-        Optional<Company> optionalCompany = companyRepository.findById(userProfileDTO.getCompany().getId());
-        optionalCompany.ifPresent(company -> {
-            company.setExhibitorList(false);
-            companyRepository.save(company);
-        });
     }
 
     // Checks the password of the current user
