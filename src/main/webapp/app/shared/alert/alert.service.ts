@@ -28,7 +28,6 @@ export default class AlertService {
   public showInfo(toastMessage: string, toastOptions?: any) {
     this.bvToast.toast(toastMessage, {
       toaster: 'b-toaster-top-center',
-      title: 'Info',
       variant: 'info',
       solid: true,
       autoHideDelay: 5000,
@@ -39,7 +38,6 @@ export default class AlertService {
   public showSuccess(toastMessage: string) {
     this.bvToast.toast(toastMessage, {
       toaster: 'b-toaster-top-center',
-      title: 'Success',
       variant: 'success',
       solid: true,
       autoHideDelay: 5000,
@@ -49,7 +47,6 @@ export default class AlertService {
   public showError(toastMessage: string) {
     this.bvToast.toast(toastMessage, {
       toaster: 'b-toaster-top-center',
-      title: 'Error',
       variant: 'danger',
       solid: true,
       autoHideDelay: 5000,
