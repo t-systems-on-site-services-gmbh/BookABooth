@@ -28,15 +28,6 @@
               </div>
               <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionProfile">
                 <div class="card-body">
-                  <!--- Unternehmenslogo Previewfenster -->
-                  <div class="form-group">
-                    <img
-                      v-if="settingsAccount.company?.logo"
-                      alt="Unternehmenslogo"
-                      :src="absoluteImageUrl"
-                      style="width: 150px; height: auto"
-                    />
-                  </div>
                   <!--- Name des Unternehmens -->
                   <div class="form-group">
                     <label class="form-control-label" for="company.name">Firmenname</label>
@@ -122,6 +113,18 @@
                       >
                     </div>
                   </div>
+                  <!--- Unternehmenslogo Previewfenster -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.logo">Unternehmenslogo</label>
+                    <br />
+                    <img
+                      v-if="settingsAccount.company?.logo"
+                      id="company.logo"
+                      alt="Unternehmenslogo"
+                      :src="absoluteImageUrl"
+                      style="width: 150px; height: auto"
+                    />
+                  </div>
                   <!--- Unternehmenslogo hochladen / aktualisieren -->
                   <div class="form-group">
                     <label class="form-control-label" for="company.logoUpload">
@@ -142,18 +145,6 @@
                       accept="image/*"
                       @change="logoUpload"
                     />
-                  </div>
-                  <!--- Checkbox, dass der User kein Logo hinzufügen will (aber trotzdem auf Ausstellerliste) -->
-                  <div class="form-group">
-                    <input
-                      type="checkbox"
-                      id="noLogo"
-                      name="noLogo"
-                      v-model="noLogoCheckbox"
-                      v-if="!company.logo"
-                      :disabled="!!settingsAccount.company.logo"
-                    />
-                    Kein Logo vorhanden
                   </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">
