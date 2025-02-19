@@ -1,8 +1,8 @@
 <template>
   <div id="footer" class="footer">
-    <p>Impressum</p>
-    <p>Datenschutzerklärung</p>
-    <p>Ausstellerinformation</p>
+    <a href="https://www.jade-hs.de/impressum/" target="_blank">Impressum</a> |
+    <a href="https://www.jade-hs.de/datenschutz/" target="_blank">Datenschutzerklärung</a> |
+    <a href="ausstellerinfo">Ausstellerinformationen</a>
   </div>
 </template>
 
