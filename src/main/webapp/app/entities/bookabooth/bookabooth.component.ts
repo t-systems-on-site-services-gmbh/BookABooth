@@ -11,11 +11,15 @@ import BookingService from '@/entities/booking/booking.service';
 import { type IBooking } from '@/shared/model/booking.model';
 import SystemService from '@/entities/system/system.service';
 import { type ISystem } from '@/shared/model/system.model';
+import Ausstellerinfo from '@/core/ausstellerinfo/ausstellerinfo.vue';
 import axios from 'axios';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Booth',
+  components: {
+    ausstellerinfo: Ausstellerinfo,
+  },
   setup() {
     const systemService = inject('systemService', () => new SystemService());
     const boothService = inject('boothService', () => new BoothService());
@@ -185,6 +189,12 @@ export default defineComponent({
         .catch(error => {
           console.log(error);
         });
+    },
+    showInfoModal() {
+      this.$refs['ausstellerinfo-modal'].show();
+    },
+    hideInfoModal() {
+      this.$refs['ausstellerinfo-modal'].hide();
     },
     showConfirmationModal() {
       this.$refs['confirmation-modal'].show();
