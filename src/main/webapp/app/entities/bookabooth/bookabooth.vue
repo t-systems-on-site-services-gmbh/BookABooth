@@ -101,13 +101,21 @@
         Es fallen Stornogebühren in Höhe von {{ 100 - system.cancellationReimbursement }}% des Buchungspreises an. Bei einer Stornierung
         nach dem {{ formatDate(system.cancellationReimbursementUntil) }} wird der gesamte Betrag fällig.
       </p>
-      <p>Bei Bestätigung der Buchung erkennen Sie die <a href="#todo">Ausstellerbedingungen</a> an.</p>
+      <p>Bei Bestätigung der Buchung erkennen Sie die <b-link @click="showInfoModal()">Ausstellerbedingungen</b-link> an.</p>
     </div>
     <div class="d-flex justify-content-end">
       <b-button class="btn btn-secondary" @click="abortBooking(currentBooking.id)">Abbrechen</b-button>
       <b-button type="submit" class="btn btn-success ml-3" id="confirmBooking" @click="confirmBooking(currentBooking.id)">
         Buchung bestätigen
       </b-button>
+    </div>
+  </b-modal>
+  <b-modal size="xl" ref="ausstellerinfo-modal" hide-footer title="Ausstellerbedingungen">
+    <div class="d-block text-left">
+      <ausstellerinfo></ausstellerinfo>
+    </div>
+    <div class="d-flex justify-content-end">
+      <b-button type="submit" class="btn btn-success ml-3" id="confirmInfo" @click="hideInfoModal()"> Ok </b-button>
     </div>
   </b-modal>
 </template>
