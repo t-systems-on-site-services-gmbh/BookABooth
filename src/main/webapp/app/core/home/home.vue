@@ -207,7 +207,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import '.\\src\\main\\webapp\\content\\scss\\_bootstrap-variables.scss';
+@import '/content/scss/_bootstrap-variables.scss';
 .logo {
   max-width: 100%;
   height: auto;
