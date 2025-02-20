@@ -18,7 +18,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Company implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
@@ -30,11 +30,11 @@ public class Company implements Serializable {
     @Column(name = "name", length = 200)
     private String name;
 
-    @Column(name = "mail")
-    private String mail;
-
     @Column(name = "billing_address")
     private String billingAddress;
+
+    @Column(name = "comment", length = 1024)
+    private String comment;
 
     @Column(name = "logo")
     private String logo;
@@ -81,19 +81,6 @@ public class Company implements Serializable {
         this.name = name;
     }
 
-    public String getMail() {
-        return this.mail;
-    }
-
-    public Company mail(String mail) {
-        this.setMail(mail);
-        return this;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
     public String getBillingAddress() {
         return this.billingAddress;
     }
@@ -105,6 +92,14 @@ public class Company implements Serializable {
 
     public void setBillingAddress(String billingAddress) {
         this.billingAddress = billingAddress;
+    }
+
+    public String getComment() {
+        return this.comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public String getLogo() {
@@ -215,8 +210,8 @@ public class Company implements Serializable {
         return "Company{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", mail='" + getMail() + "'" +
             ", billingAddress='" + getBillingAddress() + "'" +
+            ", comment='" + getComment() + "'" +
             ", logo='" + getLogo() + "'" +
             ", description='" + getDescription() + "'" +
             ", waitingList='" + getWaitingList() + "'" +

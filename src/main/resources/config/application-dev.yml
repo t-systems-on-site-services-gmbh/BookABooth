@@ -94,7 +94,7 @@ jhipster:
       # security key (this key should be unique for your application, and kept secret)
       key: c4544d3906ab71deb726a5407633728910c89ea1829c12a8fe1dd9c601da74effc786a906e63141ada7bb64d90cee466b5a3
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: http://127.0.0.1:8080
+    base-url: http://127.0.0.1:9000
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration

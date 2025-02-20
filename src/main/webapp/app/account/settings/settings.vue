@@ -113,6 +113,30 @@
                       >
                     </div>
                   </div>
+                  <!-- Bemerkung -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.comment"> Bemerkung, wird für Rechnung übernommen </label>
+                    <textarea
+                      id="company.comment"
+                      name="company.comment"
+                      class="form-control"
+                      placeholder="Bemerkung"
+                      :class="{
+                        valid: !v$.settingsAccount.company.bemerkung.$invalid,
+                        invalid: v$.settingsAccount.company.bemerkung.$invalid,
+                      }"
+                      v-model="v$.settingsAccount.company.bemerkung.$model"
+                      minlength="0"
+                      maxlength="1024"
+                      data-cy="company.bemerkung"
+                    >
+                    </textarea>
+                    <div v-if="v$.settingsAccount.company.bemerkung.$invalid">
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.bemerkung.maxLength">
+                        Die Bemerkung darf nicht länger als 1024 Zeichen sein.
+                      </small>
+                    </div>
+                  </div>
                   <!--- Unternehmenslogo Previewfenster -->
                   <div class="form-group">
                     <label class="form-control-label" for="company.logo">Unternehmenslogo</label>
