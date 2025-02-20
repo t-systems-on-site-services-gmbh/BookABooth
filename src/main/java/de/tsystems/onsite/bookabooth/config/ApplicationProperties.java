@@ -79,13 +79,13 @@ public class ApplicationProperties {
         this.bookingRemovalInterval = bookingRemovalInterval;
     }
 
-    private Long passwordResetValidity;
+    private Long passwordResetTokenValidity;
 
-    public Long getPasswordResetValidity() {
-        return passwordResetValidity;
+    public Long getPasswordResetTokenValidity() {
+        return passwordResetTokenValidity;
     }
 
-    public void setPasswordResetValidity(Long passwordResetValidity) {
-        this.passwordResetValidity = passwordResetValidity;
+    public void setPasswordResetTokenValidity(Long passwordResetTokenValidity) {
+        this.passwordResetTokenValidity = passwordResetTokenValidity;
     }
 }
