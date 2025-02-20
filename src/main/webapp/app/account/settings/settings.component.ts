@@ -41,7 +41,6 @@ export default defineComponent({
     const componentKey = ref(new Date().getTime());
     const adminCount = ref<number>(0);
     const onlyOneAdmin = ref<boolean>(true);
-    const noLogoCheckbox = ref<boolean>(false);
 
     const isAdmin = computed(() => {
       if (authorities.value && Array.isArray(authorities.value)) {
@@ -64,13 +63,6 @@ export default defineComponent({
       }
     };
 
-    // Setzt die "kein Logo"-Checkbox neu, wenn der User die Seite verlässt
-    const checkNoLogo = () => {
-      if (exhibitorList.value === true && (settingsAccount.value.company.logo === null || settingsAccount.value.company.logo === '')) {
-        noLogoCheckbox.value = true;
-      }
-    };
-
     const retrieveSystem = async () => {
       try {
         const res = await systemService().retrieve();
@@ -82,7 +74,6 @@ export default defineComponent({
 
     onMounted(() => {
       fetchAdminCount();
-      checkNoLogo();
       retrieveSystem();
     });
 
@@ -101,6 +92,9 @@ export default defineComponent({
           },
           description: {
             maxLength: maxLength(254),
+          },
+          comment: {
+            maxLength: maxLength(1024),
           },
           logoUpload: {},
           exhibitorList: {},
@@ -157,7 +151,6 @@ export default defineComponent({
       componentKey,
       adminCount,
       onlyOneAdmin,
-      noLogoCheckbox,
       system,
     };
   },
@@ -219,7 +212,6 @@ export default defineComponent({
                 autoHideDelay: 5000,
               });
               this.settingsAccount.company.logo = param.logo;
-              this.noLogoCheckbox = false;
               this.forceRender();
             })
             .catch(error => {

@@ -19,6 +19,8 @@ public class CompanyDTO implements Serializable {
 
     private String mail;
 
+    private String comment;
+
     private String billingAddress;
 
     private String logo;
@@ -51,6 +53,14 @@ public class CompanyDTO implements Serializable {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public String getBillingAddress() {
@@ -120,8 +130,8 @@ public class CompanyDTO implements Serializable {
         return "CompanyDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", mail='" + getMail() + "'" +
             ", billingAddress='" + getBillingAddress() + "'" +
+            ", comment='" + getComment() + "'" +
             ", logo='" + getLogo() + "'" +
             ", description='" + getDescription() + "'" +
             ", waitingList='" + getWaitingList() + "'" +
