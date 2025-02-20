@@ -7,7 +7,7 @@
         <div class="alert alert-danger" v-if="keyMissing">Der Schlüssel zum Zurücksetzen fehlt.</div>
 
         <div class="alert alert-danger" v-if="error">
-          <p>Ihr Passwort konnte nicht zurückgesetzt werden. Zur Erinnerung, Ihre Anfrage ist nur 24 Stunden gültig.</p>
+          <p>Ihr Passwort konnte nicht zurückgesetzt werden. Die Zeit wurde überschritten.</p>
         </div>
 
         <div class="alert alert-success" v-if="success">
