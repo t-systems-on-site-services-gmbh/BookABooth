@@ -579,7 +579,7 @@ public class UserService {
         List<User> updateUsers = new ArrayList<>();
         Instant now = Instant.now();
         userRepository
-            .findAllByResetDateBefore(now.minus(applicationProperties.getPasswordResetValidity(), ChronoUnit.HOURS))
+            .findAllByResetDateBefore(now.minus(applicationProperties.getPasswordResetTokenValidity(), ChronoUnit.HOURS))
             .forEach(user -> {
                 log.debug("Delete reset_key {} and reset_date {} for user {}", user.getResetKey(), user.getResetDate(), user.getEmail());
                 user.setResetDate(null);
