@@ -1,8 +1,8 @@
 package de.tsystems.onsite.bookabooth.service;
 
-import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CANCELED;
 import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CONFIRMED;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.*;
 import de.tsystems.onsite.bookabooth.domain.Authority;
@@ -81,6 +81,8 @@ public class UserService {
 
     private final Validator validator;
 
+    private final ApplicationProperties applicationProperties;
+
     public UserService(
         CompanyService companyService,
         UserRepository userRepository,
@@ -95,7 +97,8 @@ public class UserService {
         PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager,
-        Validator validator
+        Validator validator,
+        ApplicationProperties applicationProperties
     ) {
         this.companyService = companyService;
         this.companyRepository = companyRepository;
@@ -111,6 +114,7 @@ public class UserService {
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
         this.validator = validator;
+        this.applicationProperties = applicationProperties;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -562,6 +566,27 @@ public class UserService {
                 phoneNumber
             );
         }
+    }
+
+    /**
+     * Reset Token are used for providing the user with a way to reset their password.
+     * reset token should be automatically deleted after specific time
+     * <p>
+     * This is scheduled to get fired every minute
+     */
+    @Scheduled(cron = "0 0/1 * * * *") // every minute
+    public void removeResetKeys() {
+        List<User> updateUsers = new ArrayList<>();
+        Instant now = Instant.now();
+        userRepository
+            .findAllByResetDateBefore(now.minus(applicationProperties.getPasswordResetValidity(), ChronoUnit.HOURS))
+            .forEach(user -> {
+                log.debug("Delete reset_key {} and reset_date {} for user {}", user.getResetKey(), user.getResetDate(), user.getEmail());
+                user.setResetDate(null);
+                user.setResetKey(null);
+                updateUsers.add(user);
+            });
+        userRepository.saveAll(updateUsers);
     }
 
     /**

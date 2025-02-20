@@ -35,4 +35,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
 
     long countByAuthoritiesName(String authorityName);
+
+    List<User> findAllByResetDateBefore(Instant minus);
 }
