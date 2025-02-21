@@ -25,7 +25,6 @@
             <th scope="row"><span>Telefonnummer</span></th>
             <th scope="row"><span>Kurzbeschreibung</span></th>
             <th scope="row"><span>Stand</span></th>
-            <th scope="row"></th>
           </tr>
         </thead>
         <tbody>
