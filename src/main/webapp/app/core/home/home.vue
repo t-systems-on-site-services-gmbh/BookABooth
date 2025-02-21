@@ -8,11 +8,12 @@
       </div>
     </div>
     <div class="col-md-9">
-      <h1 class="display-4">Willkommen!</h1>
-      <p class="lead">Hier können Sie Ihren Stand für den Karrieretag buchen.</p>
       <div class="alert alert-success width-on-pc" v-if="authenticated">
         <span v-if="username">Sie sind als Benutzer "{{ username }}" angemeldet.</span>
       </div>
+      <h1 class="display-4">Willkommen!</h1>
+      <adminDashboard v-if="hasAnyAuthority('ROLE_ADMIN') && authenticated"></adminDashboard>
+      <p v-if="!hasAnyAuthority('ROLE_ADMIN')" class="lead">Hier können Sie Ihren Stand für den Karrieretag buchen.</p>
       <div v-if="!authenticated">
         <div>
           Der Jade Karrieretag steht wieder an und wie jedes Jahr können Sie die Gelegenheit nutzen, Aussteller auf unserem Karrieremarkt zu
