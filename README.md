@@ -54,6 +54,8 @@ In the project root, JHipster generates configuration files for tools like git, 
 
 ## Development
 
+### NPM / package.json
+
 Before you can build this project, you must install and configure the following dependencies on your machine:
 
 1. [Node.js](https://nodejs.org/): We use Node to run a development web server and build the project.
@@ -65,6 +67,21 @@ You will only need to run this command when dependencies change in [package.json
 ```
 npm install
 ```
+
+**Note**
+
+When you update a package version in package.json, you should also update the package-lock.json file. However, this is typically an automatic step handled by npm. Here's what you need to know:
+
+- Update package.json: Manually change the version of the module in package.json.
+- **_Run npm install:_** After updating package.json, run npm install in your project directory. This command will:
+  - Install the new version of the package
+  - Automatically update package-lock.json to reflect the changes14
+- **_Automatic update:_** The package-lock.json file is automatically generated and updated by npm for any operations that modify the node_modules tree or package.json2.
+- **_Consistency:_** This process ensures that the package-lock.json file accurately represents the current state of your project's dependencies, maintaining consistency across different environments14.
+- **_Commit both files:_** After updating, commit both package.json and package-lock.json to your version control system to ensure all team members have the same dependency versions4.
+- **_Remember:_** manually editing package-lock.json is not recommended. Always let npm handle its updates to avoid inconsistencies and potential issues with your project's dependency tree.
+
+### Start
 
 We use npm scripts and [Webpack][] as our build system.
 
