@@ -7,9 +7,13 @@ import { type ISystem } from '@/shared/model/system.model';
 import axios from 'axios';
 import { useStore } from '@/store';
 import { useRouter } from 'vue-router';
+import AdminDashboard from '@/admin/dashboard/admin-dashboard.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
+  components: {
+    adminDashboard: AdminDashboard,
+  },
   setup() {
     const store = useStore();
     const systemService = inject('systemService', () => new SystemService());
