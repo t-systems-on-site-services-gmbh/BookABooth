@@ -18,6 +18,10 @@ public class LocationDTO implements Serializable {
     @Size(max = 200)
     private String imageUrl;
 
+    private int amount;
+
+    private int booked;
+
     public Long getId() {
         return id;
     }
@@ -40,6 +44,22 @@ public class LocationDTO implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public int getBooked() {
+        return booked;
+    }
+
+    public void setBooked(int booked) {
+        this.booked = booked;
     }
 
     @Override
@@ -70,6 +90,8 @@ public class LocationDTO implements Serializable {
             "id=" + getId() +
             ", location='" + getLocation() + "'" +
             ", imageUrl='" + getImageUrl() + "'" +
+            ", amount='" + getAmount() + "'" +
+            ", booked='" + getBooked() + "'" +
             "}";
     }
 }
