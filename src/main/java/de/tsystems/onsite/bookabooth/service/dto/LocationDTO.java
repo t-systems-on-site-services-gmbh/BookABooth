@@ -18,9 +18,9 @@ public class LocationDTO implements Serializable {
     @Size(max = 200)
     private String imageUrl;
 
-    private int amount;
+    private Long amount;
 
-    private int booked;
+    private Long booked;
 
     public Long getId() {
         return id;
@@ -46,19 +46,19 @@ public class LocationDTO implements Serializable {
         this.imageUrl = imageUrl;
     }
 
-    public int getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 
-    public int getBooked() {
+    public Long getBooked() {
         return booked;
     }
 
-    public void setBooked(int booked) {
+    public void setBooked(Long booked) {
         this.booked = booked;
     }
 
