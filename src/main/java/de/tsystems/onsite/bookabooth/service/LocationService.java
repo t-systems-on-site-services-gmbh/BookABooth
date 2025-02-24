@@ -4,10 +4,8 @@ import de.tsystems.onsite.bookabooth.domain.Location;
 import de.tsystems.onsite.bookabooth.repository.LocationRepository;
 import de.tsystems.onsite.bookabooth.service.dto.LocationDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.LocationMapper;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -86,12 +84,18 @@ public class LocationService {
     public List<LocationDTO> findAll() {
         log.debug("Request to get all Locations");
         return locationRepository
-            .findAll()
+            .findAllEnriched()
             .stream()
-            .map(m -> {
-                return enrichDto(locationMapper.toDto(m));
+            .map(o -> {
+                LocationDTO dto = new LocationDTO();
+                dto.setId((Long) o[0]);
+                dto.setLocation((String) o[1]);
+                dto.setImageUrl((String) o[2]);
+                dto.setAmount((Long) o[3]);
+                dto.setBooked((Long) o[4]);
+                return dto;
             })
-            .collect(Collectors.toCollection(LinkedList::new));
+            .toList();
     }
 
     /**
@@ -114,9 +118,5 @@ public class LocationService {
     public void delete(Long id) {
         log.debug("Request to delete Location : {}", id);
         locationRepository.deleteById(id);
-    }
-
-    private LocationDTO enrichDto(LocationDTO dto) {
-        return dto;
     }
 }
