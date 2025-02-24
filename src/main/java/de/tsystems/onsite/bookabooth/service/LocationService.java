@@ -85,7 +85,13 @@ public class LocationService {
     @Transactional(readOnly = true)
     public List<LocationDTO> findAll() {
         log.debug("Request to get all Locations");
-        return locationRepository.findAll().stream().map(locationMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return locationRepository
+            .findAll()
+            .stream()
+            .map(m -> {
+                return enrichDto(locationMapper.toDto(m));
+            })
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     /**
@@ -108,5 +114,9 @@ public class LocationService {
     public void delete(Long id) {
         log.debug("Request to delete Location : {}", id);
         locationRepository.deleteById(id);
+    }
+
+    private LocationDTO enrichDto(LocationDTO dto) {
+        return dto;
     }
 }
