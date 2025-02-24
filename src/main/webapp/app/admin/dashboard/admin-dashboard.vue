@@ -1,29 +1,34 @@
 <template>
   <div class="table-responsive">
-    <b-progress :max="max" height="2rem">
-      <b-progress-bar :value="value">
-        <span
-          >Zelt 1: <strong>{{ value.toFixed(2) }} / {{ max }}</strong></span
-        >
-      </b-progress-bar>
-    </b-progress>
-    <b-progress :max="max" height="2rem">
-      <b-progress-bar :value="value">
-        <span
-          >Zelt 2: <strong>{{ value.toFixed(2) }} / {{ max }}</strong></span
-        >
-      </b-progress-bar>
-    </b-progress>
-    <b-progress :max="max" height="2rem">
-      <b-progress-bar :value="value">
-        <span
-          >Aula: <strong>{{ value.toFixed(2) }} / {{ max }}</strong></span
+    <b-progress
+      v-for="location in locations"
+      :key="location.id"
+      :max="location.amount"
+      height="2rem"
+      :striped="true"
+      class="border border-primary mb-2"
+    >
+      <b-progress-bar :value="location.booked">
+        <span class="p-4"
+          >{{ location.location }}: <strong>{{ location.booked }} / {{ location.amount }}</strong></span
         >
       </b-progress-bar>
     </b-progress>
 
-    <div>
-      <b-table striped hover :items="items"></b-table>
+    <div class="table-responsive">
+      <table class="table table-striped" aria-describedby="booths">
+        <thead>
+          <tr>
+            <th scope="row"><span>Firma</span></th>
+            <th scope="row"><span>Rechnungsanschrift</span></th>
+            <th scope="row"><span>Logo</span></th>
+            <th scope="row"><span>Telefonnummer</span></th>
+            <th scope="row"><span>Kurzbeschreibung</span></th>
+            <th scope="row"><span>Stand</span></th>
+            <th scope="row"></th>
+          </tr>
+        </thead>
+      </table>
     </div>
   </div>
 
