@@ -207,4 +207,8 @@ public class BoothUser implements Serializable {
             ", disabled='" + getDisabled() + "'" +
             "}";
     }
+
+    public boolean isAdmin() {
+        return this.user.getAuthorities().stream().anyMatch(authority -> authority.getName().equals("ROLE_ADMIN"));
+    }
 }
