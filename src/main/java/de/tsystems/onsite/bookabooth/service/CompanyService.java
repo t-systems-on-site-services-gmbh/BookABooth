@@ -1,7 +1,10 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.dto.AdminChecklistDTO;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
@@ -30,11 +33,18 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
     private final BoothUserService boothUserService;
+    private final BookingRepository bookingRepository;
 
-    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper, BoothUserService boothUserService) {
+    public CompanyService(
+        CompanyRepository companyRepository,
+        CompanyMapper companyMapper,
+        BoothUserService boothUserService,
+        BookingRepository bookingRepository
+    ) {
         this.companyRepository = companyRepository;
         this.companyMapper = companyMapper;
         this.boothUserService = boothUserService;
+        this.bookingRepository = bookingRepository;
     }
 
     /**
@@ -131,29 +141,43 @@ public class CompanyService {
     public List<AdminChecklistDTO> getAdminChecklist(List<Company> companies) {
         List<BoothUser> users = boothUserService.getAllUsers().stream().filter(user -> !user.isAdmin()).collect(Collectors.toList());
 
-        // map user.company.id to User
-        Map<Long, BoothUser> companyUserMap = users.stream().collect(Collectors.toMap(user -> user.getCompany().getId(), user -> user));
+        // map company.id to User
+        Map<Long, BoothUser> usersMap = users.stream().collect(Collectors.toMap(user -> user.getCompany().getId(), user -> user));
+        // map company.id to Booking
+        Map<Long, Booking> bookingsMap = bookingRepository
+            .findByStatus(BookingStatus.CONFIRMED)
+            .stream()
+            .collect(Collectors.toMap(b -> b.getCompany().getId(), booking -> booking));
 
         List<AdminChecklistDTO> checklist = new ArrayList<>();
         for (Company company : companies) {
             AdminChecklistDTO cl = new AdminChecklistDTO();
             cl.setCompanyName(company.getName());
 
-            // TODO: set Location+Booth when booking exists
-            cl.setBooth("Zelt-21");
+            if (bookingsMap.containsKey(company.getId())) {
+                String location = Optional.ofNullable(bookingsMap.get(company.getId()))
+                    .map(booking -> booking.getBooth())
+                    .map(booth -> booth.getLocation())
+                    .map(l -> l.getLocation())
+                    .orElse("Location fehlt");
+                String booth = Optional.ofNullable(bookingsMap.get(company.getId()))
+                    .map(booking -> booking.getBooth())
+                    .map(b -> b.getTitle())
+                    .orElse("Booth fehlt");
+                cl.setBooth(String.format("%s-%s", location, booth));
+            }
 
-            if (!company.getBillingAddress().isBlank()) {
-                cl.setAddress(true);
+            cl.setAddress(company.getBillingAddress() != null && !company.getBillingAddress().isBlank() ? true : false);
+            cl.setLogo(company.getLogo() != null && !company.getLogo().isBlank() ? true : false);
+
+            if (usersMap.containsKey(company.getId())) {
+                cl.setPhoneNumber(
+                    usersMap.get(company.getId()).getPhone() != null && !usersMap.get(company.getId()).getPhone().isBlank() ? true : false
+                );
             }
-            if (!company.getLogo().isBlank()) {
-                cl.setLogo(true);
-            }
-            if (companyUserMap.containsKey(company.getId()) && !companyUserMap.get(company.getId()).getPhone().isBlank()) {
-                cl.setPhoneNumber(true);
-            }
-            if (!company.getDescription().isBlank()) {
-                cl.setCompanyDescription(true);
-            }
+
+            cl.setCompanyDescription(company.getDescription() != null && !company.getDescription().isBlank() ? true : false);
+
             checklist.add(cl);
         }
 
