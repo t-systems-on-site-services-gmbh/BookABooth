@@ -131,4 +131,9 @@ public class BoothUserService {
             .map(boothUserMapper::toDto)
             .orElseThrow(() -> new BadRequestException("BoothUser not found for user: " + login));
     }
+
+    @Transactional(readOnly = true)
+    public List<BoothUser> getAllUsers() {
+        return boothUserRepository.findAll();
+    }
 }

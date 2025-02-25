@@ -1,12 +1,16 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
+import de.tsystems.onsite.bookabooth.service.dto.AdminChecklistDTO;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserProfileDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -25,10 +29,12 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
+    private final BoothUserService boothUserService;
 
-    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
+    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper, BoothUserService boothUserService) {
         this.companyRepository = companyRepository;
         this.companyMapper = companyMapper;
+        this.boothUserService = boothUserService;
     }
 
     /**
@@ -120,5 +126,36 @@ public class CompanyService {
                 companyRepository.save(company);
                 return userProfileDTO;
             });
+    }
+
+    public List<AdminChecklistDTO> getAdminChecklist(List<Company> companies) {
+        List<BoothUser> users = boothUserService.getAllUsers();
+        // map user.company.id to User
+        Map<Long, BoothUser> companyUserMap = users.stream().collect(Collectors.toMap(user -> user.getCompany().getId(), user -> user));
+
+        List<AdminChecklistDTO> checklist = new ArrayList<>();
+        for (Company company : companies) {
+            AdminChecklistDTO cl = new AdminChecklistDTO();
+            cl.setCompanyName(company.getName());
+
+            // TODO: set Location+Booth when booking exists
+            cl.setBooth("Zelt-21");
+
+            if (!company.getBillingAddress().isBlank()) {
+                cl.setAddress(true);
+            }
+            if (!company.getLogo().isBlank()) {
+                cl.setLogo(true);
+            }
+            if (companyUserMap.containsKey(company.getId()) && !companyUserMap.get(company.getId()).getPhone().isBlank()) {
+                cl.setPhoneNumber(true);
+            }
+            if (!company.getDescription().isBlank()) {
+                cl.setCompanyDescription(true);
+            }
+            checklist.add(cl);
+        }
+
+        return checklist;
     }
 }
