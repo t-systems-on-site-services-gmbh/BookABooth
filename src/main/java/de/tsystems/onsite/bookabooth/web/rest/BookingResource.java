@@ -7,6 +7,7 @@ import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.BookingService;
 import de.tsystems.onsite.bookabooth.service.BoothService;
 import de.tsystems.onsite.bookabooth.service.BoothUserService;
+import de.tsystems.onsite.bookabooth.service.ExcelService;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
@@ -22,8 +23,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -54,18 +55,22 @@ public class BookingResource {
 
     private final CompanyMapper companyMapper;
 
+    private final ExcelService excelService;
+
     public BookingResource(
         BookingService bookingService,
         BookingRepository bookingRepository,
         BoothService boothService,
         BoothUserService boothUserService,
-        CompanyMapper companyMapper
+        CompanyMapper companyMapper,
+        ExcelService excelService
     ) {
         this.bookingService = bookingService;
         this.bookingRepository = bookingRepository;
         this.boothService = boothService;
         this.boothUserService = boothUserService;
         this.companyMapper = companyMapper;
+        this.excelService = excelService;
     }
 
     /**
@@ -277,5 +282,19 @@ public class BookingResource {
             bookingService.isOwner(bookingId, boothUserService.getCurrentBoothUser(authentication)) ||
             SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN")
         );
+    }
+
+    @GetMapping("/downloadexcel")
+    public HttpEntity<ByteArrayResource> generateExcel() {
+        try {
+            List<Booking> BookingsList = bookingRepository.findByStatus(BookingStatus.CONFIRMED);
+            byte[] excelContent = excelService.generateExcel(BookingsList);
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(new MediaType("application", "force-download"));
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report.xlsx");
+            return new HttpEntity<>(new ByteArrayResource(excelContent), header);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
