@@ -31,10 +31,22 @@
         <tbody>
           <tr v-for="checklist in checklists" :key="checklist.id" data-cy="entityTable">
             <td>{{ checklist.companyName }}</td>
-            <td>{{ checklist.address }}</td>
-            <td>{{ checklist.logo }}</td>
-            <td>{{ checklist.phoneNumber }}</td>
-            <td>{{ checklist.companyDescription }}</td>
+            <td
+              :class="{ 'list-group-item-success': checklist.address, 'list-group-item-danger': !checklist.address }"
+              v-text="checklist.address ? 'Ja' : 'Nein'"
+            ></td>
+            <td
+              :class="{ 'list-group-item-success': checklist.logo, 'list-group-item-danger': !checklist.logo }"
+              v-text="checklist.logo ? 'Ja' : 'Nein'"
+            ></td>
+            <td
+              :class="{ 'list-group-item-success': checklist.phoneNumber, 'list-group-item-danger': !checklist.phoneNumber }"
+              v-text="checklist.phoneNumber ? 'Ja' : 'Nein'"
+            ></td>
+            <td
+              :class="{ 'list-group-item-success': checklist.companyDescription, 'list-group-item-danger': !checklist.companyDescription }"
+              v-text="checklist.companyDescription ? 'Ja' : 'Nein'"
+            ></td>
             <td>{{ checklist.booth }}</td>
           </tr>
         </tbody>
