@@ -47,7 +47,7 @@ public class AdminDashboardResource {
         adminChecklistDTO2.setPhoneNumber(true);
         adminChecklistDTO2.setCompanyDescription(true);
         adminChecklistDTO2.setBooth("Booth");
-        adminChecklist.add(adminChecklistDTO);
+        adminChecklist.add(adminChecklistDTO2);
 
         return adminChecklist;
     }
