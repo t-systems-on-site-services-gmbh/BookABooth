@@ -28,6 +28,16 @@
             <th scope="row"></th>
           </tr>
         </thead>
+        <tbody>
+          <tr v-for="checklist in checklists" :key="checklist.id" data-cy="entityTable">
+            <td>{{ checklist.companyName }}</td>
+            <td>{{ checklist.address }}</td>
+            <td>{{ checklist.logo }}</td>
+            <td>{{ checklist.phoneNumber }}</td>
+            <td>{{ checklist.companyDescription }}</td>
+            <td>{{ checklist.booth }}</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
