@@ -129,7 +129,8 @@ public class CompanyService {
     }
 
     public List<AdminChecklistDTO> getAdminChecklist(List<Company> companies) {
-        List<BoothUser> users = boothUserService.getAllUsers();
+        List<BoothUser> users = boothUserService.getAllUsers().stream().filter(user -> !user.isAdmin()).collect(Collectors.toList());
+
         // map user.company.id to User
         Map<Long, BoothUser> companyUserMap = users.stream().collect(Collectors.toMap(user -> user.getCompany().getId(), user -> user));
 
