@@ -36,15 +36,15 @@
               v-text="checklist.address ? 'Ja' : 'Nein'"
             ></td>
             <td
-              :class="{ 'list-group-item-success': checklist.logo, 'list-group-item-danger': !checklist.logo }"
+              :class="{ 'list-group-item-success': checklist.logo, 'list-group-item-warning': !checklist.logo }"
               v-text="checklist.logo ? 'Ja' : 'Nein'"
             ></td>
             <td
-              :class="{ 'list-group-item-success': checklist.phoneNumber, 'list-group-item-danger': !checklist.phoneNumber }"
+              :class="{ 'list-group-item-success': checklist.phoneNumber, 'list-group-item-warning': !checklist.phoneNumber }"
               v-text="checklist.phoneNumber ? 'Ja' : 'Nein'"
             ></td>
             <td
-              :class="{ 'list-group-item-success': checklist.companyDescription, 'list-group-item-danger': !checklist.companyDescription }"
+              :class="{ 'list-group-item-success': checklist.companyDescription, 'list-group-item-warning': !checklist.companyDescription }"
               v-text="checklist.companyDescription ? 'Ja' : 'Nein'"
             ></td>
             <td>{{ checklist.booth }}</td>
