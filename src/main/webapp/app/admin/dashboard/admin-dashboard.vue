@@ -1,5 +1,6 @@
 <template>
   <div class="table-responsive">
+    <Button class="btn btn-primary" @click="downloadExcel">Rechnungsdaten</Button>
     <b-progress
       v-for="location in locations"
       :key="location.id"
@@ -52,8 +53,6 @@
       </table>
     </div>
   </div>
-
-  <button class="btn btn-primary">Rechnungsdaten</button>
 </template>
 
 <script lang="ts" src="./admin-dashboard.component.ts"></script>
