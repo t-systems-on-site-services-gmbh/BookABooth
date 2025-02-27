@@ -4,7 +4,9 @@ import de.tsystems.onsite.bookabooth.domain.Company;
 import de.tsystems.onsite.bookabooth.repository.CompanyRepository;
 import de.tsystems.onsite.bookabooth.service.CompanyService;
 import de.tsystems.onsite.bookabooth.service.dto.AdminChecklistDTO;
+import de.tsystems.onsite.bookabooth.service.dto.AdminDashboardDTO;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,5 +51,13 @@ public class AdminDashboardResource {
         });
 
         return adminChecklist;
+    }
+
+    @GetMapping("/data")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public AdminDashboardDTO getAdminDashboardData() {
+        log.debug("REST request to get admin dashboard data");
+        AdminDashboardDTO data = new AdminDashboardDTO();
+        return data;
     }
 }

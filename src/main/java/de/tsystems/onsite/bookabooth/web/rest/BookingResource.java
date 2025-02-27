@@ -16,7 +16,9 @@ import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -287,7 +289,21 @@ public class BookingResource {
     @GetMapping("/downloadexcel")
     public HttpEntity<ByteArrayResource> generateExcel() {
         try {
-            List<Booking> BookingsList = bookingRepository.findByStatus(BookingStatus.CONFIRMED);
+            BigDecimal zero = new BigDecimal(0);
+            List<Booking> BookingsList = bookingRepository
+                .findByStatusIn(Arrays.asList(BookingStatus.CONFIRMED, BookingStatus.CANCELED))
+                .stream()
+                .filter(booking -> {
+                    if (booking.getPrice() != null && booking.getPrice().compareTo(zero) > 0) {
+                        return true;
+                    }
+                    if (booking.getCancellationFee() != null && booking.getCancellationFee().compareTo(zero) > 0) {
+                        return true;
+                    }
+                    return false;
+                })
+                .toList();
+
             byte[] excelContent = excelService.generateExcel(BookingsList);
             HttpHeaders header = new HttpHeaders();
             header.setContentType(new MediaType("application", "force-download"));
