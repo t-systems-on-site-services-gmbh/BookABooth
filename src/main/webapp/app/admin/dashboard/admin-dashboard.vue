@@ -53,7 +53,7 @@
     </div>
   </div>
 
-  <Button class="btn btn-primary">Rechnungsdaten</Button>
+  <button class="btn btn-primary">Rechnungsdaten</button>
 </template>
 
 <script lang="ts" src="./admin-dashboard.component.ts"></script>
