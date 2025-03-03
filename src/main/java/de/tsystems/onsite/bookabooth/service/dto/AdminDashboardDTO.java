@@ -5,10 +5,25 @@ import java.util.List;
 
 public class AdminDashboardDTO {
 
-    private List<String> uncompletedProfiles = new ArrayList<>();
-    private List<String> companyAddresses = new ArrayList<>();
+    List<AdminChecklistDTO> checklist = new ArrayList<>();
+    List<String> companies = new ArrayList<>(); // all mail addresses
+    List<String> uncompletedProfiles = new ArrayList<>(); // mail addresses from companies with uncompleted profiles
 
-    public AdminDashboardDTO() {}
+    public List<AdminChecklistDTO> getChecklist() {
+        return checklist;
+    }
+
+    public void setChecklist(List<AdminChecklistDTO> checklist) {
+        this.checklist = checklist;
+    }
+
+    public List<String> getCompanies() {
+        return companies;
+    }
+
+    public void setCompanies(List<String> companies) {
+        this.companies = companies;
+    }
 
     public List<String> getUncompletedProfiles() {
         return uncompletedProfiles;
@@ -18,11 +33,5 @@ public class AdminDashboardDTO {
         this.uncompletedProfiles = uncompletedProfiles;
     }
 
-    public List<String> getCompanyAddresses() {
-        return companyAddresses;
-    }
-
-    public void setCompanyAddresses(List<String> companyAddresses) {
-        this.companyAddresses = companyAddresses;
-    }
+    public AdminDashboardDTO() {}
 }

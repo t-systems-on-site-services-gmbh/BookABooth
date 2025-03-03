@@ -2,6 +2,7 @@ package de.tsystems.onsite.bookabooth.service.dto;
 
 public class AdminChecklistDTO {
 
+    private long companyId;
     private String companyName;
     private boolean address; // Rechnungsadresse hinterlegt?
     private boolean logo; // Logo hochgeladen?
@@ -57,5 +58,17 @@ public class AdminChecklistDTO {
 
     public void setBooth(String booth) {
         this.booth = booth;
+    }
+
+    public long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(long companyId) {
+        this.companyId = companyId;
+    }
+
+    public boolean isMandatoryComplete() {
+        return address;
     }
 }
