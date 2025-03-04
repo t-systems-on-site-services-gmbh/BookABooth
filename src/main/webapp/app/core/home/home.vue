@@ -29,10 +29,8 @@
         </div>
       </div>
       <div v-if="authenticated && !hasAnyAuthority('ROLE_ADMIN') && hasAnyAuthority('ROLE_USER')">
-        <div>
-          <div v-if="authenticated === true" class="list-group width-on-pc">
-            <userChecklist></userChecklist>
-          </div>
+        <div class="list-group width-on-pc">
+          <userChecklist></userChecklist>
         </div>
       </div>
     </div>

@@ -1,6 +1,11 @@
 <template>
   <div v-if="checklist">
     <h4 class="mb-2 mt-4">Checkliste und Status:</h4>
+    <div v-if="checklist.verified === false" class="d-flex justify-content-center my-2">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
     <div
       v-bind:class="{
         'mb-0': true,
@@ -15,11 +20,6 @@
         <small class="text-body-secondary" v-text="authenticated ? 'erledigt' : 'offen'"></small>
       </div>
       <p class="mb-1 font-weight-normal">Account wurde erstellt.</p>
-    </div>
-    <div v-if="checklist.verified === false" class="d-flex justify-content-center my-2">
-      <div class="spinner-border" role="status">
-        <span class="sr-only">Loading...</span>
-      </div>
     </div>
     <div
       v-bind:class="{
