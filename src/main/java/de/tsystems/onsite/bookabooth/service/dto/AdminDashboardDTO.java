@@ -2,12 +2,13 @@ package de.tsystems.onsite.bookabooth.service.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public class AdminDashboardDTO {
 
     List<AdminChecklistDTO> checklist = new ArrayList<>();
-    List<String> companies = new ArrayList<>(); // all mail addresses
-    List<String> uncompletedProfiles = new ArrayList<>(); // mail addresses from companies with uncompleted profiles
+    List<String> mailOfAllCompanies = new ArrayList<>(); // all mail addresses
+    List<String> mailOfUncompletedProfiles = new ArrayList<>(); // mail addresses from companies with uncompleted profiles
 
     public List<AdminChecklistDTO> getChecklist() {
         return checklist;
@@ -17,20 +18,20 @@ public class AdminDashboardDTO {
         this.checklist = checklist;
     }
 
-    public List<String> getCompanies() {
-        return companies;
+    public String getMailOfAllCompanies() {
+        return StringUtils.join(mailOfAllCompanies, ";");
     }
 
-    public void setCompanies(List<String> companies) {
-        this.companies = companies;
+    public void addMailOfAllCompanies(String mailAddress) {
+        this.mailOfAllCompanies.add(mailAddress);
     }
 
-    public List<String> getUncompletedProfiles() {
-        return uncompletedProfiles;
+    public String getMailOfUncompletedProfiles() {
+        return StringUtils.join(mailOfUncompletedProfiles, ";");
     }
 
-    public void setUncompletedProfiles(List<String> uncompletedProfiles) {
-        this.uncompletedProfiles = uncompletedProfiles;
+    public void addMailOfUncompletedProfiles(String mailAddress) {
+        this.mailOfUncompletedProfiles.add(mailAddress);
     }
 
     public AdminDashboardDTO() {}
