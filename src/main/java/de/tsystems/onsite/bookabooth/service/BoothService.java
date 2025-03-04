@@ -85,7 +85,6 @@ public class BoothService {
      *
      * @return the list of entities.
      */
-    @Transactional(readOnly = true)
     public List<BoothDTO> findAll() {
         log.debug("Request to get all Booths");
         //return boothRepository.findAll().stream().map(boothMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
