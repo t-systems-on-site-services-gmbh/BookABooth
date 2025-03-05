@@ -41,7 +41,6 @@ public class AdminDashboardService {
     @Transactional(readOnly = true)
     public AdminDashboardDTO getData() {
         log.debug("REST request to get checklist");
-
         // all companies
         List<Company> companies = companyRepository.findAll();
 
@@ -76,13 +75,13 @@ public class AdminDashboardService {
             // information from BoothUser
             BoothUser companyBoothUser = companyBoothUsersMap.get(company.getId());
             if (companyBoothUser != null) {
-                adminDashboard.addMailOfAllCompanies(companyBoothUser.getUser().getEmail());
                 cl.setPhoneNumber(
                     companyBoothUsersMap.get(company.getId()).getPhone() != null &&
                         !companyBoothUsersMap.get(company.getId()).getPhone().isBlank()
                         ? true
                         : false
                 );
+                cl.setMail(companyBoothUsersMap.get(cl.getCompanyId()).getUser().getEmail());
             }
 
             // information from Booking
@@ -101,12 +100,6 @@ public class AdminDashboardService {
 
             checklist.add(cl);
         }
-
-        checklist.forEach(cl -> {
-            if (!cl.isMandatoryComplete()) {
-                adminDashboard.addMailOfUncompletedProfiles(companyBoothUsersMap.get(cl.getCompanyId()).getUser().getEmail());
-            }
-        });
 
         adminDashboard
             .getChecklist()

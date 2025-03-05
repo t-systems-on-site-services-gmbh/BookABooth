@@ -9,6 +9,7 @@ public class AdminChecklistDTO {
     private boolean phoneNumber; // Telefonnummer hinterlegt?
     private boolean companyDescription; // Firmenbeschreibung hinterlegt?
     private String booth;
+    private String mail;
 
     public AdminChecklistDTO() {}
 
@@ -66,6 +67,14 @@ public class AdminChecklistDTO {
 
     public void setCompanyId(long companyId) {
         this.companyId = companyId;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     public boolean isMandatoryComplete() {
