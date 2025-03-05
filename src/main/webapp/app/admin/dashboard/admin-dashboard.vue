@@ -3,11 +3,13 @@
     <a class="btn btn-primary m-3" @click="downloadExcel">Rechnungsdaten</a>
     <a :href="bccForAllUsers" class="btn btn-primary m-3"
       >Mail an <br />
-      Alle {{ countAllProfiles }} Firmen</a
-    >
+      Alle Firmen<br />
+      <span class="badge badge-light">{{ countAllProfiles }}</span>
+    </a>
     <a :href="bccForAllUsersWithUncompleteProfile" class="btn btn-primary m-3"
       >Mail an <br />
-      {{ countUncompleteProfiles }} Unvollständige Profile</a
+      Unvollständige Profile<br />
+      <span class="badge badge-light">{{ countUncompleteProfiles }}</span></a
     >
 
     <b-progress
