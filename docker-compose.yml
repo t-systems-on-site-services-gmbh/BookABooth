@@ -1,0 +1,36 @@
+services:
+  bookabooth:
+    image: bookabooth:latest
+    restart: unless-stopped
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/bookabooth?useLegacyDatetimeCode=false
+      - SPRING_LIQUIBASE_URL=jdbc:mariadb://mariadb:3306/bookabooth?useLegacyDatetimeCode=false
+    ports:
+      - 8080:8080
+    volumes:
+      - ./uploads:/app/uploads
+      - ./application.yml:/app/config/application.yml
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/management/health']
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:10.5
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=bookabooth
+      - MARIADB_USER=bookaboothuser
+      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb-root
+      - MARIADB_PASSWORD_FILE=/run/secrets/mariadb-pw
+    volumes:
+      - ./secrets/mariadb-root:/run/secrets/mariadb-root
+      - ./secrets/mariadb-pw:/run/secrets/mariadb-pw
+    ports:
+      - 3306:3306

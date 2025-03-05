@@ -218,7 +218,7 @@ class BookingResourceIT {
         // initialize the database
         this.blockABooth();
         BoothUser boothUser = boothUserRepository.findByUserLogin("user").get();
-        Booking booking = bookingRepository.findByCompanyId(boothUser.getCompany().getId()).get();
+        Booking booking = bookingRepository.findByCompanyIdOrderByReceivedDesc(boothUser.getCompany().getId()).get(0);
 
         assertEquals(BookingStatus.BLOCKED, booking.getStatus());
 
@@ -236,7 +236,7 @@ class BookingResourceIT {
         // initialize the database
         this.confirmBooking();
         BoothUser boothUser = boothUserRepository.findByUserLogin("user").get();
-        Booking booking = bookingRepository.findByCompanyId(boothUser.getCompany().getId()).get();
+        Booking booking = bookingRepository.findByCompanyIdOrderByReceivedDesc(boothUser.getCompany().getId()).get(0);
 
         assertEquals(BookingStatus.CONFIRMED, booking.getStatus());
 
