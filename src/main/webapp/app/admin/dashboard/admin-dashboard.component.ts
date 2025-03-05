@@ -14,7 +14,11 @@ export default defineComponent({
     const adminDashboardService = inject('adminDashboardService', () => new AdminDashboardService());
 
     const locations: Ref<ILocation[]> = ref([]);
-    const checklists: Ref<IAdminChecklist> = ref({});
+    const checklists: Ref<IAdminChecklist[]> = ref([]);
+    const bccForAllUsers: Ref<string> = ref('');
+    const countAllProfiles: Ref<number> = ref(0);
+    const bccForAllUsersWithUncompleteProfile: Ref<string> = ref('');
+    const countUncompleteProfiles: Ref<number> = ref(0);
 
     const initRelationships = () => {
       locationService()
@@ -22,10 +26,31 @@ export default defineComponent({
         .then((res: { data: ILocation[] }) => {
           locations.value = res.data;
         });
+
       adminDashboardService()
         .checklist()
         .then((res: { data: IAdminChecklist[] }) => {
-          checklists.value = res;
+          checklists.value = res.data;
+          const ListOfUsersWithUncompleteProfile: string[] = [];
+          const ListOfUsers: string[] = [];
+
+          res.checklist.forEach((c: IAdminChecklist) => {
+            if (!c.mandatoryComplete && c.mail != null) {
+              ListOfUsersWithUncompleteProfile.push(c.mail);
+            }
+
+            if (c.mail != null) {
+              ListOfUsers.push(c.mail);
+            }
+          });
+          bccForAllUsers.value = 'mailTo:?bcc=' + ListOfUsers.join(';') + '&subject=Vollständiges Profil&body=Sehr geehrte Leuts';
+          countAllProfiles.value = ListOfUsers.length;
+          bccForAllUsersWithUncompleteProfile.value =
+            'mailTo:?bcc=' + ListOfUsersWithUncompleteProfile.join(';') + '&subject=Vollständiges Profil&body=Sehr geehrte Leuts';
+          countUncompleteProfiles.value = ListOfUsersWithUncompleteProfile.length;
+        })
+        .catch((error: any) => {
+          console.error('Error fetching checklist:', error);
         });
     };
 
@@ -35,6 +60,10 @@ export default defineComponent({
       locations,
       checklists,
       adminDashboardService,
+      bccForAllUsers,
+      bccForAllUsersWithUncompleteProfile,
+      countAllProfiles,
+      countUncompleteProfiles,
     };
   },
   mounted() {
@@ -42,7 +71,7 @@ export default defineComponent({
   },
   methods: {
     init(): void {},
-    async downloadExcel(): void {
+    async downloadExcel(): Promise<void> {
       const excelUrl = 'api/bookings/downloadexcel';
       const response = await axios.get(`${excelUrl}`, { responseType: 'blob' });
       const url = window.URL.createObjectURL(new Blob([response.data]));

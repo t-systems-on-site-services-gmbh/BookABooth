@@ -1,13 +1,13 @@
 <template>
   <div class="table-responsive">
     <a class="btn btn-primary m-3" @click="downloadExcel">Rechnungsdaten</a>
-    <a href="mailTo:?bcc=romina@telekom.de;jan@claas.de&subject=Unvollständiges Profil&body=Sehr geehrte Leuts" class="btn btn-primary m-3"
+    <a :href="bccForAllUsers" class="btn btn-primary m-3"
       >Mail an <br />
-      Alle Firmen</a
+      Alle {{ countAllProfiles }} Firmen</a
     >
-    <a href="mailTo:?bcc=romina@telekom.de&subject=Unvollständiges Profil&body=Sehr geehrte Leuts" class="btn btn-primary m-3"
+    <a :href="bccForAllUsersWithUncompleteProfile" class="btn btn-primary m-3"
       >Mail an <br />
-      Unvollständige Profile</a
+      {{ countUncompleteProfiles }} Unvollständige Profile</a
     >
 
     <b-progress
