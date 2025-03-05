@@ -89,7 +89,6 @@ class CompanyResourceIT {
     public static Company createEntity(EntityManager em) {
         Company company = new Company()
             .name(DEFAULT_NAME)
-            .mail(DEFAULT_MAIL)
             .billingAddress(DEFAULT_BILLING_ADDRESS)
             .logo(DEFAULT_LOGO)
             .description(DEFAULT_DESCRIPTION)
@@ -107,7 +106,6 @@ class CompanyResourceIT {
     public static Company createUpdatedEntity(EntityManager em) {
         Company company = new Company()
             .name(UPDATED_NAME)
-            .mail(UPDATED_MAIL)
             .billingAddress(UPDATED_BILLING_ADDRESS)
             .logo(UPDATED_LOGO)
             .description(UPDATED_DESCRIPTION)
@@ -226,7 +224,6 @@ class CompanyResourceIT {
         em.detach(updatedCompany);
         updatedCompany
             .name(UPDATED_NAME)
-            .mail(UPDATED_MAIL)
             .billingAddress(UPDATED_BILLING_ADDRESS)
             .logo(UPDATED_LOGO)
             .description(UPDATED_DESCRIPTION)
@@ -355,7 +352,6 @@ class CompanyResourceIT {
 
         partialUpdatedCompany
             .name(UPDATED_NAME)
-            .mail(UPDATED_MAIL)
             .billingAddress(UPDATED_BILLING_ADDRESS)
             .logo(UPDATED_LOGO)
             .description(UPDATED_DESCRIPTION)
