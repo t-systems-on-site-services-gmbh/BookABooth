@@ -1,12 +1,12 @@
 <template>
   <div class="table-responsive">
     <a class="btn btn-primary m-3" @click="downloadExcel">Rechnungsdaten</a>
-    <a :href="bccForAllUsers" class="btn btn-primary m-3"
+    <a :href="countAllProfiles === 0 ? null : bccForAllUsers" class="btn btn-primary m-3"
       >Mail an <br />
       Alle Firmen<br />
       <span class="badge badge-light">{{ countAllProfiles }}</span>
     </a>
-    <a :href="bccForAllUsersWithUncompleteProfile" class="btn btn-primary m-3"
+    <a :href="countUncompleteProfiles === 0 ? null : bccForAllUsersWithUncompleteProfile" class="btn btn-primary m-3"
       >Mail an <br />
       Unvollständige Profile<br />
       <span class="badge badge-light">{{ countUncompleteProfiles }}</span></a
