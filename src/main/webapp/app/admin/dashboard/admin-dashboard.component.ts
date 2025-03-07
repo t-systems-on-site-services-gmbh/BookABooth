@@ -30,7 +30,7 @@ export default defineComponent({
       adminDashboardService()
         .checklist()
         .then((res: { data: IAdminChecklist[] }) => {
-          checklists.value = res.data;
+          checklists.value = res.checklist;
           const ListOfUsersWithIncompleteProfile: string[] = [];
           const ListOfUsers: string[] = [];
 
@@ -43,10 +43,10 @@ export default defineComponent({
               ListOfUsers.push(c.mail);
             }
           });
-          bccForAllUsers.value = 'mailTo:?bcc=' + ListOfUsers.join(';') + '&subject=Vollständiges Profil&body=Moin!';
+          bccForAllUsers.value = 'mailTo:?bcc=' + ListOfUsers.join(';') + '&subject=Jade Karrieretag&body=Moin!';
           countAllProfiles.value = ListOfUsers.length;
           bccForAllUsersWithIncompleteProfile.value =
-            'mailTo:?bcc=' + ListOfUsersWithIncompleteProfile.join(';') + '&subject=Vollständiges Profil&body=Moin!';
+            'mailTo:?bcc=' + ListOfUsersWithIncompleteProfile.join(';') + '&subject=Jade Karrieretag&body=Moin!';
           countIncompleteProfiles.value = ListOfUsersWithIncompleteProfile.length;
         })
         .catch((error: any) => {
