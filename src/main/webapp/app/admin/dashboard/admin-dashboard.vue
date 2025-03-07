@@ -12,20 +12,14 @@
       <span class="badge badge-light">{{ countIncompleteProfiles }}</span></a
     >
 
-    <b-progress
-      v-for="location in locations"
-      :key="location.id"
-      :max="location.amount"
-      height="2rem"
-      :striped="true"
-      class="border border-primary mb-2"
-    >
-      <b-progress-bar :value="location.booked">
-        <span class="p-4"
-          >{{ location.location }}: <strong>{{ location.booked }} / {{ location.amount }}</strong></span
-        >
-      </b-progress-bar>
-    </b-progress>
+    <div v-for="location in locations">
+      <span
+        >{{ location.location }}: <strong>{{ location.booked }} / {{ location.amount }}</strong></span
+      >
+      <b-progress :key="location.id" :max="location.amount" height="2rem" :striped="true" class="border border-primary mb-2">
+        <b-progress-bar :value="location.booked"> </b-progress-bar>
+      </b-progress>
+    </div>
 
     <div class="table-responsive">
       <table class="table table-striped" aria-describedby="booths">
