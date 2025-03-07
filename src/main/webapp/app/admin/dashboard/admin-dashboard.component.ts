@@ -17,8 +17,8 @@ export default defineComponent({
     const checklists: Ref<IAdminChecklist[]> = ref([]);
     const bccForAllUsers: Ref<string> = ref('');
     const countAllProfiles: Ref<number> = ref(0);
-    const bccForAllUsersWithUncompleteProfile: Ref<string> = ref('');
-    const countUncompleteProfiles: Ref<number> = ref(0);
+    const bccForAllUsersWithIncompleteProfile: Ref<string> = ref('');
+    const countIncompleteProfiles: Ref<number> = ref(0);
 
     const initRelationships = () => {
       locationService()
@@ -31,23 +31,23 @@ export default defineComponent({
         .checklist()
         .then((res: { data: IAdminChecklist[] }) => {
           checklists.value = res.data;
-          const ListOfUsersWithUncompleteProfile: string[] = [];
+          const ListOfUsersWithIncompleteProfile: string[] = [];
           const ListOfUsers: string[] = [];
 
           res.checklist.forEach((c: IAdminChecklist) => {
             if (!c.mandatoryComplete && c.mail != null) {
-              ListOfUsersWithUncompleteProfile.push(c.mail);
+              ListOfUsersWithIncompleteProfile.push(c.mail);
             }
 
             if (c.mail != null) {
               ListOfUsers.push(c.mail);
             }
           });
-          bccForAllUsers.value = 'mailTo:?bcc=' + ListOfUsers.join(';') + '&subject=Vollständiges Profil&body=Sehr geehrte Leuts';
+          bccForAllUsers.value = 'mailTo:?bcc=' + ListOfUsers.join(';') + '&subject=Vollständiges Profil&body=Moin!';
           countAllProfiles.value = ListOfUsers.length;
-          bccForAllUsersWithUncompleteProfile.value =
-            'mailTo:?bcc=' + ListOfUsersWithUncompleteProfile.join(';') + '&subject=Vollständiges Profil&body=Sehr geehrte Leuts';
-          countUncompleteProfiles.value = ListOfUsersWithUncompleteProfile.length;
+          bccForAllUsersWithIncompleteProfile.value =
+            'mailTo:?bcc=' + ListOfUsersWithIncompleteProfile.join(';') + '&subject=Vollständiges Profil&body=Moin!';
+          countIncompleteProfiles.value = ListOfUsersWithIncompleteProfile.length;
         })
         .catch((error: any) => {
           console.error('Error fetching checklist:', error);
@@ -61,9 +61,9 @@ export default defineComponent({
       checklists,
       adminDashboardService,
       bccForAllUsers,
-      bccForAllUsersWithUncompleteProfile,
+      bccForAllUsersWithIncompleteProfile,
       countAllProfiles,
-      countUncompleteProfiles,
+      countIncompleteProfiles,
     };
   },
   mounted() {

@@ -6,10 +6,10 @@
       Alle Firmen<br />
       <span class="badge badge-light">{{ countAllProfiles }}</span>
     </a>
-    <a :href="countUncompleteProfiles === 0 ? null : bccForAllUsersWithUncompleteProfile" class="btn btn-primary m-3"
+    <a :href="countIncompleteProfiles === 0 ? null : bccForAllUsersWithIncompleteProfile" class="btn btn-primary m-3"
       >Mail an <br />
       Unvollständige Profile<br />
-      <span class="badge badge-light">{{ countUncompleteProfiles }}</span></a
+      <span class="badge badge-light">{{ countIncompleteProfiles }}</span></a
     >
 
     <b-progress
