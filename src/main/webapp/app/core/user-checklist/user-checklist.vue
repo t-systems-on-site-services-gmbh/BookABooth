@@ -42,7 +42,7 @@
         'list-group-item': true,
         'list-group-item-action': true,
         'list-group-item-success': checklist.address && checklist.logo && checklist.phoneNumber && checklist.companyDescription,
-        'list-group-item-warning': !(checklist.address && checklist.logo && checklist.phoneNumber && checklist.companyDescription),
+        'list-group-item-danger': !(checklist.address && checklist.logo && checklist.phoneNumber && checklist.companyDescription),
       }"
     >
       <div class="d-flex w-100 justify-content-between">
@@ -71,7 +71,7 @@
       <div
         :class="{
           'list-group-item': true,
-          'list-group-item-warning': !checklist.logo,
+          'list-group-item-danger': !checklist.logo,
           'list-group-item-success': checklist.logo,
           'mb-0': true,
           'font-weight-normal': true,
@@ -87,7 +87,7 @@
       <div
         :class="{
           'list-group-item': true,
-          'list-group-item-warning': !checklist.phoneNumber,
+          'list-group-item-danger': !checklist.phoneNumber,
           'list-group-item-success': checklist.phoneNumber,
           'mb-0': true,
           'font-weight-normal': true,
@@ -103,7 +103,7 @@
       <div
         :class="{
           'list-group-item': true,
-          'list-group-item-warning': !checklist.companyDescription,
+          'list-group-item-danger': !checklist.companyDescription,
           'list-group-item-success': checklist.companyDescription,
           'mb-1': true,
           'font-weight-normal': true,
@@ -165,7 +165,6 @@
     </div>
     <p class="mt-4">
       <small class="mr-2 px-2" style="background-color: #f5c6cb">&nbsp;</small> Rot: ausstehende Pflichtangabe<br />
-      <small class="mr-2 px-2" style="background-color: #ffeeba">&nbsp;</small> Gelb: ausstehend, aber optional<br />
       <small class="mr-2 px-2" style="background-color: #c3e6cb">&nbsp;</small> Grün: erledigt <br />
     </p>
   </div>
