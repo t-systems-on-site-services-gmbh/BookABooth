@@ -121,6 +121,7 @@
                       name="company.description"
                       class="form-control"
                       placeholder="Beschreibung Ihres Unternehmens"
+                      required
                       :class="{
                         valid: !v$.settingsAccount.company.description.$invalid,
                         invalid: v$.settingsAccount.company.description.$invalid,
@@ -161,6 +162,7 @@
                       class="form-control-file"
                       id="company.logoUpload"
                       name="company.logoUpload"
+                      required
                       :class="{
                         valid: !v$.settingsAccount.company.logoUpload.$invalid,
                         invalid: v$.settingsAccount.company.logoUpload.$invalid,
@@ -299,6 +301,7 @@
                       id="phoneNumber"
                       name="phoneNumber"
                       placeholder="Ihre Telefonnummer"
+                      required
                       :class="{ valid: !v$.settingsAccount.phoneNumber.$invalid, invalid: v$.settingsAccount.phoneNumber.$invalid }"
                       v-model="v$.settingsAccount.phoneNumber.$model"
                       maxlength="20"
