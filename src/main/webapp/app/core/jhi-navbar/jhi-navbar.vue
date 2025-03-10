@@ -183,7 +183,7 @@
 
 .logo-img {
   height: 100%;
-  background: url('/content/images/jhs-logo.png') no-repeat center center;
+  background: url('/content/images/jadehs-logo.png') no-repeat center center;
   background-size: contain;
   width: 100%;
   filter: drop-shadow(0 0 0.05rem white);
