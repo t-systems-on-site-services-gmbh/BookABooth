@@ -173,7 +173,7 @@
             </div>
             <div v-if="v$.registerAccount.termsAccepted.$anyDirty && v$.registerAccount.termsAccepted.$invalid">
               <small class="form-text text-danger" v-if="!v$.registerAccount.termsAccepted.required"
-                >Sie müssen die Datenschutzerkärung akzeptieren.</small
+                >Sie müssen die Datenschutzerklärung akzeptieren.</small
               >
             </div>
           </div>
