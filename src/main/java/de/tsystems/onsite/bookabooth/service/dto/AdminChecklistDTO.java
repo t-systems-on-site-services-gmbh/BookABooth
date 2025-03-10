@@ -78,6 +78,6 @@ public class AdminChecklistDTO {
     }
 
     public boolean isMandatoryComplete() {
-        return address;
+        return address && phoneNumber && logo && companyDescription;
     }
 }
