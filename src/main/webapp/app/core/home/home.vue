@@ -1,7 +1,7 @@
 <template>
   <div class="home row">
     <div class="col-12 col-md-3 mb-3 mb-md-0">
-      <span><img class="logo" src="https://www.jade-hs.de/typo3conf/ext/jhs_site/Resources/Public/Images/jadehs-logo.png" /></span>
+      <span><img class="logo" src="/content/images/jadehs-logo.png" /></span>
       <div class="news">
         ++ Jade Karrieretag 2025 ++ <br />
         Nächster Termin: Mittwoch, 19. November 2025 <br />
