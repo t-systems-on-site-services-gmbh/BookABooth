@@ -72,6 +72,6 @@ public class ChecklistDTO {
     }
 
     public boolean isMandatoryComplete() {
-        return verified && address;
+        return verified && address && phoneNumber && logo && companyDescription;
     }
 }

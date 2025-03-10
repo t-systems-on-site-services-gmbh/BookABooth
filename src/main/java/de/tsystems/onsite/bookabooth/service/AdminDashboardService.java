@@ -104,7 +104,7 @@ public class AdminDashboardService {
         adminDashboard
             .getChecklist()
             .sort((o1, o2) -> {
-                if (o1.getAddress() && o1.getPhoneNumber()) {
+                if (o1.isMandatoryComplete()) {
                     return 0;
                 } else {
                     return -1;
