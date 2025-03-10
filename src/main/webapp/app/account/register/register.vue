@@ -168,26 +168,17 @@
                 data-cy="termsAccepted"
               />
               <label class="form-check-label" for="termsAccepted">
-                Ich habe die <a href="/terms" target="_blank">Nutzungsbedingungen</a> (DSGVO) gelesen und akzeptiert.
+                Ich habe die <a href="https://www.jade-hs.de/datenschutz/" target="_blank">Datenschutzerklärung</a> gelesen und akzeptiert.
               </label>
             </div>
             <div v-if="v$.registerAccount.termsAccepted.$anyDirty && v$.registerAccount.termsAccepted.$invalid">
               <small class="form-text text-danger" v-if="!v$.registerAccount.termsAccepted.required"
-                >Sie müssen die Nutzungsbedingungen akzeptieren.</small
+                >Sie müssen die Datenschutzerkärung akzeptieren.</small
               >
             </div>
           </div>
           <button type="submit" :disabled="v$.$invalid" class="btn btn-primary" data-cy="submit">Registrieren</button>
         </form>
-        <p></p>
-        <div class="alert alert-warning">
-          <span>Wenn Sie sich </span>
-          <a class="alert-link" v-on:click="openLogin()">anmelden</a
-          ><span>
-            möchten, versuchen Sie es mit <br />- Administrator (Name="admin" und Passwort="admin")<br />- Benutzer (Name="user" und
-            Passwort="user").</span
-          >
-        </div>
       </div>
     </div>
   </div>
