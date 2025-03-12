@@ -226,6 +226,11 @@ public class BookingService {
             throw new ForbiddenException("System is disabled");
         }
 
+        // check if booth is enabled
+        if (!boothDTO.getAvailable()) {
+            throw new BadRequestException("Booth is disabled");
+        }
+
         // Profile completed
         String login = bUserDTO.getUser().getLogin();
         boolean profileCompleted = userService.getChecklistDTO(login).isMandatoryComplete();
