@@ -18,7 +18,8 @@ RUN mvn -DskipTests --batch-mode -Pprod clean verify
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 RUN mkdir /app/uploads
-RUN mkdir /config
+RUN mkdir /app/logs
+RUN mkdir /app/config
 COPY --from=backend-build /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

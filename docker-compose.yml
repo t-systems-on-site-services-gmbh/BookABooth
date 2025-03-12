@@ -1,6 +1,6 @@
 services:
   bookabooth:
-    image: bookabooth:latest
+    image: ghcr.io/t-systems-on-site-services-gmbh/bookabooth:latest
     restart: unless-stopped
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
@@ -13,6 +13,7 @@ services:
     volumes:
       - ./uploads:/app/uploads
       - ./application.yml:/app/config/application.yml
+      - ./logs:/app/logs
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/management/health']
       interval: 5s
@@ -32,5 +33,9 @@ services:
     volumes:
       - ./secrets/mariadb-root:/run/secrets/mariadb-root
       - ./secrets/mariadb-pw:/run/secrets/mariadb-pw
+      - dbvolume:/var/lib/mysql
     ports:
       - 3306:3306
+
+  volumes:
+    dbvolume:
