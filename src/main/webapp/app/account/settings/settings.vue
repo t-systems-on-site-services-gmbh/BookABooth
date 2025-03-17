@@ -374,7 +374,7 @@
             </div>
             <div class="d-flex justify-content-end">
               <b-button class="btn btn-secondary" @click="hideCancelBooking">Abbrechen</b-button>
-              <b-button type="button" class="btn btn-danger ml-3" @click="setCanceled">Standbuchung stornieren</b-button>
+              <b-button type="button" class="btn btn-danger ml-3" @click="setCanceled">Kostenpflichtig stornieren</b-button>
             </div>
           </b-modal>
           <br /><br />
