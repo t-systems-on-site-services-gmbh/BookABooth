@@ -620,6 +620,7 @@ public class UserService {
             .forEach(user -> {
                 log.debug("Deleting not activated user {}", user.getLogin());
                 userRepository.delete(user);
+                companyService.delete(getBoothUser(user).getCompany().getId());
                 this.clearUserCaches(user);
             });
     }
