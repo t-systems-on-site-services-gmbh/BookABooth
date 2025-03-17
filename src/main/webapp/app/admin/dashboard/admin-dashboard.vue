@@ -1,17 +1,23 @@
 <template>
-  <div class="table-responsive">
-    <a class="btn btn-primary m-3" @click="downloadExcel">Rechnungsdaten</a>
-    <a :href="countAllProfiles === 0 ? null : bccForAllUsers" class="btn btn-primary m-3"
-      >Mail an <br />
-      Alle Firmen<br />
-      <span class="badge badge-light">{{ countAllProfiles }}</span>
-    </a>
-    <a :href="countIncompleteProfiles === 0 ? null : bccForAllUsersWithIncompleteProfile" class="btn btn-primary m-3"
-      >Mail an <br />
-      Unvollständige Profile<br />
-      <span class="badge badge-light">{{ countIncompleteProfiles }}</span></a
-    >
-
+  <div class="container-fluid">
+    <div class="row">
+      <div>
+        <a class="btn btn-primary m-3" @click="downloadExcel">Rechnungsdaten</a>
+        <a :href="countAllProfiles === 0 ? null : bccForAllUsers" class="btn btn-primary m-3"
+          >Mail an <br />
+          Alle Firmen<br />
+          <span class="badge badge-light">{{ countAllProfiles }}</span>
+        </a>
+        <a :href="countIncompleteProfiles === 0 ? null : bccForAllUsersWithIncompleteProfile" class="btn btn-primary m-3"
+          >Mail an <br />
+          Unvollständige Profile<br />
+          <span class="badge badge-light">{{ countIncompleteProfiles }}</span></a
+        >
+      </div>
+      <div>
+        <system class="m-3"></system>
+      </div>
+    </div>
     <div v-for="location in locations">
       <span
         >{{ location.location }}: <strong>{{ location.booked }} / {{ location.amount }}</strong></span

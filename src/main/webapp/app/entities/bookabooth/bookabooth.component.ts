@@ -12,6 +12,8 @@ import { type IBooking } from '@/shared/model/booking.model';
 import SystemService from '@/entities/system/system.service';
 import { type ISystem } from '@/shared/model/system.model';
 import Ausstellerinfo from '@/core/ausstellerinfo/ausstellerinfo.vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import axios from 'axios';
 
 export default defineComponent({
@@ -41,6 +43,7 @@ export default defineComponent({
     const system: Ref<ISystem> = ref();
     const boothId = ref(null);
     const componentKey = ref(new Date().getTime());
+    const confirmConditions = ref(false);
 
     const getMyBooking = async () => {
       isFetching.value = true;
@@ -149,6 +152,17 @@ export default defineComponent({
       return booths.value;
     });
 
+    // filter for service packages that have an entry for booths
+    const filteredServicePackages = computed(() => {
+      return servicePackages.value.filter(servicePackage => servicePackage.booths.length > 0);
+    });
+
+    const rules = {
+      confirmConditions: { required },
+    };
+
+    const v$ = useVuelidate(rules, { confirmConditions });
+
     return {
       alertService,
       booths,
@@ -170,6 +184,9 @@ export default defineComponent({
       system,
       boothId,
       componentKey,
+      filteredServicePackages,
+      confirmConditions,
+      v$,
     };
   },
   methods: {
@@ -195,6 +212,12 @@ export default defineComponent({
     },
     hideInfoModal() {
       this.$refs['ausstellerinfo-modal'].hide();
+    },
+    showLageplanModal() {
+      this.$refs['lageplan-modal'].show();
+    },
+    hideLageplanModal() {
+      this.$refs['lageplan-modal'].hide();
     },
     showConfirmationModal() {
       this.$refs['confirmation-modal'].show();
