@@ -4,11 +4,15 @@ import type { ILocation } from '@/shared/model/location.model';
 import LocationService from '@/entities/location/location.service';
 import type { IAdminChecklist } from '@/shared/model/admin-checklist.model';
 import AdminDashboardService from '@/admin/dashboard/admin-dashboard.service';
+import System from '@/entities/system/system.vue';
 import axios from 'axios';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'AdminDashboard',
+  components: {
+    system: System,
+  },
   setup() {
     const locationService = inject('locationService', () => new LocationService());
     const adminDashboardService = inject('adminDashboardService', () => new AdminDashboardService());
