@@ -145,6 +145,29 @@
       <p v-else-if="!checklist.address || !checklist.logo || !checklist.phoneNumber || !checklist.companyDescription">
         Bitte vervollständigen Sie Ihre Kontaktdaten, um einen Stand buchen zu können.
       </p>
+      <p
+        v-else-if="
+          checklist.bookingStatus !== 'CONFIRMED' &&
+          checklist.bookingStatus !== 'BLOCKED' &&
+          allBoothsOccupied &&
+          !account.company.waitingList
+        "
+        class="mb-1 font-weight-normal"
+      >
+        Alle Stände sind bereits gebucht. Sie können sich <span @click="addToWaitingList" class="link">hier</span> für die Warteliste
+        eintragen.
+      </p>
+      <p
+        v-else-if="
+          checklist.bookingStatus !== 'CONFIRMED' &&
+          checklist.bookingStatus !== 'BLOCKED' &&
+          allBoothsOccupied &&
+          account.company.waitingList
+        "
+        class="mb-1 font-weight-normal"
+      >
+        Sie befinden sich auf der Warteliste. Sie erhalten eine E-Mail, wenn Stände wieder verfügbar sind.
+      </p>
       <p v-else-if="checklist.bookingStatus === 'CANCELED'" class="mb-1 font-weight-normal">
         Ihre Buchung wurde storniert. Sie können <a href="bookabooth">hier</a> eine erneute Buchung vornehmen.
       </p>
@@ -154,13 +177,6 @@
       </p>
       <p v-else-if="checklist.bookingStatus === null && !allBoothsOccupied" class="mb-1 font-weight-normal">
         Nehmen Sie Ihre Buchung <a href="bookabooth">hier</a> vor.
-      </p>
-      <p v-else-if="checklist.bookingStatus === null && allBoothsOccupied && !account.company.waitingList" class="mb-1 font-weight-normal">
-        Alle Stände sind bereits gebucht. Sie können sich <span @click="addToWaitingList" class="link">hier</span> für die Warteliste
-        eintragen.
-      </p>
-      <p v-else-if="checklist.bookingStatus === null && allBoothsOccupied && account.company.waitingList" class="mb-1 font-weight-normal">
-        Sie befinden sich auf der Warteliste. Sie erhalten eine E-Mail, wenn Stände wieder verfügbar sind.
       </p>
     </div>
     <p class="mt-4">
