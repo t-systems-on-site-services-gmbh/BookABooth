@@ -51,7 +51,7 @@ public class ApplicationProperties {
     private Integer cancellationReimbursement;
 
     public Integer getCancellationReimbursement() {
-        return cancellationReimbursement;
+        return cancellationReimbursement == null ? 100 : cancellationReimbursement;
     }
 
     public void setCancellationReimbursement(Integer cancellationReimbursement) {

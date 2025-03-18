@@ -10,7 +10,8 @@
         </h2>
 
         <div class="alert alert-success" role="alert" v-if="success">
-          <strong>Einstellungen wurden gespeichert!</strong>
+          <strong>Die Einstellungen wurden gespeichert.</strong> Weiter geht es auf der
+          <router-link :to="{ path: '/' }">Startseite</router-link>.
         </div>
 
         <div class="alert alert-danger" role="alert" v-if="errorEmailExists">
@@ -63,7 +64,7 @@
                       id="company.billingAddress"
                       name="company.billingAddress"
                       class="form-control"
-                      placeholder="Rechnungsanschrift Ihres Unternehmens"
+                      placeholder="Firmenname // Straße Hausnummer // PLZ Ort"
                       :class="{
                         valid: !v$.settingsAccount.company.billingAddress.$invalid,
                         invalid: v$.settingsAccount.company.billingAddress.$invalid,
@@ -89,7 +90,7 @@
                   </div>
                   <!-- Bemerkung -->
                   <div class="form-group">
-                    <label class="form-control-label" for="company.comment"> Bemerkung, wird für Rechnung übernommen </label>
+                    <label class="form-control-label" for="company.comment">Bemerkung, wird für Rechnung übernommen</label>
                     <textarea
                       id="company.comment"
                       name="company.comment"
@@ -174,7 +175,7 @@
                   </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">
-                    <label class="form-control-label" for="company.exhibitorList"> Freigabe Ausstellerliste </label>
+                    <label class="form-control-label" for="company.exhibitorList">Freigabe Ausstellerliste </label>
                     <br />
                     <input
                       type="checkbox"

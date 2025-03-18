@@ -18,6 +18,8 @@ logging:
     ROOT: INFO
     tech.jhipster: INFO
     de.tsystems.onsite.bookabooth: INFO
+  file:
+    path: /apps/logs
 
 management:
   prometheus:
