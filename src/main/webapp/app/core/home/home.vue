@@ -8,10 +8,8 @@
       </div>
     </div>
     <div class="col-md-9">
-      <div class="alert alert-success width-on-pc" v-if="authenticated">
-        <span v-if="username">Sie sind als Benutzer "{{ username }}" angemeldet.</span>
-      </div>
-      <h1 class="display-4">Willkommen!</h1>
+      <h1 class="display-4" v-if="authenticated && username">Willkommen {{ username }}!</h1>
+      <h1 class="display-4" v-else="authenticated && username">Willkommen</h1>
       <adminDashboard v-if="hasAnyAuthority('ROLE_ADMIN') && authenticated"></adminDashboard>
       <p v-if="!hasAnyAuthority('ROLE_ADMIN')" class="lead">Hier können Sie Ihren Stand für den Karrieretag buchen.</p>
       <div v-if="!authenticated">
