@@ -190,10 +190,10 @@ export default defineComponent({
     };
   },
   methods: {
-    displayConfirmationModal(booth: IBooth) {
-      this.getUnavailableBooths();
+    async displayConfirmationModal(booth: IBooth) {
+      await this.getUnavailableBooths();
       if (this.unavailableBooths.find(b => b.id === booth.id)) {
-        this.alertService.showError('Der Stand ist bereits belegt.');
+        this.alertService.showErrorNoHide('Der Stand wurde in der Zwischenzeit geblockt oder gebucht.');
         return;
       }
       this.bookingService()
@@ -237,12 +237,8 @@ export default defineComponent({
       this.bookingService()
         .confirm(bookingId)
         .then(() => {
-          console.log('Buchung vorgenommen 1.');
           this.hideConfirmationModal();
-          this.alertService.showSuccess('Buchung vorgenommen.');
-          console.log('Buchung vorgenommen 2.');
           this.$router.push({ path: '/' }).then(() => {
-            console.log('Buchung vorgenommen 3.');
             this.$router.go(0);
           });
         })
