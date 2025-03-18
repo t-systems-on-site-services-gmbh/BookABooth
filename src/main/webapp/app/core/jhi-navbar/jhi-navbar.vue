@@ -70,10 +70,6 @@
             <font-awesome-icon icon="lock" />
             <span>Passwort</span>
           </b-dropdown-item>
-          <b-dropdown-item to="/account/sessions" v-if="authenticated" active-class="active">
-            <font-awesome-icon icon="cloud" />
-            <span>Sitzungen</span>
-          </b-dropdown-item>
           <b-dropdown-item data-cy="logout" v-if="authenticated" v-on:click="logout()" id="logout" active-class="active">
             <font-awesome-icon icon="sign-out-alt" />
             <span>Abmelden</span>
