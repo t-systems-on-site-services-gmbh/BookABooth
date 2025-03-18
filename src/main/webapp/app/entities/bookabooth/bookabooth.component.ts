@@ -39,8 +39,9 @@ export default defineComponent({
     const selectedBooth: Ref<IBooth> = ref();
     const myBooking: Ref<IBooking> = ref();
     const currentBooking: Ref<IBooking> = ref();
-    const isBookingAllowed = ref(false);
+    const checklistIncomplete = ref(false);
     const system: Ref<ISystem> = ref();
+    const isBookingAllowed = computed(() => checklistIncomplete.value && system.value.enabled);
     const boothId = ref(null);
     const componentKey = ref(new Date().getTime());
     const confirmConditions = ref(false);
@@ -81,11 +82,6 @@ export default defineComponent({
       }
     };
 
-    const handleSyncList = () => {
-      retrieveBooths();
-      getUnavailableBooths();
-    };
-
     const calculatePrice = (booth: IBooth) => {
       var boothPrice = 0;
       booth.servicePackages.forEach((servicePackage: { id: number }) => {
@@ -121,7 +117,7 @@ export default defineComponent({
         const response = await axios.get('api/checklist');
         const checklist = response.data;
 
-        isBookingAllowed.value =
+        checklistIncomplete.value =
           checklist.verified && checklist.address && checklist.logo && checklist.phoneNumber && checklist.companyDescription;
 
         boothId.value = checklist.boothId;
@@ -133,7 +129,6 @@ export default defineComponent({
     const checkBookingAllowed = () => {
       retrieveSystem();
       fetchUserChecklist();
-      isBookingAllowed.value = isBookingAllowed.value && system.value.enabled;
     };
 
     initRelationships();
@@ -168,10 +163,10 @@ export default defineComponent({
       booths,
       unavailableBooths,
       getUnavailableBooths,
-      handleSyncList,
       isFetching,
       myBooking,
       retrieveBooths,
+      retrieveSystem,
       locations,
       servicePackages,
       filteredBooths,
@@ -191,6 +186,11 @@ export default defineComponent({
   },
   methods: {
     async displayConfirmationModal(booth: IBooth) {
+      await this.retrieveSystem();
+      if (!this.system.enabled) {
+        this.alertService.showErrorNoHide('Die Standbuchung wurde systemseitig gesperrt.');
+        return;
+      }
       await this.getUnavailableBooths();
       if (this.unavailableBooths.find(b => b.id === booth.id)) {
         this.alertService.showErrorNoHide('Der Stand wurde in der Zwischenzeit geblockt oder gebucht.');
