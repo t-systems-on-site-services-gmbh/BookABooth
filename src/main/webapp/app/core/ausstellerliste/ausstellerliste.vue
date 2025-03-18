@@ -1,6 +1,8 @@
 <template>
-  <div class="container mt-5">
-    <h1 class="text-center mb-4">Ausstellerliste</h1>
+  <div>
+    <h2 id="page-heading" data-cy="AusstellerlisteHeading">
+      <span id="ausstellerliste-heading">Ausstellerliste</span>
+    </h2>
     <div v-if="loading" class="d-flex justify-content-center align-items-center">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden"></span>
@@ -8,7 +10,7 @@
     </div>
     <div v-else>
       <div class="row">
-        <div v-for="company in companies" :key="company.id" class="col-md-6 col-lg-4 mb-4">
+        <div v-for="company in companies" :key="company.id" class="col col-md-6 col-lg-4 mb-4">
           <div class="card shadow-sm company-card">
             <div class="img-container">
               <img
@@ -50,7 +52,6 @@
   width: 150%;
   max-width: 500px;
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-  margin: auto;
   transition: box-shadow 0.3s ease;
   display: block;
 }
@@ -76,21 +77,10 @@
   justify-content: flex-start;
 }
 
-.row {
+.myrow {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
   gap: 20px;
-}
-
-.btn-link {
-  font-size: 0.9rem;
-  text-decoration: underline;
-  cursor: pointer;
-  color: #007bff;
-}
-
-.btn-link:hover {
-  color: #0056b3;
 }
 </style>
