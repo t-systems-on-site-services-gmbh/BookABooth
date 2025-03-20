@@ -381,13 +381,11 @@
           <br /><br />
         </div>
         <!--- Konto löschen + Modal -->
-        <p v-if="settingsAccount?.booking?.status === 'PREBOOKED'">
-          Solange Sie eine vorgemerkte Standbuchung haben, können Sie Ihr Konto nicht löschen. Stonieren Sie Ihre Standbuchung, falls Sie
-          Ihr Konto löschen wollen.
+        <p v-if="settingsAccount?.booking?.status === 'CONFIRMED'">
+          Sie habe eine bestätigte Standbuchung und können daher Ihr Konto nicht löschen.
         </p>
-        <p v-else-if="settingsAccount?.booking?.status === 'CONFIRMED'">
-          Solange Sie eine bestätigte Standbuchung haben, können Sie Ihr Konto nicht löschen. Stonieren Sie Ihre Standbuchung, falls Sie Ihr
-          Konto löschen wollen.
+        <p v-else-if="settingsAccount?.booking?.status === 'CANCELED'">
+          Sie habe eine stornierte Standbuchung und können daher Ihr Konto erst nach Rechnungsstellung löschen.
         </p>
         <p v-else-if="hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin">
           Sie sind der einzige Admin im System. Es ist nicht möglich, den einzigen Admin zu löschen.
@@ -398,7 +396,7 @@
           class="btn btn-danger"
           id="show-btn"
           :disabled="
-            settingsAccount?.booking?.status === 'PREBOOKED' ||
+            settingsAccount?.booking?.status === 'CANCELED' ||
             settingsAccount?.booking?.status === 'CONFIRMED' ||
             (hasAnyAuthority('ROLE_ADMIN') && onlyOneAdmin)
           "
