@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 id="page-heading" data-cy="AusstellerlisteHeading">
+    <h2 id="page-heading" data-cy="AusstellerlisteHeading" class="mb-3">
       <span id="ausstellerliste-heading">Ausstellerliste</span>
     </h2>
     <div v-if="loading" class="d-flex justify-content-center align-items-center">
@@ -10,7 +10,7 @@
     </div>
     <div v-else>
       <div class="row">
-        <div v-for="company in companies" :key="company.id" class="col col-md-6 col-lg-4 mb-4">
+        <div v-for="company in companies" :key="company.id" class="col-lg-4 mb-4">
           <div class="card shadow-sm company-card">
             <div class="img-container">
               <img
@@ -48,39 +48,8 @@
 <script lang="ts" src="./ausstellerliste.component.ts"></script>
 
 <style scoped>
-.company-card {
-  width: 150%;
-  max-width: 500px;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-  display: block;
-}
-
 .img-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: #f8f9fa;
   border-bottom: 1px solid #ddd;
-  padding: 1rem;
-}
-
-.card-img-top {
-  object-fit: contain;
-  max-height: 150px;
-  max-width: 100%;
-}
-
-.card-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.myrow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 20px;
 }
 </style>
