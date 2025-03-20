@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -62,6 +63,7 @@ public class CompanyResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new companyDTO, or with status {@code 400 (Bad Request)} if the company has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<CompanyDTO> createCompany(@Valid @RequestBody CompanyDTO companyDTO) throws URISyntaxException {
         log.debug("REST request to save Company : {}", companyDTO);
@@ -84,6 +86,7 @@ public class CompanyResource {
      * or with status {@code 500 (Internal Server Error)} if the companyDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<CompanyDTO> updateCompany(
         @PathVariable(value = "id", required = false) final Long id,
@@ -115,6 +118,7 @@ public class CompanyResource {
      * @return
      * @throws URISyntaxException
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PostMapping("/{id}/image")
     public ResponseEntity<CompanyDTO> addLogo(@PathVariable(value = "id", required = false) final Long id, @RequestBody String imageBase64)
         throws URISyntaxException {
@@ -157,6 +161,7 @@ public class CompanyResource {
      * or with status {@code 500 (Internal Server Error)} if the companyDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<CompanyDTO> partialUpdateCompany(
         @PathVariable(value = "id", required = false) final Long id,
@@ -187,6 +192,7 @@ public class CompanyResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of companies in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("")
     public List<CompanyDTO> getAllCompanies() {
         log.debug("REST request to get all Companies");
@@ -199,6 +205,7 @@ public class CompanyResource {
      * @param id the id of the companyDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the companyDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDTO> getCompany(@PathVariable("id") Long id) {
         log.debug("REST request to get Company : {}", id);
@@ -212,6 +219,7 @@ public class CompanyResource {
      * @param id the id of the companyDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCompany(@PathVariable("id") Long id) {
         log.debug("REST request to delete Company : {}", id);

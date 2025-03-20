@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,6 +107,7 @@ public class AccountResource {
      * @param request the HTTP request.
      * @return the login if the user is authenticated.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/authenticate")
     public String isAuthenticated(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");
@@ -132,6 +134,7 @@ public class AccountResource {
      * @param userProfileDTO profile of the current user
      * @return the profile with its new values
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PostMapping("/account")
     public ResponseEntity<UserProfileDTO> updateUserProfile(@Valid @RequestBody UserProfileDTO userProfileDTO)
         throws AccountNotFoundException {
@@ -154,6 +157,7 @@ public class AccountResource {
      * @param userProfileDTO profile of the current user
      * @return profile without the check for waitingList
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PutMapping("/account/remove-waitinglist")
     public ResponseEntity<Void> removeFromWaitingList(@RequestBody UserProfileDTO userProfileDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
@@ -171,6 +175,7 @@ public class AccountResource {
      * @param userProfileDTO profile of the current user
      * @return profile with canceled booking
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PutMapping("/account/cancel-booking")
     public ResponseEntity<Void> cancelBooking(@RequestBody UserProfileDTO userProfileDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
@@ -191,6 +196,7 @@ public class AccountResource {
      * @param passwordChangeDto current and new password.
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the new password is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PostMapping(path = "/account/change-password")
     public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
         if (isPasswordLengthInvalid(passwordChangeDto.getNewPassword())) {
@@ -205,6 +211,7 @@ public class AccountResource {
      * @return the current open sessions.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the current open sessions couldn't be retrieved.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/account/sessions")
     public List<PersistentToken> getCurrentSessions() {
         return persistentTokenRepository.findByUser(
@@ -232,6 +239,7 @@ public class AccountResource {
      * @param series the series of an existing session.
      * @throws IllegalArgumentException if the series couldn't be URL decoded.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @DeleteMapping("/account/sessions/{series}")
     public void invalidateSession(@PathVariable("series") String series) {
         String decodedSeries = URLDecoder.decode(series, StandardCharsets.UTF_8);
@@ -254,8 +262,17 @@ public class AccountResource {
      * @param id is given in the url to identify the user
      * @return bad request, if the password is incorrect, otherwise it returns ok
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @DeleteMapping("/account/delete-account/{id}")
     public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO, @PathVariable Long id) {
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        Optional<User> currentUser = userRepository.findOneByLogin(currentUserLogin);
+
+        if (currentUser.isEmpty() || (!currentUser.get().getId().equals(id) && !SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
@@ -272,6 +289,7 @@ public class AccountResource {
      *
      * @param mail the mail of the user.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PostMapping(path = "/account/reset-password/init")
     public void requestPasswordReset(@RequestBody String mail) {
         Optional<User> user = userService.requestPasswordReset(mail);
@@ -291,6 +309,7 @@ public class AccountResource {
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the password could not be reset.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
         if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
@@ -316,6 +335,7 @@ public class AccountResource {
      * @param authentication authenticate the user
      * @return the data for the current user
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
     @GetMapping("/checklist")
     public ResponseEntity<ChecklistDTO> getUserChecklist(Authentication authentication) {
         String login = authentication.getName();

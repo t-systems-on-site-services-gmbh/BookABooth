@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -48,6 +49,7 @@ public class WaitinglistResource {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public List<CompanyDTO> getAllWaitingListCompanies() {
         log.debug("REST request to get all companies on the waiting list");
 
@@ -75,6 +77,7 @@ public class WaitinglistResource {
             .toList();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("/send-emails")
     public ResponseEntity<Void> sendEmailsToWaitingList() {
         log.debug("REST request to send emails to companies on the waiting list");
@@ -114,6 +117,7 @@ public class WaitinglistResource {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<Void> partialUpdateWaitingListStatus(@PathVariable Long id, @RequestBody CompanyDTO companyDTO) {
         log.debug("REST request to partially update the status of company with ID: {}", id);
@@ -142,6 +146,7 @@ public class WaitinglistResource {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PutMapping("/add-waitinglist")
     public ResponseEntity<Void> addToWaitingList(@RequestBody UserProfileDTO userProfileDTO) throws AccountNotFoundException {
         SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new AccountNotFoundException("Current user login not found"));

@@ -82,6 +82,7 @@ public class BookingResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking was not created.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PostMapping("/booth/{id}")
     public ResponseEntity<BookingDTO> blockBooking(
         @PathVariable(value = "id", required = true) final Long boothId,
@@ -104,6 +105,7 @@ public class BookingResource {
      * @return the {@link ResponseEntity} with status {@code 200 (Ok)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking was not confirmed.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @PatchMapping("/confirm/{id}")
     public ResponseEntity<BookingDTO> confirmBooking(
         @PathVariable(value = "id", required = true) final Long bookingId,
@@ -126,6 +128,7 @@ public class BookingResource {
      * @return the {@link ResponseEntity} with status {@code 200 (Ok)} and with body the new bookingDTO, or with status {@code 400 (Bad Request)} if the booking was not canceled.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping("/cancel/{id}")
     public ResponseEntity<BookingDTO> cancelBooking(
         @PathVariable(value = "id", required = true) final Long bookingId,
@@ -219,6 +222,7 @@ public class BookingResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of bookings in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("")
     public List<BookingDTO> getAllBookings() {
         log.debug("REST request to get all Bookings");
@@ -231,6 +235,7 @@ public class BookingResource {
      * @param id the id of the bookingDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the bookingDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<BookingDTO> getBooking(@PathVariable("id") Long id) {
         log.debug("REST request to get Booking : {}", id);
@@ -238,6 +243,7 @@ public class BookingResource {
         return ResponseUtil.wrapOrNotFound(bookingDTO);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/mybooking")
     public ResponseEntity<BookingDTO> getMyBooking(Authentication authentication) {
         log.debug("REST request to get my own Booking");
@@ -246,6 +252,7 @@ public class BookingResource {
         return bookingDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.ok().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/unavailable")
     public List<BoothDTO> getUnavailableBooths(Authentication authentication) {
         log.debug("REST request to get all unavailable Booths");
@@ -258,6 +265,7 @@ public class BookingResource {
      * @param bookingId the bookingId of the bookingDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable("id") Long bookingId, Authentication authentication) {
         log.debug("REST request to delete Booking : {}", bookingId);

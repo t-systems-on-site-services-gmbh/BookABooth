@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -49,6 +50,7 @@ public class BoothUserResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new boothUserDTO, or with status {@code 400 (Bad Request)} if the boothUser has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<BoothUserDTO> createBoothUser(@Valid @RequestBody BoothUserDTO boothUserDTO) throws URISyntaxException {
         log.debug("REST request to save BoothUser : {}", boothUserDTO);
@@ -74,6 +76,7 @@ public class BoothUserResource {
      * or with status {@code 500 (Internal Server Error)} if the boothUserDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<BoothUserDTO> updateBoothUser(
         @PathVariable(value = "id", required = false) final Long id,
@@ -108,6 +111,7 @@ public class BoothUserResource {
      * or with status {@code 500 (Internal Server Error)} if the boothUserDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<BoothUserDTO> partialUpdateBoothUser(
         @PathVariable(value = "id", required = false) final Long id,
@@ -138,6 +142,7 @@ public class BoothUserResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of boothUsers in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("")
     public List<BoothUserDTO> getAllBoothUsers() {
         log.debug("REST request to get all BoothUsers");
@@ -150,6 +155,7 @@ public class BoothUserResource {
      * @param id the id of the boothUserDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the boothUserDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<BoothUserDTO> getBoothUser(@PathVariable("id") Long id) {
         log.debug("REST request to get BoothUser : {}", id);
@@ -163,6 +169,7 @@ public class BoothUserResource {
      * @param id the id of the boothUserDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBoothUser(@PathVariable("id") Long id) {
         log.debug("REST request to delete BoothUser : {}", id);

@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
@@ -62,6 +63,7 @@ public class LocationResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new locationDTO, or with status {@code 400 (Bad Request)} if the location has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<LocationDTO> createLocation(@Valid @RequestBody LocationDTO locationDTO) throws URISyntaxException {
         log.debug("REST request to save Location : {}", locationDTO);
@@ -84,6 +86,7 @@ public class LocationResource {
      * or with status {@code 500 (Internal Server Error)} if the locationDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<LocationDTO> updateLocation(
         @PathVariable(value = "id", required = false) final Long id,
@@ -118,6 +121,7 @@ public class LocationResource {
      * or with status {@code 500 (Internal Server Error)} if the locationDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<LocationDTO> partialUpdateLocation(
         @PathVariable(value = "id", required = false) final Long id,
@@ -144,6 +148,7 @@ public class LocationResource {
     }
 
     // Add method addImageToLocation which takes the location's id as parameter and a Base64 encoded image in the request body
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("/{id}/image")
     public ResponseEntity<LocationDTO> addImageToLocation(
         @PathVariable(value = "id", required = false) final Long id,
@@ -182,6 +187,7 @@ public class LocationResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of locations in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("")
     public List<LocationDTO> getAllLocations() {
         log.debug("REST request to get all Locations");
@@ -194,6 +200,7 @@ public class LocationResource {
      * @param id the id of the locationDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the locationDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<LocationDTO> getLocation(@PathVariable("id") Long id) {
         log.debug("REST request to get Location : {}", id);
@@ -207,6 +214,7 @@ public class LocationResource {
      * @param id the id of the locationDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable("id") Long id) {
         log.debug("REST request to delete Location : {}", id);

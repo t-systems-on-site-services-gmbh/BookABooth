@@ -81,6 +81,7 @@ public class SystemResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of systems in body.
      */
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("")
     public SystemDTO getSystem() {
         log.debug("REST request to get System");
@@ -94,6 +95,7 @@ public class SystemResource {
      * @param id the id of the systemDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the systemDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<SystemDTO> getSystem(@PathVariable("id") Long id) {
         log.debug("REST request to get System : {}", id);
@@ -107,6 +109,7 @@ public class SystemResource {
      * @param id the id of the systemDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSystem(@PathVariable("id") Long id) {
         log.debug("REST request to delete System : {}", id);

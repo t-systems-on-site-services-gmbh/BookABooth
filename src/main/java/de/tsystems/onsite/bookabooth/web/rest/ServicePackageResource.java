@@ -139,6 +139,7 @@ public class ServicePackageResource {
      * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of servicePackages in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("")
     public List<ServicePackageDTO> getAllServicePackages(
         @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
@@ -153,6 +154,7 @@ public class ServicePackageResource {
      * @param id the id of the servicePackageDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the servicePackageDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<ServicePackageDTO> getServicePackage(@PathVariable("id") Long id) {
         log.debug("REST request to get ServicePackage : {}", id);
