@@ -7,7 +7,7 @@
   </head>
   <body>
     <p>Moin <span th:text="${user.login}">onsite</span>,</p>
-    <p>zur Aktivierung Ihres Accounts folgen Sie bitte den unten stehenden link:</p>
+    <p>zur Aktivierung Ihres Accounts folgen Sie bitte dem unten stehenden Link:</p>
     <p>
       <a th:with="url=(@{|${baseUrl}/account/activate?key=${user.activationKey}|})" th:href="${url}" th:text="${url}">Activation link</a>
     </p>
