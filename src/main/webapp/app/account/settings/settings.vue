@@ -122,7 +122,6 @@
                       name="company.description"
                       class="form-control"
                       placeholder="Beschreibung Ihres Unternehmens"
-                      required
                       :class="{
                         valid: !v$.settingsAccount.company.description.$invalid,
                         invalid: v$.settingsAccount.company.description.$invalid,
@@ -130,10 +129,11 @@
                       v-model="v$.settingsAccount.company.description.$model"
                       minlength="0"
                       maxlength="254"
+                      required
                       data-cy="company.description"
                     >
                     </textarea>
-                    <div v-if="v$.settingsAccount.company.description.$invalid">
+                    <div v-if="v$.settingsAccount.company.description.$invalid && !v$.settingsAccount.company.description.required">
                       <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.maxLength"
                         >Ihre Firmenbeschreibung darf nicht länger als 254 Zeichen sein.</small
                       >
@@ -163,7 +163,6 @@
                       class="form-control-file"
                       id="company.logoUpload"
                       name="company.logoUpload"
-                      required
                       :class="{
                         valid: !v$.settingsAccount.company.logoUpload.$invalid,
                         invalid: v$.settingsAccount.company.logoUpload.$invalid,
@@ -302,10 +301,10 @@
                       id="phoneNumber"
                       name="phoneNumber"
                       placeholder="Ihre Telefonnummer"
-                      required
                       :class="{ valid: !v$.settingsAccount.phoneNumber.$invalid, invalid: v$.settingsAccount.phoneNumber.$invalid }"
                       v-model="v$.settingsAccount.phoneNumber.$model"
                       maxlength="20"
+                      required
                       data-cy="phonenumber"
                     />
                   </div>
@@ -314,7 +313,9 @@
             </div>
           </div>
           <br />
-          <button type="submit" :disabled="v$.settingsAccount.$invalid" class="btn btn-primary" data-cy="submit">Speichern</button>
+          <button type="submit" :disabled="v$.settingsAccount.user.email.$invalid" class="btn btn-primary" data-cy="submit">
+            Speichern
+          </button>
         </form>
         <br />
         <div class="form-group" v-if="!hasAnyAuthority('ROLE_ADMIN')">

@@ -91,6 +91,7 @@ export default defineComponent({
             maxLength: maxLength(254),
           },
           description: {
+            required: requiredUnless(isAdmin),
             maxLength: maxLength(254),
           },
           comment: {
@@ -118,6 +119,7 @@ export default defineComponent({
           },
         },
         phoneNumber: {
+          required: requiredUnless(isAdmin),
           maxLength: maxLength(20),
         },
       },
