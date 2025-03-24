@@ -44,7 +44,7 @@ public class Booth implements Serializable {
     private Location location;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "booths")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "booths" }, allowSetters = true)
     private Set<ServicePackage> servicePackages = new HashSet<>();
 

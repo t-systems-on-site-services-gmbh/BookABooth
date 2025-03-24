@@ -50,7 +50,7 @@ export default defineComponent({
       try {
         await servicePackageService().delete(removeId.value);
         const message = 'A ServicePackage is deleted with identifier ' + removeId.value;
-        alertService.showInfo(message, { variant: 'danger' });
+        alertService.showSuccess(message);
         removeId.value = null;
         retrieveServicePackages();
         closeDialog();
