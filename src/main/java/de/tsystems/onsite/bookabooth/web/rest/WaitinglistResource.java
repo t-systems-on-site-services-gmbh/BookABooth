@@ -59,19 +59,23 @@ public class WaitinglistResource {
         log.debug("REST request to get all companies on the waiting list");
 
         var companies = companyService.findAll();
-        companies.forEach(company -> {
-            Long companyId = company.getId();
-            List<User> users = userService.findUsersByCompanyId(companyId);
+        try {
+            companies.forEach(company -> {
+                Long companyId = company.getId();
+                List<User> users = userService.findUsersByCompanyId(companyId);
 
-            if ((users == null) || users.isEmpty()) {
-                company.setMail("Dieser Firma ist kein Benutzer zugeordnet.");
-                log.warn("No user IDs found for company ID: {}", companyId);
-            } else {
-                List<String> emails = users.stream().map(User::getEmail).filter(Objects::nonNull).toList();
-                log.debug("Setting emails for company ID: {}", company.getId());
-                company.setMail(String.join(", ", emails));
-            }
-        });
+                if ((users == null) || users.isEmpty()) {
+                    log.warn("No user IDs found for company ID: {}", companyId);
+                    company.setMail("Dieser Firma ist kein Benutzer zugeordnet.");
+                } else {
+                    log.debug("Setting emails for company ID: {}", company.getId());
+                    List<String> emails = users.stream().map(User::getEmail).filter(Objects::nonNull).toList();
+                    company.setMail(String.join(", ", emails));
+                }
+            });
+        } catch (Exception e) {
+            log.error("Error while setting emails for companies", e);
+        }
         return companies
             .stream()
             .sorted((c1, c2) -> {
