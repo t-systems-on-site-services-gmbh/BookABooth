@@ -57,6 +57,7 @@ public class BoothResource {
             throw new BadRequestAlertException("A new booth cannot already have an ID", ENTITY_NAME, "idexists");
         }
         boothDTO = boothService.save(boothDTO);
+        boothService.updateServicePackages(boothDTO);
         return ResponseEntity.created(new URI("/api/booths/" + boothDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, boothDTO.getId().toString()))
             .body(boothDTO);
@@ -89,7 +90,6 @@ public class BoothResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        boothService.updateServicePackages(boothDTO);
         boothDTO = boothService.update(boothDTO);
 
         return ResponseEntity.ok()
@@ -177,6 +177,7 @@ public class BoothResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooth(@PathVariable("id") Long id) {
         log.debug("REST request to delete Booth : {}", id);
+        // TODO: remove service packages relation before deleting booth
         boothService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))

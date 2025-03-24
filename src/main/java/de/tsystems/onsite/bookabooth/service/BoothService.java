@@ -4,7 +4,10 @@ import de.tsystems.onsite.bookabooth.domain.Booth;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
+import de.tsystems.onsite.bookabooth.service.dto.ServicePackageDTO;
+import de.tsystems.onsite.bookabooth.service.exception.BadRequestException;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
+import de.tsystems.onsite.bookabooth.service.mapper.ServicePackageMapper;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +28,19 @@ public class BoothService {
     private final BoothRepository boothRepository;
 
     private final BoothMapper boothMapper;
+    private final ServicePackageMapper servicePackageMapper;
 
     private final ServicePackageService servicePackageService;
 
-    public BoothService(BoothRepository boothRepository, BoothMapper boothMapper, ServicePackageService servicePackageService) {
+    public BoothService(
+        BoothRepository boothRepository,
+        BoothMapper boothMapper,
+        ServicePackageMapper servicePackageMapper,
+        ServicePackageService servicePackageService
+    ) {
         this.boothRepository = boothRepository;
         this.boothMapper = boothMapper;
+        this.servicePackageMapper = servicePackageMapper;
         this.servicePackageService = servicePackageService;
     }
 
@@ -56,7 +66,12 @@ public class BoothService {
     public BoothDTO update(BoothDTO boothDTO) {
         log.debug("Request to update Booth : {}", boothDTO);
         Booth booth = boothMapper.toEntity(boothDTO);
+
+        // update servicePackages via owning side
+        updateServicePackages(boothDTO);
+
         booth = boothRepository.save(booth);
+
         return boothMapper.toDto(booth);
     }
 
@@ -124,18 +139,42 @@ public class BoothService {
 
     /**
      * Update the servicePackages of a booth.
-     * Removes booth from all servicePackages and adds it to the ones in the DTO.
-     * @param boothDTO the entity to update.
+     * Removes booth from all servicePackages and add the new ones.
+     * @param newBoothDTO the entity to update.
      */
-    public void updateServicePackages(BoothDTO boothDTO) {
-        log.debug("Request to update ServicePackages : {}", boothDTO);
-        Optional<Booth> optionalBooth = boothRepository.findById(boothDTO.getId());
-        if (optionalBooth.isPresent()) {
-            Booth booth = optionalBooth.get();
-            var servicePackages = booth.getServicePackages();
-            servicePackages.forEach(servicePackage -> servicePackageService.removeBooth(servicePackage, booth));
-            boothDTO.getServicePackages().forEach(servicePackageDTO -> servicePackageService.addBooth(servicePackageDTO, booth));
+    public void updateServicePackages(BoothDTO newBoothDTO) {
+        // throw exception if the booth or booth id is null
+        if (newBoothDTO == null || newBoothDTO.getId() == null) {
+            throw new BadRequestException("The booth or booth id is null");
         }
+        Booth repoBooth = boothRepository
+            .findById(newBoothDTO.getId())
+            .orElseThrow(() -> new BadRequestException("The booth does not exist in the repository"));
+        BoothDTO oldBoothDTO = boothMapper.toDto(repoBooth);
+
+        // all servicePackageIds from newBoothDTO excluding the ones that are already in the oldBoothDTO
+        List<Long> spToAdd = newBoothDTO
+            .getServicePackages()
+            .stream()
+            .map(ServicePackageDTO::getId)
+            .filter(id -> !oldBoothDTO.getServicePackages().stream().map(ServicePackageDTO::getId).toList().contains(id))
+            .toList();
+        // all servicePackageIds from oldBoothDTO excluding the ones that are already in the newBoothDTO
+        List<Long> spToRemove = oldBoothDTO
+            .getServicePackages()
+            .stream()
+            .map(ServicePackageDTO::getId)
+            .filter(id -> !newBoothDTO.getServicePackages().stream().map(ServicePackageDTO::getId).toList().contains(id))
+            .toList();
+
+        log.debug(
+            "Request to update ServicePackages relations for Booth : {} to remove ServicePackage Ids: {} and add {}",
+            newBoothDTO.getId(),
+            spToRemove,
+            spToAdd
+        );
+        servicePackageService.removeBooth(spToRemove, repoBooth);
+        servicePackageService.addBooth(spToAdd, boothMapper.toEntity(newBoothDTO));
     }
 
     @Transactional(readOnly = true)
