@@ -679,6 +679,7 @@ public class UserService {
     }
 
     public List<User> findUsersByCompanyId(Long companyId) {
+        log.debug("Request to get all users by company ID: {}", companyId);
         var boothUsers = boothUserRepository.findByCompanyId(companyId);
         return boothUsers.stream().map(BoothUser::getUser).toList();
     }
