@@ -132,14 +132,20 @@ public class CompanyService {
         companyRepository.deleteById(id);
     }
 
-    public void addToWaitingList(UserProfileDTO userProfileDTO) {
-        Optional.of(companyRepository.findById(userProfileDTO.getCompany().getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(company -> {
-                company.setWaitingList(true);
-                companyRepository.save(company);
-                return userProfileDTO;
-            });
+    /**
+     * Set the waiting list state of a company and save it to the database.
+     * @param dto
+     * @param waitingList
+     */
+    public void setWaitingList(CompanyDTO dto, Boolean waitingList) {
+        log.debug("Request to set company's {} waiting list state {}", dto.getId(), waitingList);
+        dto.setWaitingList(waitingList);
+
+        var optCompany = companyRepository.findById(dto.getId());
+        if (optCompany.isPresent()) {
+            var company = optCompany.get();
+            company.setWaitingList(waitingList);
+            companyRepository.save(company);
+        }
     }
 }

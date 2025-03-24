@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const baseApiUrl = 'api/waitinglist';
 
-export default class CompanyService {
+export default class WaitingListService {
   public retrieve(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       axios
@@ -41,16 +41,17 @@ export default class CompanyService {
         });
     });
   }
+
   public updateWaitingListStatus(id: number, status: boolean): Promise<any> {
-    return axios
-      .patch(`${baseApiUrl}/${id}`, { waitingList: status })
-      .then(response => {
-        console.log(`Erfolgreich aktualisiert:`, response.data);
-        return response.data;
-      })
-      .catch(error => {
-        console.error(`Fehler beim Aktualisieren des Status für ID: ${id}`, error);
-        throw error; // Stelle sicher, dass Fehler korrekt weitergeleitet werden
-      });
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .patch(`${baseApiUrl}/${id}`, { waitingList: status })
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
   }
 }
