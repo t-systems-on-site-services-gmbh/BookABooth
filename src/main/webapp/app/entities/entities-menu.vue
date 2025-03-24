@@ -20,10 +20,6 @@
       <font-awesome-icon icon="asterisk" />
       <span>Buchungen</span>
     </b-dropdown-item>
-    <b-dropdown-item to="/booth-user">
-      <font-awesome-icon icon="asterisk" />
-      <span>Benutzerverwaltung</span>
-    </b-dropdown-item>
     <b-dropdown-item to="/waitinglist">
       <font-awesome-icon icon="asterisk" />
       <span>Warteliste</span>
