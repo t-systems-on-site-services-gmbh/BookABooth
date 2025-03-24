@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link de.tsystems.onsite.bookabooth.domain.ServicePackage}.
+ * Service Implementation for managing {@link ServicePackage}.
  */
 @Service
 @Transactional
@@ -126,16 +126,23 @@ public class ServicePackageService {
         servicePackageRepository.deleteById(id);
     }
 
-    public ServicePackage removeBooth(ServicePackage servicePackage, Booth booth) {
-        servicePackage.removeBooth(booth);
-        servicePackageRepository.save(servicePackage);
-        return servicePackage;
+    public void removeBooth(List<Long> spToRemove, Booth booth) {
+        // get all service packages by spToRemove ids
+        List<ServicePackage> servicePackages = servicePackageRepository.findAllById(spToRemove);
+
+        // remove booth from each service package by boothId
+        servicePackages.forEach(servicePackage -> servicePackage.removeBooth(booth));
+
+        servicePackageRepository.saveAll(servicePackages);
     }
 
-    public ServicePackage addBooth(ServicePackageDTO servicePackageDTO, Booth booth) {
-        ServicePackage servicePackage = servicePackageMapper.toEntity(servicePackageDTO);
-        servicePackage.addBooth(booth);
-        servicePackageRepository.save(servicePackage);
-        return servicePackage;
+    public void addBooth(List<Long> spToAdd, Booth boothId) {
+        // get all service packages by spToAdd ids
+        List<ServicePackage> servicePackages = servicePackageRepository.findAllById(spToAdd);
+
+        // add booth to each service package by boothId
+        servicePackages.forEach(servicePackage -> servicePackage.addBooth(boothId));
+
+        servicePackageRepository.saveAll(servicePackages);
     }
 }
