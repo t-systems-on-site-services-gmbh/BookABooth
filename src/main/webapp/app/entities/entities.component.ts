@@ -6,7 +6,6 @@ import LocationService from './location/location.service';
 import CompanyService from './company/company.service';
 import ServicePackageService from './service-package/service-package.service';
 import BookingService from './booking/booking.service';
-import BoothUserService from './booth-user/booth-user.service';
 import UserService from '@/entities/user/user.service';
 // jhipster-needle-add-entity-service-to-entities-component-import - JHipster will import entities services here
 
@@ -21,7 +20,6 @@ export default defineComponent({
     provide('companyService', () => new CompanyService());
     provide('servicePackageService', () => new ServicePackageService());
     provide('bookingService', () => new BookingService());
-    provide('boothUserService', () => new BoothUserService());
     // jhipster-needle-add-entity-service-to-entities-component - JHipster will import entities services here
   },
 });
