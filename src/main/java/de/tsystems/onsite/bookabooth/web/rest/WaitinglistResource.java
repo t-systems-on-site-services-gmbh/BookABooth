@@ -58,12 +58,12 @@ public class WaitinglistResource {
                 Long companyId = company.getId();
                 List<User> users = userService.findUsersByCompanyId(companyId);
 
-                if (!users.isEmpty()) {
-                    List<String> emails = users.stream().map(User::getEmail).filter(Objects::nonNull).toList();
-                    company.setMail(String.join(", ", emails));
-                } else {
+                if ((users == null) || users.isEmpty()) {
                     company.setMail("Dieser Firma ist kein Benutzer zugeordnet.");
                     log.warn("No user IDs found for company ID: {}", companyId);
+                } else {
+                    List<String> emails = users.stream().map(User::getEmail).filter(Objects::nonNull).toList();
+                    company.setMail(String.join(", ", emails));
                 }
             })
             .sorted((c1, c2) -> {
@@ -95,7 +95,9 @@ public class WaitinglistResource {
             String companyName = company.getName();
             List<User> users = userService.findUsersByCompanyId(companyId);
 
-            if (!users.isEmpty()) {
+            if ((users == null) || users.isEmpty()) {
+                log.warn("No users found for company ID: {}", companyId);
+            } else {
                 users.forEach(user -> {
                     if ((user.getEmail() != null) && user.isActivated()) {
                         String userEmail = user.getEmail();
@@ -106,8 +108,6 @@ public class WaitinglistResource {
                         mailService.sendWaitingListEmail(user);
                     }
                 });
-            } else {
-                log.warn("No users found for company ID: {}", companyId);
             }
         });
 
