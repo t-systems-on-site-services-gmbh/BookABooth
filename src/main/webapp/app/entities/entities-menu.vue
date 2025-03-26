@@ -2,7 +2,7 @@
   <div>
     <b-dropdown-item to="/system">
       <font-awesome-icon icon="asterisk" />
-      <span>Anmeldung freischalten/sperren</span>
+      <span>Standbuchung freischalten/sperren</span>
     </b-dropdown-item>
     <b-dropdown-item to="/location">
       <font-awesome-icon icon="asterisk" />
