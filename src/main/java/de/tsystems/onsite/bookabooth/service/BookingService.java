@@ -20,10 +20,7 @@ import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothMapper;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,6 +212,10 @@ public class BookingService {
         return bookingRepository.findByCompanyIdOrderByReceivedDesc(id).stream().findFirst().map(bookingMapper::toDto);
     }
 
+    public List<Booking> getAllBookingsByCompanyId(Long id) {
+        return bookingRepository.findByCompanyId(id);
+    }
+
     public BookingDTO blockABoothBooking(Long boothId, BoothUserDTO bUserDTO) {
         BoothDTO boothDTO = boothService.findOne(boothId).orElseThrow(() -> new BadRequestException("Booth not found"));
         return this.blockABoothBooking(boothDTO, bUserDTO);
@@ -343,5 +344,21 @@ public class BookingService {
             .toList();
 
         bookings.forEach(bookingRepository::delete);
+    }
+
+    public List<Booking> getOpenBilling(Company company) {
+        return this.getAllBookingsByCompanyId(company.getId())
+            .stream()
+            .filter(booking -> {
+                if (booking.getStatus().equals(BookingStatus.CONFIRMED)) return true;
+                else if (booking.getCancellationFee() != null && booking.getCancellationFee().compareTo(BigDecimal.ZERO) > 0) return true;
+                else return false;
+            })
+            .collect(Collectors.toList());
+    }
+
+    public boolean hasOpenBilling(Company company) {
+        List<Booking> bookings = getOpenBilling(company);
+        return !bookings.isEmpty();
     }
 }

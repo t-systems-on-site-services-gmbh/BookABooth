@@ -51,27 +51,19 @@ public class BookingResource {
 
     private final BookingRepository bookingRepository;
 
-    private final BoothService boothService;
-
     private final BoothUserService boothUserService;
-
-    private final CompanyMapper companyMapper;
 
     private final ExcelService excelService;
 
     public BookingResource(
         BookingService bookingService,
         BookingRepository bookingRepository,
-        BoothService boothService,
         BoothUserService boothUserService,
-        CompanyMapper companyMapper,
         ExcelService excelService
     ) {
         this.bookingService = bookingService;
         this.bookingRepository = bookingRepository;
-        this.boothService = boothService;
         this.boothUserService = boothUserService;
-        this.companyMapper = companyMapper;
         this.excelService = excelService;
     }
 
@@ -89,7 +81,7 @@ public class BookingResource {
     ) throws URISyntaxException {
         log.debug("REST request to save Booking : {}", boothId);
 
-        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUserDTO(authentication);
         BookingDTO blockedBookingDTO = bookingService.blockABoothBooking(boothId, bUserDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -111,7 +103,7 @@ public class BookingResource {
     ) throws URISyntaxException {
         log.debug("REST request to confirm Booking : {}", bookingId);
 
-        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUserDTO(authentication);
         BookingDTO blockedBookingDTO = bookingService.confirmABoothBooking(bookingId, bUserDTO);
 
         return ResponseEntity.ok()
@@ -135,7 +127,7 @@ public class BookingResource {
 
         boolean force = SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN");
 
-        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUser(authentication);
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUserDTO(authentication);
         BookingDTO bookingDTO = bookingService.cancelAConfirmedBoothBooking(bookingId, bUserDTO, force);
 
         return ResponseEntity.accepted()
@@ -241,7 +233,7 @@ public class BookingResource {
     @GetMapping("/mybooking")
     public ResponseEntity<BookingDTO> getMyBooking(Authentication authentication) {
         log.debug("REST request to get my own Booking");
-        var boothUser = boothUserService.getCurrentBoothUser(authentication);
+        var boothUser = boothUserService.getCurrentBoothUserDTO(authentication);
         Optional<BookingDTO> bookingDTO = bookingService.getBookingByCompanyId(boothUser.getCompany().getId());
         return bookingDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.ok().build());
     }
@@ -249,7 +241,7 @@ public class BookingResource {
     @GetMapping("/unavailable")
     public List<BoothDTO> getUnavailableBooths(Authentication authentication) {
         log.debug("REST request to get all unavailable Booths");
-        return bookingService.getBoothsUnavailableForBooking(boothUserService.getCurrentBoothUser(authentication));
+        return bookingService.getBoothsUnavailableForBooking(boothUserService.getCurrentBoothUserDTO(authentication));
     }
 
     /**
@@ -281,7 +273,7 @@ public class BookingResource {
 
     private boolean isBookingOwnerOrAdmin(Long bookingId, Authentication authentication) {
         return (
-            bookingService.isOwner(bookingId, boothUserService.getCurrentBoothUser(authentication)) ||
+            bookingService.isOwner(bookingId, boothUserService.getCurrentBoothUserDTO(authentication)) ||
             SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN")
         );
     }

@@ -5,10 +5,6 @@ import static de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus.CON
 import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.*;
-import de.tsystems.onsite.bookabooth.domain.Authority;
-import de.tsystems.onsite.bookabooth.domain.BoothUser;
-import de.tsystems.onsite.bookabooth.domain.Company;
-import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
@@ -684,7 +680,11 @@ public class UserService {
         return boothUsers.stream().map(BoothUser::getUser).toList();
     }
 
-    public BoothUserDTO getBoothUser(User user) {
+    public BoothUserDTO getBoothUserDTO(User user) {
         return boothUserRepository.findById(user.getId()).map(boothUserMapper::toDto).orElseThrow();
+    }
+
+    public BoothUser getBoothUser(User user) {
+        return boothUserRepository.findById(user.getId()).orElseThrow();
     }
 }
