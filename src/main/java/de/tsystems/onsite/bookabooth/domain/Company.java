@@ -1,11 +1,14 @@
 package de.tsystems.onsite.bookabooth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 

@@ -85,7 +85,7 @@ public class WaitinglistResource {
 
     @PutMapping("/add-waitinglist")
     public ResponseEntity<Void> addToWaitingList(@RequestBody UserProfileDTO userProfileDTO, Authentication authentication) {
-        var boothUserDTO = boothUserService.getCurrentBoothUser(authentication);
+        var boothUserDTO = boothUserService.getCurrentBoothUserDTO(authentication);
 
         if (!boothUserDTO.getCompany().getId().equals(userProfileDTO.getCompany().getId())) {
             log.warn(
