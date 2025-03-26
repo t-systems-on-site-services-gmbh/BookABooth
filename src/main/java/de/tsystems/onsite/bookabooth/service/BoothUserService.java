@@ -124,7 +124,7 @@ public class BoothUserService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public BoothUserDTO getCurrentBoothUser(Authentication authentication) {
+    public BoothUserDTO getCurrentBoothUserDTO(Authentication authentication) {
         String login = String.valueOf(authentication.getName());
         return boothUserRepository
             .findByUserLogin(login)
@@ -132,8 +132,31 @@ public class BoothUserService {
             .orElseThrow(() -> new BadRequestException("BoothUser not found for user: " + login));
     }
 
+    /**
+     * Get the boothUser by the current user.
+     *
+     * @return the entity.
+     */
+    @Transactional(readOnly = true)
+    public BoothUser getCurrentBoothUser(Authentication authentication) {
+        String login = String.valueOf(authentication.getName());
+        return boothUserRepository
+            .findByUserLogin(login)
+            .orElseThrow(() -> new BadRequestException("BoothUser not found for user: " + login));
+    }
+
     @Transactional(readOnly = true)
     public List<BoothUser> getAllUsers() {
         return boothUserRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<BoothUser> getBoothUserById(Long id) {
+        return boothUserRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<BoothUser> getBoothUserByUserLogin(String login) {
+        return boothUserRepository.findByUserLogin(login);
     }
 }

@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.web.rest.onsite;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,22 +9,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.*;
 import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.*;
 import de.tsystems.onsite.bookabooth.service.mapper.*;
 import de.tsystems.onsite.bookabooth.web.rest.AccountResource;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -71,10 +78,16 @@ public class AccountResourceTest {
     @Autowired
     private BookingMapper bookingMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private static final String TEST_USER_LOGIN = "testUser";
+    private static final String TEST_USER_PASSWORD = "testPassword";
     private User testUser;
     private Company testCompany;
     private BoothUser testBoothUser;
-    private Booking testBooking;
+    private Booking confirmedBooking;
+    private Booking canceledBooking;
     private UserProfileDTO userProfileDTO;
 
     @BeforeEach
@@ -83,21 +96,12 @@ public class AccountResourceTest {
         testUser = new User();
         testUser.setFirstName("Test User");
         testUser.setLastName("Initial");
-        testUser.setLogin("testuser");
+        testUser.setLogin(TEST_USER_LOGIN);
         testUser.setEmail("test@localhost.de");
-        testUser.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        testUser.setPassword(passwordEncoder.encode(TEST_USER_PASSWORD));
+        testUser.setActivated(true);
         userRepository.saveAndFlush(testUser);
         UserDTO testUserDTO = userMapper.userToUserDTO(testUser);
-
-        testCompany = new Company();
-        testCompany.setName("Test Company");
-        companyRepository.saveAndFlush(testCompany);
-        CompanyDTO testCompanyDTO = companyMapper.toDto(testCompany);
-
-        testBoothUser = new BoothUser();
-        testBoothUser.setUser(testUser);
-        testBoothUser.setCompany(testCompany);
-        boothUserRepository.saveAndFlush(testBoothUser);
 
         // Booth muss vorhanden sein, damit kein Fehler auftritt
         Booth testBooth = new Booth();
@@ -105,11 +109,35 @@ public class AccountResourceTest {
         testBooth.setAvailable(true);
         boothRepository.saveAndFlush(testBooth);
 
-        testBooking = new Booking();
-        testBooking.setCompany(testCompany);
-        testBooking.setBooth(testBooth);
-        bookingRepository.saveAndFlush(testBooking);
-        BookingDTO testBookingDTO = bookingMapper.toDto(testBooking);
+        testCompany = new Company();
+        testCompany.setName("Test Company");
+        companyRepository.save(testCompany);
+        CompanyDTO testCompanyDTO = companyMapper.toDto(testCompany);
+
+        testBoothUser = new BoothUser();
+        testBoothUser.setUser(testUser);
+        testBoothUser.setCompany(testCompany);
+        boothUserRepository.saveAndFlush(testBoothUser);
+
+        canceledBooking = new Booking();
+        canceledBooking.setCompany(testCompany);
+        canceledBooking.setBooth(testBooth);
+        canceledBooking.setReceived(ZonedDateTime.now());
+        canceledBooking.setConfirmed(ZonedDateTime.now());
+        canceledBooking.setPrice(BigDecimal.valueOf(100));
+        canceledBooking.setCancellationFee(BigDecimal.valueOf(25));
+        canceledBooking.setStatus(BookingStatus.CANCELED);
+
+        confirmedBooking = new Booking();
+        confirmedBooking.setCompany(testCompany);
+        confirmedBooking.setBooth(testBooth);
+        confirmedBooking.setPrice(BigDecimal.valueOf(100));
+        confirmedBooking.setReceived(ZonedDateTime.now());
+        confirmedBooking.setConfirmed(ZonedDateTime.now());
+        confirmedBooking.setStatus(BookingStatus.CONFIRMED);
+
+        bookingRepository.saveAllAndFlush(List.of(confirmedBooking, canceledBooking));
+        BookingDTO testBookingDTO = bookingMapper.toDto(confirmedBooking);
 
         userProfileDTO = new UserProfileDTO();
         userProfileDTO.setUser(testUserDTO);
@@ -119,46 +147,56 @@ public class AccountResourceTest {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.USER)
-    public void deleteUserCompanyBookingAndBoothUserAsUser() {
-        // Verifizieren, dass Entities gespeichert wurden
-        assertNotNull(testBoothUser.getId());
-        assertNotNull(testUser.getId());
-        assertNotNull(testCompany.getId());
-        assertNotNull(testBooking.getId());
+    @WithMockUser(username = TEST_USER_LOGIN, authorities = "ROLE_USER")
+    @DisplayName("prevent deletion of user with open billing")
+    void openBilling() throws Exception {
+        // Create PasswordChangeDTO
+        PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO();
+        passwordChangeDTO.setCurrentPassword(TEST_USER_PASSWORD);
 
-        // Löschen des Users, mitsamt der Dependencies
-        userService.deleteAccount(testUser.getId());
+        // Perform delete request
+        mockMvc
+            .perform(
+                delete("/api/account/delete-account/{id}", testUser.getId())
+                    .with(csrf())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(om.writeValueAsBytes(passwordChangeDTO))
+            )
+            .andExpect(status().isBadRequest());
 
-        // Verifizieren, dass User, Company, BoothUser und Booking gelöscht wurden
-        assertFalse(boothUserRepository.findById(testBoothUser.getId()).isPresent());
-        assertFalse(userRepository.findById(testUser.getId()).isPresent());
-        assertFalse(companyRepository.findById(testCompany.getId()).isPresent());
-        assertFalse(bookingRepository.findById(testBooking.getId()).isPresent());
+        // Validate the user is not deleted
+        assertThat(userRepository.findOneByLogin(TEST_USER_LOGIN)).isPresent();
+
+        // set confirmedBooking to canceled and canceledBooking cancelationFee to null
+        confirmedBooking.setStatus(BookingStatus.CANCELED);
+        canceledBooking.setCancellationFee(null);
+        bookingRepository.saveAllAndFlush(List.of(confirmedBooking, canceledBooking));
+
+        // Perform delete request
+        mockMvc
+            .perform(
+                delete("/api/account/delete-account/{id}", testUser.getId())
+                    .with(csrf())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(om.writeValueAsBytes(passwordChangeDTO))
+            )
+            .andExpect(status().isOk());
     }
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.USER)
+    @WithMockUser(username = TEST_USER_LOGIN)
     public void deleteOverApiAndSucceed() throws Exception {
-        // JSON für die Anfrage
-        String requestJson = "{\"currentPassword\": \"user\"}";
-
-        // API-Endpunkt aufrufen
-        mockMvc
-            .perform(
-                delete("/api/account/delete-account/" + testUser.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestJson)
-                    .with(csrf())
-            )
-            .andExpect(status().isOk());
+        // Löschen des Users, mitsamt der Dependencies
+        userService.deleteAccount(testUser.getId());
 
         // Überprüfen, dass Einträge geleert wurden
         assertFalse(boothUserRepository.findById(testBoothUser.getId()).isPresent());
         assertFalse(userRepository.findById(testUser.getId()).isPresent());
         assertFalse(companyRepository.findById(testCompany.getId()).isPresent());
-        assertFalse(bookingRepository.findById(testBooking.getId()).isPresent());
+        assertFalse(bookingRepository.findById(confirmedBooking.getId()).isPresent());
     }
 
     @Test
@@ -207,7 +245,7 @@ public class AccountResourceTest {
         assertNotNull(testBoothUser.getId());
         assertNotNull(testUser.getId());
         assertNotNull(testCompany.getId());
-        assertNotNull(testBooking.getId());
+        assertNotNull(confirmedBooking.getId());
         assertNotNull(userProfileDTO.getUser());
 
         // Neue Userinfos in DTO einfügen
@@ -256,7 +294,7 @@ public class AccountResourceTest {
             .andExpect(jsonPath("$.user.id").value(testUser.getId()))
             .andExpect(jsonPath("$.user.login").value(testUser.getLogin()))
             .andExpect(jsonPath("$.company.id").value(testCompany.getId()))
-            .andExpect(jsonPath("$.booking.id").value(testBooking.getId()))
-            .andExpect(jsonPath("$.booking.booth.id").value(testBooking.getBooth().getId()));
+            .andExpect(jsonPath("$.booking.id").value(confirmedBooking.getId()))
+            .andExpect(jsonPath("$.booking.booth.id").value(confirmedBooking.getBooth().getId()));
     }
 }

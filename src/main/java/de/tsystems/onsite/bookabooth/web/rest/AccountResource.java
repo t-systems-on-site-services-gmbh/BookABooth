@@ -1,10 +1,12 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
 import de.tsystems.onsite.bookabooth.domain.*;
+import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.PersistentTokenRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.BookingService;
+import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.*;
@@ -21,6 +23,8 @@ import javax.security.auth.login.AccountNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -32,6 +36,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class AccountResource {
+
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
+
+    private BoothUserService boothUserService;
 
     private static class AccountResourceException extends RuntimeException {
 
@@ -55,12 +64,14 @@ public class AccountResource {
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
+        BoothUserService boothUserService,
         BookingService bookingService,
         MailService mailService,
         PersistentTokenRepository persistentTokenRepository
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.boothUserService = boothUserService;
         this.bookingService = bookingService;
         this.mailService = mailService;
         this.persistentTokenRepository = persistentTokenRepository;
@@ -180,7 +191,7 @@ public class AccountResource {
             throw new InvalidEmailException("Provided email does not match the existing email");
         }
 
-        BoothUserDTO bUserDTO = userService.getBoothUser(user);
+        BoothUserDTO bUserDTO = userService.getBoothUserDTO(user);
         bookingService.cancelAConfirmedBoothBooking(userProfileDTO.getBooking().getId(), bUserDTO, false);
         return ResponseEntity.ok().build();
     }
@@ -255,16 +266,62 @@ public class AccountResource {
      * @return bad request, if the password is incorrect, otherwise it returns ok
      */
     @DeleteMapping("/account/delete-account/{id}")
-    public ResponseEntity<Void> deleteAccount(@RequestBody PasswordChangeDTO passwordChangeDTO, @PathVariable Long id) {
-        if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
-            userService.deleteAccount(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<Void> deleteAccount(
+        @RequestBody PasswordChangeDTO passwordChangeDTO,
+        @PathVariable Long id,
+        @RequestParam(name = "forcedelete", defaultValue = "false") boolean forceDelete,
+        Authentication authentication
+    ) {
+        // get logged in user
+        BoothUser currentBoothUser = boothUserService.getCurrentBoothUser(authentication);
+
+        // get user to be deleted or throw exception
+        BoothUser deleteBoothUser = boothUserService
+            .getBoothUserById(id)
+            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+
+        if (SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_ADMIN")) {
+            // the admin requested a deletion
+            if (!currentBoothUser.equals(deleteBoothUser)) {
+                // the admin requested a deletion of another user
+                if (forceDelete) {
+                    // force deletion requested by admin > no billing check
+                    userService.deleteAccount(id);
+                } else {
+                    // force deletion not requested by admin > check billing
+                    checkBillingAndDelete(deleteBoothUser);
+                }
+            } else {
+                // the admin requested a deletion of himself
+                checkPassword(passwordChangeDTO, deleteBoothUser);
+                userService.deleteAccount(id);
+            }
+        } else if (SecurityUtils.hasCurrentUserAnyOfAuthorities("ROLE_USER") && currentBoothUser.equals(deleteBoothUser)) {
+            // the user requested a deletion of himself
+            checkPassword(passwordChangeDTO, deleteBoothUser);
+            checkBillingAndDelete(deleteBoothUser);
         } else {
             return ResponseEntity.badRequest().build();
         }
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    private void checkPassword(PasswordChangeDTO passwordChangeDTO, BoothUser deleteBoothUser) {
+        if (passwordChangeDTO.getCurrentPassword() == null || passwordChangeDTO.getCurrentPassword().isEmpty()) {
+            throw new BadRequestAlertException("Password cannot be empty", "passwordEmpty", "passwordEmpty");
+        }
+
+        if (!userService.checkPassword(passwordChangeDTO.getCurrentPassword())) {
+            throw new BadRequestAlertException("Password is incorrect", "passwordIncorrect", "passwordIncorrect");
+        }
+    }
+
+    private void checkBillingAndDelete(BoothUser deleteBoothUser) {
+        if (bookingService.hasOpenBilling(deleteBoothUser.getCompany())) {
+            throw new BadRequestAlertException("Company has open billing", "openBilling", "openBilling");
+        }
+        userService.deleteAccount(deleteBoothUser.getId());
     }
 
     /**
