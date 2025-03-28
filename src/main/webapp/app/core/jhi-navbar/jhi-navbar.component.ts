@@ -41,9 +41,8 @@ export default defineComponent({
     const logout = async () => {
       const response = await loginService.logout();
       store.logout();
-      if (router.currentRoute.value.path !== '/') {
-        await router.push('/');
-      }
+      await router.push('/');
+      await accountService.authenticate();
     };
 
     return {
