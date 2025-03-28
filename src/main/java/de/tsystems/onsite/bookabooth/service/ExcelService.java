@@ -2,12 +2,16 @@ package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Booking;
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
+import de.tsystems.onsite.bookabooth.domain.Location;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
+import de.tsystems.onsite.bookabooth.repository.LocationRepository;
 import de.tsystems.onsite.bookabooth.repository.UserRepository;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ExcelService {
 
     @Autowired
@@ -29,10 +34,18 @@ public class ExcelService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LocationRepository locationRepository;
+
     @Transactional(readOnly = true)
     public byte[] generateExcel(List<Booking> BookingList) throws IOException {
+        Map<Long, String> locationNames = locationRepository
+            .findAll()
+            .stream()
+            .collect(Collectors.toMap(Location::getId, Location::getLocation));
+
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Report");
+        Sheet sheet = workbook.createSheet("Buchungen");
         sheet.setDefaultColumnWidth(15);
 
         // Set specific column widths
@@ -44,6 +57,10 @@ public class ExcelService {
         CellStyle numberStyle = workbook.createCellStyle();
         DataFormat format = workbook.createDataFormat();
         numberStyle.setDataFormat(format.getFormat("#,##0.00"));
+
+        // Create a cell style for address
+        CellStyle addressStyle = workbook.createCellStyle();
+        addressStyle.setWrapText(true);
 
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
@@ -72,7 +89,7 @@ public class ExcelService {
         int i = 1;
         for (Booking booking : BookingList) {
             Row bodyRow = sheet.createRow(i);
-            createCell(bodyRow, 0, null).setCellValue(booking.getCompany().getName().toString());
+            createCell(bodyRow, 0, null).setCellValue(booking.getCompany().getName());
             BoothUser bUser = boothUserRepository.findFirstByCompanyId(booking.getCompany().getId());
             if (bUser != null) {
                 User user = userRepository.findById(bUser.getId()).get();
@@ -80,9 +97,14 @@ public class ExcelService {
                     String.format("%s, %s (%s)", user.getLastName(), user.getFirstName(), bUser.getPhone())
                 );
             }
-            createCell(bodyRow, 2, null).setCellValue(booking.getCompany().getBillingAddress());
+            createCell(bodyRow, 2, addressStyle).setCellValue(booking.getCompany().getBillingAddress());
             createCell(bodyRow, 3, null).setCellValue(booking.getCompany().getComment());
-            createCell(bodyRow, 4, null).setCellValue(booking.getBooth().getId());
+            String locBooth = String.format(
+                "%s-%s",
+                locationNames.get(booking.getBooth().getLocation().getId()),
+                booking.getBooth().getTitle()
+            );
+            createCell(bodyRow, 4, null).setCellValue(locBooth);
             createCell(bodyRow, 5, numberStyle).setCellValue(booking.getPrice() == null ? 0.00 : booking.getPrice().doubleValue());
             createCell(bodyRow, 6, numberStyle).setCellValue(
                 booking.getCancellationFee() == null ? 0.00 : booking.getCancellationFee().doubleValue()

@@ -1,8 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
-import de.tsystems.onsite.bookabooth.domain.Booking;
-import de.tsystems.onsite.bookabooth.domain.BoothUser;
-import de.tsystems.onsite.bookabooth.domain.Company;
+import de.tsystems.onsite.bookabooth.domain.*;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothUserRepository;
@@ -49,7 +47,7 @@ public class AdminDashboardService {
 
         // helper mappings
 
-        List<BoothUser> users = boothUserRepository.findAll().stream().filter(user -> !user.isAdmin()).collect(Collectors.toList());
+        List<BoothUser> users = boothUserRepository.findAll().stream().filter(user -> !user.isAdmin()).toList();
         // map company.id to User
         Map<Long, BoothUser> companyBoothUsersMap = users
             .stream()
@@ -74,18 +72,16 @@ public class AdminDashboardService {
             // information from company
             cl.setCompanyId(company.getId());
             cl.setCompanyName(company.getName());
-            cl.setAddress(company.getBillingAddress() != null && !company.getBillingAddress().isBlank() ? true : false);
-            cl.setLogo(company.getLogo() != null && !company.getLogo().isBlank() ? true : false);
-            cl.setCompanyDescription(company.getDescription() != null && !company.getDescription().isBlank() ? true : false);
+            cl.setAddress(company.getBillingAddress() != null && !company.getBillingAddress().isBlank());
+            cl.setLogo(company.getLogo() != null && !company.getLogo().isBlank());
+            cl.setCompanyDescription(company.getDescription() != null && !company.getDescription().isBlank());
 
             // information from BoothUser
             BoothUser companyBoothUser = companyBoothUsersMap.get(company.getId());
             if (companyBoothUser != null) {
                 cl.setPhoneNumber(
                     companyBoothUsersMap.get(company.getId()).getPhone() != null &&
-                        !companyBoothUsersMap.get(company.getId()).getPhone().isBlank()
-                        ? true
-                        : false
+                    !companyBoothUsersMap.get(company.getId()).getPhone().isBlank()
                 );
                 cl.setMail(companyBoothUsersMap.get(cl.getCompanyId()).getUser().getEmail());
             }
@@ -93,13 +89,13 @@ public class AdminDashboardService {
             // information from Booking
             if (companyBookingsMap.containsKey(company.getId())) {
                 String location = Optional.ofNullable(companyBookingsMap.get(company.getId()))
-                    .map(booking -> booking.getBooth())
-                    .map(booth -> booth.getLocation())
-                    .map(l -> l.getLocation())
+                    .map(Booking::getBooth)
+                    .map(Booth::getLocation)
+                    .map(Location::getLocation)
                     .orElse("Location fehlt");
                 String booth = Optional.ofNullable(companyBookingsMap.get(company.getId()))
-                    .map(booking -> booking.getBooth())
-                    .map(b -> b.getTitle())
+                    .map(Booking::getBooth)
+                    .map(Booth::getTitle)
                     .orElse("Booth fehlt");
                 cl.setBooth(String.format("%s-%s", location, booth));
             }
@@ -111,10 +107,10 @@ public class AdminDashboardService {
                     .stream()
                     .map(booking -> {
                         String location = Optional.ofNullable(booking.getBooth())
-                            .map(booth -> booth.getLocation())
-                            .map(l -> l.getLocation())
+                            .map(Booth::getLocation)
+                            .map(Location::getLocation)
                             .orElse("Location fehlt");
-                        String booth = Optional.ofNullable(booking.getBooth()).map(b -> b.getTitle()).orElse("Booth fehlt");
+                        String booth = Optional.ofNullable(booking.getBooth()).map(Booth::getTitle).orElse("Booth fehlt");
                         return String.format("%s-%s", location, booth);
                     })
                     .collect(Collectors.joining(", ")); // Kombiniere alle stornierten Buchungen in einem String
@@ -126,7 +122,7 @@ public class AdminDashboardService {
 
         adminDashboard
             .getChecklist()
-            .sort((o1, o2) -> {
+            .sort((AdminChecklistDTO o1, AdminChecklistDTO o2) -> {
                 if (o1.isMandatoryComplete()) {
                     return 0;
                 } else {
