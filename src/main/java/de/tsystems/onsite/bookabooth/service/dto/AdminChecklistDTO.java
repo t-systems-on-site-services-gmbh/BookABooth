@@ -10,6 +10,7 @@ public class AdminChecklistDTO {
     private boolean companyDescription; // Firmenbeschreibung hinterlegt?
     private String booth;
     private String mail;
+    private String canceledBooth;
 
     public AdminChecklistDTO() {}
 
@@ -79,5 +80,13 @@ public class AdminChecklistDTO {
 
     public boolean isMandatoryComplete() {
         return address && phoneNumber && logo && companyDescription;
+    }
+
+    public String getCanceledBooth() {
+        return canceledBooth;
+    }
+
+    public void setCanceledBooth(String canceledBooth) {
+        this.canceledBooth = canceledBooth;
     }
 }

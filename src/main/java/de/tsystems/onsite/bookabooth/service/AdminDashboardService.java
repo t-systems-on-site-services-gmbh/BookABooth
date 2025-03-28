@@ -61,6 +61,12 @@ public class AdminDashboardService {
             .stream()
             .collect(Collectors.toMap(b -> b.getCompany().getId(), booking -> booking));
 
+        // map company.id to List of CANCELED Bookings
+        Map<Long, List<Booking>> companyCanceledBookingsMap = bookingRepository
+            .findByStatus(BookingStatus.CANCELED)
+            .stream()
+            .collect(Collectors.groupingBy(booking -> booking.getCompany().getId()));
+
         // company
         for (Company company : companies) {
             AdminChecklistDTO cl = new AdminChecklistDTO();
@@ -96,6 +102,23 @@ public class AdminDashboardService {
                     .map(b -> b.getTitle())
                     .orElse("Booth fehlt");
                 cl.setBooth(String.format("%s-%s", location, booth));
+            }
+
+            // information from CANCELED Bookings
+            if (companyCanceledBookingsMap.containsKey(company.getId())) {
+                List<Booking> canceledBookings = companyCanceledBookingsMap.get(company.getId());
+                String canceledBooths = canceledBookings
+                    .stream()
+                    .map(booking -> {
+                        String location = Optional.ofNullable(booking.getBooth())
+                            .map(booth -> booth.getLocation())
+                            .map(l -> l.getLocation())
+                            .orElse("Location fehlt");
+                        String booth = Optional.ofNullable(booking.getBooth()).map(b -> b.getTitle()).orElse("Booth fehlt");
+                        return String.format("%s-%s", location, booth);
+                    })
+                    .collect(Collectors.joining(", ")); // Kombiniere alle stornierten Buchungen in einem String
+                cl.setCanceledBooth(canceledBooths);
             }
 
             checklist.add(cl);

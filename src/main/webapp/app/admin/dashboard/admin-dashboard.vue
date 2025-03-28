@@ -58,7 +58,18 @@
               :class="{ 'list-group-item-success': checklist.companyDescription, 'list-group-item-danger': !checklist.companyDescription }"
               v-text="checklist.companyDescription ? 'Ja' : 'Nein'"
             ></td>
-            <td>{{ checklist.booth }}</td>
+            <td>
+              <span v-if="checklist.booth" class="badge badge-pill badge-success">{{ checklist.booth }}</span>
+              <div v-if="checklist.canceledBooth">
+                <span
+                  v-for="(canceled, index) in checklist.canceledBooth.split(',')"
+                  :key="index"
+                  class="badge badge-pill badge-danger mr-1"
+                >
+                  {{ canceled.trim() }}
+                </span>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
