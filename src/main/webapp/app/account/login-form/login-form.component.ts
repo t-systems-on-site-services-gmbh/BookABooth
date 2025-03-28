@@ -33,6 +33,8 @@ export default defineComponent({
         await accountService.retrieveAccount();
         if (route.path === '/forbidden') {
           previousState();
+        } else {
+          router.push('/');
         }
       } catch (_error) {
         authenticationError.value = true;

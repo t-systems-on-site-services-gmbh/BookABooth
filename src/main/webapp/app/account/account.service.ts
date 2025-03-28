@@ -26,6 +26,18 @@ export default class AccountService {
     }
   }
 
+  public async authenticate() {
+    try {
+      const response = await axios.get<any>('api/authenticate');
+      if (response.status === 200 && response.data) {
+        const auth = response.data;
+        console.log(auth);
+      }
+    } catch (error) {
+      // Ignore error
+    }
+  }
+
   public async retrieveAccount(): Promise<boolean> {
     try {
       const response = await axios.get<any>('api/account');
