@@ -5,14 +5,12 @@ import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.security.SecurityUtils;
 import de.tsystems.onsite.bookabooth.service.BookingService;
-import de.tsystems.onsite.bookabooth.service.BoothService;
 import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.ExcelService;
 import de.tsystems.onsite.bookabooth.service.dto.BookingDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothDTO;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
 import de.tsystems.onsite.bookabooth.service.exception.ForbiddenException;
-import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -282,7 +280,7 @@ public class BookingResource {
     public HttpEntity<ByteArrayResource> generateExcel() {
         try {
             BigDecimal zero = new BigDecimal(0);
-            List<Booking> BookingsList = bookingRepository
+            List<Booking> bookingsList = bookingRepository
                 .findByStatusIn(Arrays.asList(BookingStatus.CONFIRMED, BookingStatus.CANCELED))
                 .stream()
                 .filter(booking -> {
@@ -296,10 +294,10 @@ public class BookingResource {
                 })
                 .toList();
 
-            byte[] excelContent = excelService.generateExcel(BookingsList);
+            byte[] excelContent = excelService.generateExcel(bookingsList);
             HttpHeaders header = new HttpHeaders();
             header.setContentType(new MediaType("application", "force-download"));
-            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report.xlsx");
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Standbuchungen.xlsx");
             return new HttpEntity<>(new ByteArrayResource(excelContent), header);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
