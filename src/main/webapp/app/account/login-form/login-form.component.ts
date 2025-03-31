@@ -10,7 +10,6 @@ export default defineComponent({
     const authenticationError: Ref<boolean> = ref(false);
     const login: Ref<string> = ref(null);
     const password: Ref<string> = ref(null);
-    const rememberMe: Ref<boolean> = ref(false);
     const route = useRoute();
     const router = useRouter();
 
@@ -20,7 +19,7 @@ export default defineComponent({
     const loginService = inject<LoginService>('loginService');
 
     const doLogin = async () => {
-      const data = `username=${encodeURIComponent(login.value)}&password=${encodeURIComponent(password.value)}&remember-me=${rememberMe.value}&submit=Login`;
+      const data = `username=${encodeURIComponent(login.value)}&password=${encodeURIComponent(password.value)}&submit=Login`;
       try {
         await axios.post('api/authentication', data, {
           headers: {
@@ -44,7 +43,6 @@ export default defineComponent({
       authenticationError,
       login,
       password,
-      rememberMe,
       accountService,
       doLogin,
     };

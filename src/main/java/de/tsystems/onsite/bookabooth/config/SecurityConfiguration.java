@@ -33,10 +33,7 @@ public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
 
-    private final RememberMeServices rememberMeServices;
-
-    public SecurityConfiguration(RememberMeServices rememberMeServices, JHipsterProperties jHipsterProperties) {
-        this.rememberMeServices = rememberMeServices;
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
         this.jHipsterProperties = jHipsterProperties;
     }
 
@@ -96,13 +93,6 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/management/info")).permitAll()
                         .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
                         .requestMatchers(mvc.pattern("/management/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-            )
-            .rememberMe(
-                rememberMe ->
-                    rememberMe
-                        .rememberMeServices(rememberMeServices)
-                        .rememberMeParameter("remember-me")
-                        .key(jHipsterProperties.getSecurity().getRememberMe().getKey())
             )
             .exceptionHandling(
                 exceptionHanding ->
