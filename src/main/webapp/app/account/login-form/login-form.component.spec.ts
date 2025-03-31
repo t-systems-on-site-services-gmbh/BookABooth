@@ -72,7 +72,7 @@ describe('LoginForm Component', () => {
 
     // THEN
     expect(
-      axiosStub.post.calledWith('api/authentication', 'username=login&password=pwd&remember-me=true&submit=Login', {
+      axiosStub.post.calledWith('api/authentication', 'username=login&password=pwd&submit=Login', {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       }),
     ).toBeTruthy();
@@ -84,7 +84,6 @@ describe('LoginForm Component', () => {
     // GIVEN
     loginForm.login = 'login';
     loginForm.password = 'pwd';
-    loginForm.rememberMe = true;
     axiosStub.post.resolves({});
 
     // WHEN
@@ -93,7 +92,7 @@ describe('LoginForm Component', () => {
 
     // THEN
     expect(
-      axiosStub.post.calledWith('api/authentication', 'username=login&password=pwd&remember-me=true&submit=Login', {
+      axiosStub.post.calledWith('api/authentication', 'username=login&password=pwd&submit=Login', {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       }),
     ).toBeTruthy();

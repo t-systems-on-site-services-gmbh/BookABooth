@@ -13,7 +13,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Persistent tokens are used by Spring Security to automatically log in users.
  *
- * @see de.tsystems.onsite.bookabooth.security.PersistentTokenRememberMeServices
  */
 @Entity
 @Table(name = "jhi_persistent_token")

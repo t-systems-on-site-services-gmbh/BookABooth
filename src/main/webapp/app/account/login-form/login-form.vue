@@ -24,9 +24,6 @@
             <b-form-input id="password" type="password" name="password" placeholder="Ihr Passwort" v-model="password" data-cy="password">
             </b-form-input>
           </b-form-group>
-          <b-form-checkbox id="rememberMe" name="rememberMe" v-model="rememberMe" checked>
-            <span>Automatische Anmeldung</span>
-          </b-form-checkbox>
           <div>
             <b-button data-cy="submit" type="submit" variant="primary">Anmelden</b-button>
           </div>
