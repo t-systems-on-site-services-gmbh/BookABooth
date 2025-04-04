@@ -27,7 +27,6 @@ public class AdminDashboardResource {
      * @return the {@link List} of entities.
      */
     @GetMapping("/data")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public AdminDashboardDTO getChecklist() {
         return AdminDashboardService.getData();
     }

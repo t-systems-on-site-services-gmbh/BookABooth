@@ -144,7 +144,6 @@ public class BookingResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BookingDTO> updateBooking(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody BookingDTO bookingDTO
@@ -179,7 +178,6 @@ public class BookingResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BookingDTO> partialUpdateBooking(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody BookingDTO bookingDTO

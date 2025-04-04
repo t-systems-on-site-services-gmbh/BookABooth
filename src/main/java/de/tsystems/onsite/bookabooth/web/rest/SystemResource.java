@@ -51,7 +51,6 @@ public class SystemResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<SystemDTO> partialUpdateSystem(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody SystemDTO systemDTO
