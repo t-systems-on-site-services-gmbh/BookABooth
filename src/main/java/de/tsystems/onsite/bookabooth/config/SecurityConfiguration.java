@@ -7,6 +7,7 @@ import de.tsystems.onsite.bookabooth.security.*;
 import de.tsystems.onsite.bookabooth.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -66,31 +67,84 @@ public class SecurityConfiguration {
                                 "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()"
                             )
                     ))
-            .authorizeHttpRequests(
-                authz ->
-                    // prettier-ignore
-                    authz
-                        .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
-                        .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
-                        .requestMatchers(mvc.pattern("/assets/**")).permitAll()
-                        .requestMatchers(mvc.pattern("/content/**")).permitAll()
-                        .requestMatchers(mvc.pattern("/uploads/**")).permitAll()
-                        .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/authenticate")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/register")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/activate")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/ausstellerliste")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-                        .requestMatchers(mvc.pattern("/api/**")).authenticated()
-                        .requestMatchers(mvc.pattern("/v3/api-docs/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-                        .requestMatchers(mvc.pattern("/management/health")).permitAll()
-                        .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
-                        .requestMatchers(mvc.pattern("/management/info")).permitAll()
-                        .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
-                        .requestMatchers(mvc.pattern("/management/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-            )
+            .authorizeHttpRequests(authz -> {
+                // prettier-ignore
+
+                // permit all
+                authz
+                    .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
+                    .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
+                    .requestMatchers(mvc.pattern("/assets/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/content/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/uploads/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/authenticate")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/register")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/activate")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/ausstellerliste")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/health")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/info")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
+                ;
+                // role specific access
+                authz
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/account"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/account"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/account/cancel-booking"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/account/change-password"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/account/delete-account/*"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/account/remove-waitinglist"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/booths"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/booths/occupied"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/bookings/mybooking"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/bookings/unavailable"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/bookings/booth/*"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.PATCH, "/api/bookings/confirm/*"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/checklist"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/companies/*/image"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/locations"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/privacy-policy/latest"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/privacy-policy/check"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/privacy-policy/accept"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/service-packages"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/systems"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/waitinglist/add-waitinglist"))
+                    .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER);
+
+                // all other endpoints (only Admin)
+                authz
+                    .requestMatchers(mvc.pattern("/api/admin/**"))
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers(mvc.pattern("/v3/api-docs/**"))
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers(mvc.pattern("/management/**"))
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers(mvc.pattern("/**"))
+                    .hasAuthority(AuthoritiesConstants.ADMIN);
+            })
             .exceptionHandling(
                 exceptionHanding ->
                     exceptionHanding.defaultAuthenticationEntryPointFor(

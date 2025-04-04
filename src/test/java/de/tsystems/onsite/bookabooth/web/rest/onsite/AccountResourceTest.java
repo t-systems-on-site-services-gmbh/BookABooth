@@ -185,6 +185,7 @@ public class AccountResourceTest {
             .andExpect(status().isOk());
     }
 
+    // TODO: TEST: This test failed -> move this test to service or test the rest api
     @Test
     @Transactional
     @WithMockUser(username = TEST_USER_LOGIN)

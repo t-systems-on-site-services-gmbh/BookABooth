@@ -49,7 +49,6 @@ public class ServicePackageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicePackageDTO> createServicePackage(@RequestBody ServicePackageDTO servicePackageDTO)
         throws URISyntaxException {
         log.debug("REST request to save ServicePackage : {}", servicePackageDTO);
@@ -73,7 +72,6 @@ public class ServicePackageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicePackageDTO> updateServicePackage(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ServicePackageDTO servicePackageDTO
@@ -108,7 +106,6 @@ public class ServicePackageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicePackageDTO> partialUpdateServicePackage(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ServicePackageDTO servicePackageDTO
@@ -167,7 +164,6 @@ public class ServicePackageResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteServicePackage(@PathVariable("id") Long id) {
         log.debug("REST request to delete ServicePackage : {}", id);
         servicePackageService.delete(id);

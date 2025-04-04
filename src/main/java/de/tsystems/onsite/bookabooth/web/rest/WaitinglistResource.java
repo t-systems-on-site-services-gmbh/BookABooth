@@ -47,7 +47,6 @@ public class WaitinglistResource {
     }
 
     @PostMapping("/send-emails")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> sendEmailsToWaitingList() {
         log.debug("REST request to send emails to companies on the waiting list");
         waitinglistService.sendMailToCompaniesOnWaitingList();
@@ -55,7 +54,6 @@ public class WaitinglistResource {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> partialUpdateWaitingListStatus(@PathVariable Long id, @RequestBody CompanyDTO companyDTO) {
         log.debug("REST request to partially update the status of company with ID: {}", id);
 
