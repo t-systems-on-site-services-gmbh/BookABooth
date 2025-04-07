@@ -56,6 +56,9 @@ public class BoothUser implements Serializable {
     @JsonIgnoreProperties(value = { "bookings", "departments", "contacts" }, allowSetters = true)
     private Company company;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private PrivacyPolicy acceptedPrivacyPolicy;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -173,6 +176,14 @@ public class BoothUser implements Serializable {
     public BoothUser company(Company company) {
         this.setCompany(company);
         return this;
+    }
+
+    public PrivacyPolicy getAcceptedPrivacyPolicy() {
+        return this.acceptedPrivacyPolicy;
+    }
+
+    public void setAcceptedPrivacyPolicy(PrivacyPolicy acceptedPrivacyPolicy) {
+        this.acceptedPrivacyPolicy = acceptedPrivacyPolicy;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

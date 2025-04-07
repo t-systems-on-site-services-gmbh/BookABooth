@@ -36,6 +36,7 @@
     <include file="config/liquibase/changelog/20250214141000_update_booking.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250218073000_remove_department.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250220124000_update_company.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250407144000_added_entity_PrivacyPolicy.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
