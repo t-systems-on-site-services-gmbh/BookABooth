@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +48,7 @@ public class PrivacyPolicyService {
     @Transactional(readOnly = true)
     public Optional<PrivacyPolicyDTO> findLatestById() {
         log.debug("Request to get the latest PrivacyPolicy");
-        return privacyPolicyRepository.findLatestPrivacyPolicyById(PageRequest.of(0, 1)).map(privacyPolicyMapper::toDto);
+        return privacyPolicyRepository.findLatestPrivacyPolicyById().map(privacyPolicyMapper::toDto);
     }
 
     /**
