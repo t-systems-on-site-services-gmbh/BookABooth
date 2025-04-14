@@ -1,6 +1,8 @@
 package de.tsystems.onsite.bookabooth.web.rest;
 
+import de.tsystems.onsite.bookabooth.service.BoothUserService;
 import de.tsystems.onsite.bookabooth.service.PrivacyPolicyService;
+import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
 import de.tsystems.onsite.bookabooth.service.dto.PrivacyPolicyDTO;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,7 +11,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import tech.jhipster.web.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/api/privacy-policy")
@@ -19,8 +23,11 @@ public class PrivacyPolicyResource {
 
     private final PrivacyPolicyService privacyPolicyService;
 
-    public PrivacyPolicyResource(PrivacyPolicyService privacyPolicyService) {
+    private final BoothUserService boothUserService;
+
+    public PrivacyPolicyResource(PrivacyPolicyService privacyPolicyService, BoothUserService boothUserService) {
         this.privacyPolicyService = privacyPolicyService;
+        this.boothUserService = boothUserService;
     }
 
     /**
@@ -61,5 +68,13 @@ public class PrivacyPolicyResource {
     public List<PrivacyPolicyDTO> getAllPrivacyPolicies() {
         log.debug("REST request to get all privacy policies");
         return privacyPolicyService.findAll();
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<PrivacyPolicyDTO> checkPrivacyPolicy(Authentication authentication) {
+        log.debug("REST request to check which privacy policy has been accepted by user");
+        BoothUserDTO boothUser = boothUserService.getCurrentBoothUserDTO(authentication);
+        Optional<PrivacyPolicyDTO> privacyPolicyDTO = privacyPolicyService.findOne(boothUser.getAcceptedPrivacyPolicy().getId());
+        return privacyPolicyDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.service.dto;
 
+import de.tsystems.onsite.bookabooth.domain.PrivacyPolicy;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -32,6 +33,8 @@ public class BoothUserDTO implements Serializable {
     private UserDTO user;
 
     private CompanyDTO company;
+
+    private PrivacyPolicy acceptedPrivacyPolicy;
 
     public Long getId() {
         return id;
@@ -103,6 +106,14 @@ public class BoothUserDTO implements Serializable {
 
     public void setCompany(CompanyDTO company) {
         this.company = company;
+    }
+
+    public PrivacyPolicy getAcceptedPrivacyPolicy() {
+        return this.acceptedPrivacyPolicy;
+    }
+
+    public void setAcceptedPrivacyPolicy(PrivacyPolicy acceptedPrivacyPolicy) {
+        this.acceptedPrivacyPolicy = acceptedPrivacyPolicy;
     }
 
     @Override
