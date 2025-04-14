@@ -52,7 +52,7 @@ public class PrivacyPolicyService {
     }
 
     /**
-     * Get all the locations.
+     * Get all the privacy policies.
      *
      * @return the list of entities.
      */
@@ -60,5 +60,17 @@ public class PrivacyPolicyService {
     public List<PrivacyPolicyDTO> findAll() {
         log.debug("Request to get all privacy policies");
         return privacyPolicyRepository.findAll().stream().map(privacyPolicyMapper::toDto).toList();
+    }
+
+    /**
+     * Get one PrivacyPolicy by id.
+     *
+     * @param id the id of the entity.
+     * @return the entity.
+     */
+    @Transactional(readOnly = true)
+    public Optional<PrivacyPolicyDTO> findOne(Long id) {
+        log.debug("Request to get PrivacyPolicy : {}", id);
+        return privacyPolicyRepository.findById(id).map(privacyPolicyMapper::toDto);
     }
 }
