@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PrivacyPolicyRepository extends JpaRepository<PrivacyPolicy, Long> {
-    @Query("SELECT p FROM PrivacyPolicy p ORDER BY p.id DESC")
+    @Query("SELECT p FROM PrivacyPolicy p ORDER BY p.id DESC LIMIT 1")
     Optional<PrivacyPolicy> findLatestPrivacyPolicyById();
 }
