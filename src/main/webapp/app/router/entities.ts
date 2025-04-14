@@ -30,6 +30,8 @@ const BookingUpdate = () => import('@/entities/booking/booking-update.vue');
 const BookingDetails = () => import('@/entities/booking/booking-details.vue');
 
 const Waitinglist = () => import('@/entities/waitinglist/waitinglist.vue');
+
+const PrivacyPolicy = () => import('@/entities/privacy-policy/privacy-policy.vue');
 // jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
 
 export default {
@@ -191,6 +193,12 @@ export default {
       name: 'Waitinglist',
       component: Waitinglist,
       meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'privacy-policy',
+      name: 'PrivacyPolicy',
+      component: PrivacyPolicy,
+      meta: { authorities: [Authority.ADMIN] },
     },
 
     // jhipster-needle-add-entity-to-router - JHipster will add entities to the router here
