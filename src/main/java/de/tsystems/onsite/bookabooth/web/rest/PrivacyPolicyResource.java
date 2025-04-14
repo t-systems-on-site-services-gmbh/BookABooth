@@ -4,6 +4,7 @@ import de.tsystems.onsite.bookabooth.service.PrivacyPolicyService;
 import de.tsystems.onsite.bookabooth.service.dto.PrivacyPolicyDTO;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,5 +50,11 @@ public class PrivacyPolicyResource {
         log.debug("REST request to get the latest PrivacyPolicy");
         Optional<PrivacyPolicyDTO> privacyPolicyDTO = privacyPolicyService.findLatestById();
         return privacyPolicyDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("")
+    public List<PrivacyPolicyDTO> getAllPrivacyPolicies() {
+        log.debug("REST request to get all privacy policies");
+        return privacyPolicyService.findAll();
     }
 }

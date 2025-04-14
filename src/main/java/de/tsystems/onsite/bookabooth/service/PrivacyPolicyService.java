@@ -2,8 +2,10 @@ package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.PrivacyPolicy;
 import de.tsystems.onsite.bookabooth.repository.PrivacyPolicyRepository;
+import de.tsystems.onsite.bookabooth.service.dto.LocationDTO;
 import de.tsystems.onsite.bookabooth.service.dto.PrivacyPolicyDTO;
 import de.tsystems.onsite.bookabooth.service.mapper.PrivacyPolicyMapper;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,5 +49,16 @@ public class PrivacyPolicyService {
     public Optional<PrivacyPolicyDTO> findLatestById() {
         log.debug("Request to get the latest PrivacyPolicy");
         return privacyPolicyRepository.findLatestPrivacyPolicyById().map(privacyPolicyMapper::toDto);
+    }
+
+    /**
+     * Get all the locations.
+     *
+     * @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public List<PrivacyPolicyDTO> findAll() {
+        log.debug("Request to get all privacy policies");
+        return privacyPolicyRepository.findAll().stream().map(privacyPolicyMapper::toDto).toList();
     }
 }
