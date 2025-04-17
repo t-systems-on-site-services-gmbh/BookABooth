@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import tech.jhipster.web.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/api/privacy-policy")
@@ -28,6 +27,43 @@ public class PrivacyPolicyResource {
     public PrivacyPolicyResource(PrivacyPolicyService privacyPolicyService, BoothUserService boothUserService) {
         this.privacyPolicyService = privacyPolicyService;
         this.boothUserService = boothUserService;
+    }
+
+    /**
+     * {@code GET  /privacy-policy} : get all privacy policies.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of privacy policies in body.
+     */
+    @GetMapping("")
+    public List<PrivacyPolicyDTO> getAllPrivacyPolicies() {
+        log.debug("REST request to get all privacy policies");
+        return privacyPolicyService.findAll();
+    }
+
+    /**
+     * {@code GET  /privacy-policy/latest} : get the latest privacy policy.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the latest privacy policy, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/latest")
+    public ResponseEntity<PrivacyPolicyDTO> getLatestPrivacyPolicy() {
+        log.debug("REST request to get the latest PrivacyPolicy");
+        Optional<PrivacyPolicyDTO> privacyPolicyDTO = privacyPolicyService.findLatestById();
+        return privacyPolicyDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * {@code GET  /privacy-policy/check} : check which privacy policy has been accepted by the user.
+     *
+     * @param authentication the authentication object containing user details.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the privacy policy accepted by the user, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/check")
+    public ResponseEntity<PrivacyPolicyDTO> checkPrivacyPolicy(Authentication authentication) {
+        log.debug("REST request to check which privacy policy has been accepted by user");
+        BoothUserDTO boothUser = boothUserService.getCurrentBoothUserDTO(authentication);
+        Optional<PrivacyPolicyDTO> privacyPolicyDTO = privacyPolicyService.findOne(boothUser.getAcceptedPrivacyPolicy().getId());
+        return privacyPolicyDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -48,33 +84,21 @@ public class PrivacyPolicyResource {
     }
 
     /**
-     * {@code GET  /privacy-policy/latest} : get the latest privacy policy.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the latest privacy policy, or with status {@code 404 (Not Found)}.
+     * {@code PUT  /privacy-policy/accept} : Accepts the latest privacy policy for the logged in user.
      */
-    @GetMapping("/latest")
-    public ResponseEntity<PrivacyPolicyDTO> getLatestPrivacyPolicy() {
-        log.debug("REST request to get the latest PrivacyPolicy");
+    @PostMapping("/accept/")
+    public ResponseEntity<Void> acceptPrivacyPolicy(Authentication authentication) {
+        log.debug("REST request to accept the latest PrivacyPolicy");
+
         Optional<PrivacyPolicyDTO> privacyPolicyDTO = privacyPolicyService.findLatestById();
-        return privacyPolicyDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
+        if (privacyPolicyDTO.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-    /**
-     * {@code GET  /privacy-policy} : get all privacy policies.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of privacy policies in body.
-     */
-    @GetMapping("")
-    public List<PrivacyPolicyDTO> getAllPrivacyPolicies() {
-        log.debug("REST request to get all privacy policies");
-        return privacyPolicyService.findAll();
-    }
+        BoothUserDTO bUserDTO = boothUserService.getCurrentBoothUserDTO(authentication);
+        bUserDTO.setAcceptedPrivacyPolicy(privacyPolicyDTO.get());
+        boothUserService.save(bUserDTO);
 
-    @GetMapping("/check")
-    public ResponseEntity<PrivacyPolicyDTO> checkPrivacyPolicy(Authentication authentication) {
-        log.debug("REST request to check which privacy policy has been accepted by user");
-        BoothUserDTO boothUser = boothUserService.getCurrentBoothUserDTO(authentication);
-        Optional<PrivacyPolicyDTO> privacyPolicyDTO = privacyPolicyService.findOne(boothUser.getAcceptedPrivacyPolicy().getId());
-        return privacyPolicyDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok().build();
     }
 }
