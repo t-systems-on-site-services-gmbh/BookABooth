@@ -34,7 +34,7 @@ public class BoothUserDTO implements Serializable {
 
     private CompanyDTO company;
 
-    private PrivacyPolicy acceptedPrivacyPolicy;
+    private PrivacyPolicyDTO acceptedPrivacyPolicy;
 
     public Long getId() {
         return id;
@@ -108,11 +108,11 @@ public class BoothUserDTO implements Serializable {
         this.company = company;
     }
 
-    public PrivacyPolicy getAcceptedPrivacyPolicy() {
+    public PrivacyPolicyDTO getAcceptedPrivacyPolicy() {
         return this.acceptedPrivacyPolicy;
     }
 
-    public void setAcceptedPrivacyPolicy(PrivacyPolicy acceptedPrivacyPolicy) {
+    public void setAcceptedPrivacyPolicy(PrivacyPolicyDTO acceptedPrivacyPolicy) {
         this.acceptedPrivacyPolicy = acceptedPrivacyPolicy;
     }
 
