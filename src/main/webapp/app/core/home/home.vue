@@ -12,6 +12,19 @@
       <h1 class="display-4" v-else="authenticated && username">Willkommen</h1>
       <adminDashboard v-if="hasAnyAuthority('ROLE_ADMIN') && authenticated"></adminDashboard>
       <p v-if="!hasAnyAuthority('ROLE_ADMIN')" class="lead">Hier können Sie Ihren Stand für den Karrieretag buchen.</p>
+
+      <b-modal size="lg" ref="privacyPolicyModal" hide-footer title="Datenschutzerklärung" v-if="authenticated">
+        <div class="col-12 mb-3 mb-md-0">
+          Die Datenschutzerklärung wurde aktualisiert. <br />
+          Die aktuelle <a href="https://www.jade-hs.de/datenschutz/" target="_blank">Datenschutzerklärung</a> ist vom
+          <b> {{ formatDate(latestPrivacyPolicy.fromDate) }} </b> <br />
+          Mit dem Klicken auf den Button "Ok" stimmen Sie der Datenschutzerklärung zu.
+        </div>
+        <div class="d-flex justify-content-end">
+          <b-button type="submit" class="btn btn-success ml-3" id="confirmPrivacyPolicy" @click="closePrivacyPolicyModal()"> Ok </b-button>
+        </div>
+      </b-modal>
+
       <div v-if="!authenticated">
         <div>
           Der Jade Karrieretag steht wieder an und wie jedes Jahr können Sie die Gelegenheit nutzen, Aussteller auf unserem Karrieremarkt zu
