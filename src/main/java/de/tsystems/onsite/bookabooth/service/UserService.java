@@ -79,6 +79,8 @@ public class UserService {
 
     private final ApplicationProperties applicationProperties;
 
+    private final PrivacyPolicyRepository privacyPolicyRepository;
+
     public UserService(
         CompanyService companyService,
         UserRepository userRepository,
@@ -94,7 +96,8 @@ public class UserService {
         AuthorityRepository authorityRepository,
         CacheManager cacheManager,
         Validator validator,
-        ApplicationProperties applicationProperties
+        ApplicationProperties applicationProperties,
+        PrivacyPolicyRepository privacyPolicyRepository
     ) {
         this.companyService = companyService;
         this.companyRepository = companyRepository;
@@ -111,6 +114,7 @@ public class UserService {
         this.cacheManager = cacheManager;
         this.validator = validator;
         this.applicationProperties = applicationProperties;
+        this.privacyPolicyRepository = privacyPolicyRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -210,6 +214,7 @@ public class UserService {
         BoothUser newBoothUser = new BoothUser();
         newBoothUser.setUser(newUser);
         newBoothUser.setCompany(company);
+        newBoothUser.setAcceptedPrivacyPolicy(privacyPolicyRepository.findLatestPrivacyPolicyById().get());
         boothUserRepository.save(newBoothUser);
         //this.clearUserCaches(newUser);
 
