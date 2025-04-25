@@ -62,7 +62,7 @@ public class PrivacyPolicyResource {
     public ResponseEntity<PrivacyPolicyDTO> checkPrivacyPolicy(Authentication authentication) {
         log.debug("REST request to check which privacy policy has been accepted by user");
         BoothUserDTO boothUser = boothUserService.getCurrentBoothUserDTO(authentication);
-        Optional<PrivacyPolicyDTO> privacyPolicyDTO = privacyPolicyService.findOne(boothUser.getAcceptedPrivacyPolicy().getId());
+        Optional<PrivacyPolicyDTO> privacyPolicyDTO = Optional.ofNullable(boothUser.getAcceptedPrivacyPolicy());
         return privacyPolicyDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

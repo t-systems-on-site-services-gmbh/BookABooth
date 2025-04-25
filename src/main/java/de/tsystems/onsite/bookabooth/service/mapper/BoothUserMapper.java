@@ -2,9 +2,11 @@ package de.tsystems.onsite.bookabooth.service.mapper;
 
 import de.tsystems.onsite.bookabooth.domain.BoothUser;
 import de.tsystems.onsite.bookabooth.domain.Company;
+import de.tsystems.onsite.bookabooth.domain.PrivacyPolicy;
 import de.tsystems.onsite.bookabooth.domain.User;
 import de.tsystems.onsite.bookabooth.service.dto.BoothUserDTO;
 import de.tsystems.onsite.bookabooth.service.dto.CompanyDTO;
+import de.tsystems.onsite.bookabooth.service.dto.PrivacyPolicyDTO;
 import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
 import org.mapstruct.*;
 
@@ -15,6 +17,7 @@ import org.mapstruct.*;
 public interface BoothUserMapper extends EntityMapper<BoothUserDTO, BoothUser> {
     @Mapping(target = "user", source = "user", qualifiedByName = "userId")
     @Mapping(target = "company", source = "company", qualifiedByName = "companyId")
+    @Mapping(target = "acceptedPrivacyPolicy", source = "acceptedPrivacyPolicy", qualifiedByName = "acceptedPrivacyPolicyId")
     BoothUserDTO toDto(BoothUser s);
 
     @Named("userId")
@@ -28,4 +31,10 @@ public interface BoothUserMapper extends EntityMapper<BoothUserDTO, BoothUser> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     CompanyDTO toDtoCompanyId(Company company);
+
+    @Named("acceptedPrivacyPolicyId")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "fromDate", source = "fromDate")
+    PrivacyPolicyDTO toDtoPrivacyPolicyId(PrivacyPolicy privacyPolicy);
 }
