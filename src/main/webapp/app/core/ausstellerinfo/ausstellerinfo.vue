@@ -1,28 +1,55 @@
 <template>
-  <h1>Ausstellerinfos JKT 2025</h1>
-  <p>Sehr geehrte Damen und Herren,</p>
-  <p>es ist fast so weit, der Jade Karrieretag rückt näher.</p>
-  <p>Wir möchten Ihnen daher einige Informationen zur Organisation mitgeben.</p>
+  <h1>Ausstellerinformationen Jade Karrieretag 2025</h1>
+  <p>
+    Die Karrieremesse am Campus Wilhelmshaven findet in der Aula und zusätzlichen Messezelten statt. Wir bieten über 1.000qm
+    Ausstellungsfläche an. Die Standflächen auf der Karrieremesse sind in zwei Kategorien ausschließlich über das Buchungstool buchbar:
+  </p>
+  <h2>Paket 1 (960€ netto)</h2>
+  <p>
+    Standfläche in der Aula 3 x 2,50m (BxT; max. Standhöhe 3m)<br />
+    Strom (230V) & WLAN<br />
+    Getränkecatering im Ausstellercafé und bis zu 5 Gutscheine für ein Mittagessen in der Mensa oder Cafeteria<br />
+    Zugang zum Karriereportal der Jade Hochschule<br />
+    Zugang zur App talentefinder<br />
+    Firmenvorstellung im Ausstellerverzeichnis
+  </p>
+  <h2>Paket 2 (860€ netto)</h2>
+  <p>
+    Standfläche im beheizten Messezelt 3 x 2,50m (BxT; max. Standhöhe 2,35m)<br />
+    Strom (230V) & WLAN<br />
+    Getränkecatering im Ausstellercafé und bis zu 3 Gutscheine für ein Mittagessen in der Mensa oder Cafeteria<br />
+    Zugang zum Karriereportal der Jade Hochschule<br />
+    Zugang zur App talentefinder<br />
+    Firmennennung im Ausstellerverzeichnis
+  </p>
+  <h2>Stornierung</h2>
+  <p>
+    Wird die Teilnahme eines angemeldeten Ausstellers abgesagt, so werden bei einer Absage bis zum 20. September 2025 50% der Standgebühr
+    erstattet. Bei einer kurzfristigeren Absage erfolgt keine Erstattung der Standgebühr. Die Stornierung der Standplatzbuchung erfolgt
+    ebenfalls über das Buchungstool.
+  </p>
   <h2>Auf- und Abbau</h2>
   <p>
-    Dienstag, 18. November 2025, 15:00 – 19:00 Uhr<br />
+    Dienstag, 18. November 2025, 16:00 – 18:00 Uhr<br />
     Mittwoch, 19. November 2025, 07:00 – 08:30 Uhr<br />
-    Der Aufbau soll spätestens am Mittwoch um 08:30 Uhr beendet sein. Veranstaltungsbeginn ist 09.00 Uhr.<br />
-    Der Abbau findet direkt im Anschluss ab 14:00 Uhr statt. Bitte beachten Sie die Einhaltung dieser Zeit, damit wir eine vorherige Unruhe
-    vermeiden können. Eine Bewachung der Messestände in der Nacht auf den 20. November kann nicht gestellt werden.<br />
-    Zum Anliefern bzw. Abtransport Ihres Equipments stehen Ihnen während der Aufbauzeiten verschiedene Ein- und Ausgänge der Hochschule zur
-    Verfügung. Eine Übersicht zeigt der angehängte Gebäudeplan. Beide Messezelte befinden sich vor dem Haupteingang und sind ebenfalls über
-    Rampen zugänglich.
+    Der <strong>Aufbau</strong> soll spätestens am Mittwoch um 08:30 Uhr beendet sein. Veranstaltungsbeginn ist 09.00 Uhr.<br />
+    Der <strong>Abbau</strong> findet direkt im Anschluss ab 14:00 Uhr statt. Bitte beachten Sie die Einhaltung dieser Zeit, damit wir eine
+    vorherige Unruhe vermeiden können.<br />
+    Eine Bewachung der Messestände in der Nacht auf den 19. November kann nicht gestellt werden. Für Material und Equipment, das über Nacht
+    in der Hochschule oder im Messezelt gelagert wird, wird keine Haftung übernommen.<br />
+    Zum <strong>Anliefern bzw. Abtransport</strong> Ihres Equipments stehen Ihnen während der Aufbauzeiten verschiedene Ein- und Ausgänge
+    der Hochschule zur Verfügung.
   </p>
   <ul>
     <li>Haupteingang mit Treppe & Rampe (zwei Drehtüren, eine Flügeltür)</li>
     <li>Zwei Rampen auf der Rückseite (Ostseite) des Hauptgebäudes</li>
     <li>Zwei Zugänge zur Aula an der Südseite des Hauptgebäudes</li>
   </ul>
+  <p>Messezelte befinden sich vor dem Haupteingang und sind ebenfalls über Rampen zugänglich.</p>
   <p>
-    Eine Stromversorgung (230V) steht für alle Stände zur Verfügung. Wir möchten Sie jedoch bitten, mit eigenen Mitteln für eine Verteilung
-    zu sorgen, also unbedingt 25m Kabeltrommeln bzw. Verlängerungskabel mitzubringen. Wir bitten um Kenntnisnahme der mitgelieferten
-    Informationen zum Arbeits- bzw. Brandschutz. Zugang zur kostenlosen WLAN-Nutzung erhalten Sie am Tag der Veranstaltung.
+    Eine <strong>Stromversorgung</strong> (230V) steht für alle Stände zur Verfügung. Wir möchten Sie jedoch bitten, mit eigenen Mitteln für
+    eine Verteilung zu sorgen, also unbedingt 25m Kabeltrommeln bzw. Verlängerungskabel mitzubringen. Wir bitten um Kenntnisnahme der
+    Informationen zum Arbeits- bzw. Brandschutz. Zugang zur kostenlosen <strong>WLAN</strong>-Nutzung erhalten Sie am Tag der Veranstaltung.
   </p>
   <h2>Parken</h2>
   <p>
@@ -44,20 +71,14 @@
   </p>
   <h2>Talentefinder</h2>
   <p>
-    Noch bis zum 25. Oktober haben Sie Gelegenheit, ihr Ausstellerprofil in der App Talentefinder zu erstellen bzw. zu bearbeiten. Im
-    Anschluss daran werden die Profile für das Matching freigeschaltet und Studierende und SchülerInnen erhalten nach und nach Zugang zur
-    App. Sie können dann mit dem Matching starten, interessante Profile identifizieren und ggf. Gesprächstermine für die Präsenzmesse am 19.
-    bzw. digitale Gespräche für den 20. November vereinbaren. Die Anleitung zur Profilerstellung finden Sie hier.
+    Mit Teilnahme an der Karrieremesse haben Sie Gelegenheit, ihr Ausstellerprofil in der App Talentefinder zu erstellen bzw. zu bearbeiten.
+    Im Vorfeld der Veranstaltung werden die Profile für das Matching freigeschaltet und Studierende und SchülerInnen erhalten nach und nach
+    Zugang zur App. Sie können dann mit dem Matching starten, interessante Profile identifizieren und ggf. Gesprächstermine für die
+    Präsenzmesse am 19. bzw. digitale Gespräche für den 20. November vereinbaren.
   </p>
   <p>
     Die Jade Hochschule ist eine offene und vielfältige Hochschule, die sich ausdrücklich gegen Geschlechterstereotype ausspricht. Daher
     möchten wir auch Sie als Aussteller_innen auf dem Jade Karrieretag darum bitten, auf eine diskriminierungsfreie und diverse Gestaltung
     ihres Standes zu achten. Dazu gehören Texte und Bilder auf Plakaten, Flyern und anderen Werbematerialien.
-  </p>
-  <p>Wir freuen uns auf einen erfolgreichen Tag!</p>
-  <p>
-    Mit freundlichem Gruß<br />
-    Oliver Koopmann<br />
-    Zentrales Veranstaltungsmanagement
   </p>
 </template>
