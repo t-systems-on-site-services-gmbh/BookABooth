@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.domain.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -31,6 +32,10 @@ public class MailService {
 
     private static final String BASE_URL = "baseUrl";
 
+    private static final String SUPPORT_MAIL = "supportEmail";
+
+    private final ApplicationProperties applicationProperties;
+
     private final JHipsterProperties jHipsterProperties;
 
     private final JavaMailSender javaMailSender;
@@ -40,11 +45,13 @@ public class MailService {
     private final SpringTemplateEngine templateEngine;
 
     public MailService(
+        ApplicationProperties applicationProperties,
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
         SpringTemplateEngine templateEngine
     ) {
+        this.applicationProperties = applicationProperties;
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
@@ -95,6 +102,7 @@ public class MailService {
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable(SUPPORT_MAIL, applicationProperties.getSupportEmail());
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
         this.sendEmailSync(user.getEmail(), subject, content, false, true);

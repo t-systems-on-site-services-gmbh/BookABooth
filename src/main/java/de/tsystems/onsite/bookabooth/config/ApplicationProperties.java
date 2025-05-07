@@ -88,4 +88,14 @@ public class ApplicationProperties {
     public void setPasswordResetTokenValidity(Long passwordResetTokenValidity) {
         this.passwordResetTokenValidity = passwordResetTokenValidity;
     }
+
+    private String supportEmail;
+
+    public String getSupportEmail() {
+        return supportEmail;
+    }
+
+    public void setSupportEmail(String supportEmail) {
+        this.supportEmail = supportEmail;
+    }
 }

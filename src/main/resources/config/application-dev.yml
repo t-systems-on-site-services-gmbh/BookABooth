@@ -117,3 +117,4 @@ application:
   cancellation-reimbursement: 50 # The percentage of the booking price that is reimbursed when a booking is cancelled
   cancellation-reimbursement-until: 20.09.2025 # The date until which the cancellation reimbursement is valid, after this date there is no reimbursement
   password-reset-token-validity: 24 # The validity of the password reset token in hours
+  support-email: support@email.de
