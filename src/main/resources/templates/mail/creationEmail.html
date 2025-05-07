@@ -11,10 +11,13 @@
     <p>
       <a th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}|})" th:href="${url}" th:text="${url}">Login link</a>
     </p>
+    <p>Bei Fragen kontaktieren Sie uns bitte unter <a th:href="@{|mailto:${supportEmail}|}" th:text="${supportEmail}">supportEmail</a>.</p>
     <p>
       <span>Mit freundlichen Grüßen</span>
       <br />
-      <em>Ihre Jade Hochschule</em>
+      <em>Jade Hochschule</em>
+      <br />
+      Zentrales Veranstaltungsmanagement
     </p>
   </body>
 </html>

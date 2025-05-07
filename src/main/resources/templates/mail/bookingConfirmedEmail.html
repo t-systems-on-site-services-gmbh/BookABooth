@@ -8,10 +8,13 @@
   <body>
     <p>Moin <span th:text="${user.login}">onsite</span>,</p>
     <p>hiermit bestätigen wir Ihre Standbuchung beim diesjährigen Jade Karrieretag.</p>
+    <p>Bei Fragen kontaktieren Sie uns bitte unter <a th:href="@{|mailto:${supportEmail}|}" th:text="${supportEmail}">supportEmail</a>.</p>
     <p>
       <span>Mit freundlichen Grüßen</span>
       <br />
-      <em>Ihre Jade Hochschule</em>
+      <em>Jade Hochschule</em>
+      <br />
+      Zentrales Veranstaltungsmanagement
     </p>
   </body>
 </html>
