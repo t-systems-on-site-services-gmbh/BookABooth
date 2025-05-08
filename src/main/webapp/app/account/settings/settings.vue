@@ -41,7 +41,6 @@
                       :class="{ valid: !v$.settingsAccount.company.name.$invalid, invalid: v$.settingsAccount.company.name.$invalid }"
                       v-model="v$.settingsAccount.company.name.$model"
                       minlength="1"
-                      maxlength="100"
                       required
                       data-cy="company.name"
                     />
@@ -71,7 +70,6 @@
                       }"
                       v-model="v$.settingsAccount.company.billingAddress.$model"
                       minlength="1"
-                      maxlength="254"
                       required
                       data-cy="company.billingaddress"
                     >
@@ -102,7 +100,6 @@
                       }"
                       v-model="v$.settingsAccount.company.comment.$model"
                       minlength="0"
-                      maxlength="1024"
                       data-cy="company.bemerkung"
                     >
                     </textarea>
@@ -128,15 +125,14 @@
                       }"
                       v-model="v$.settingsAccount.company.description.$model"
                       minlength="0"
-                      maxlength="1024"
                       required
                       data-cy="company.description"
                       rows="5"
                     >
                     </textarea>
-                    <div v-if="v$.settingsAccount.company.description.$invalid && !v$.settingsAccount.company.description.required">
+                    <div v-if="v$.settingsAccount.company.description.$invalid">
                       <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.maxLength"
-                        >Ihre Firmenbeschreibung darf nicht länger als 254 Zeichen sein.</small
+                        >Ihre Firmenbeschreibung darf nicht länger als 1024 Zeichen sein.</small
                       >
                     </div>
                   </div>
