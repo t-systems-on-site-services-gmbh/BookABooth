@@ -115,7 +115,7 @@
                   <!--- Kurzbeschreibung des Unternehmens -->
                   <div class="form-group">
                     <label class="form-control-label" for="company.description"
-                      >Kurze Beschreibung Ihres Unternehmens (max. 254 Zeichen)</label
+                      >Kurze Beschreibung Ihres Unternehmens (max. 1024 Zeichen)</label
                     >
                     <textarea
                       id="company.description"
@@ -128,9 +128,10 @@
                       }"
                       v-model="v$.settingsAccount.company.description.$model"
                       minlength="0"
-                      maxlength="254"
+                      maxlength="1024"
                       required
                       data-cy="company.description"
+                      rows="5"
                     >
                     </textarea>
                     <div v-if="v$.settingsAccount.company.description.$invalid && !v$.settingsAccount.company.description.required">
