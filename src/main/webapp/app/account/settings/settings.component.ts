@@ -92,7 +92,7 @@ export default defineComponent({
           },
           description: {
             required: requiredUnless(isAdmin),
-            maxLength: maxLength(254),
+            maxLength: maxLength(1024),
           },
           comment: {
             maxLength: maxLength(1024),
