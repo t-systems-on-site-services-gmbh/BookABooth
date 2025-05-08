@@ -89,17 +89,17 @@
               maxlength="254"
               email
               required
-              placeholder="Ihre Email Adresse"
+              placeholder="Ihre E-Mail-Adresse"
               data-cy="email"
             />
             <div v-if="v$.registerAccount.email.$anyDirty && v$.registerAccount.email.$invalid">
-              <small class="form-text text-danger" v-if="!v$.registerAccount.email.required">Ihre Email Adresse wird benötigt.</small>
-              <small class="form-text text-danger" v-if="!v$.registerAccount.email.email">Ihre Email Adresse ist ungültig.</small>
+              <small class="form-text text-danger" v-if="!v$.registerAccount.email.required">Ihre E-Mail-Adresse wird benötigt.</small>
+              <small class="form-text text-danger" v-if="!v$.registerAccount.email.email">Ihre E-Mail-Adresse ist ungültig.</small>
               <small class="form-text text-danger" v-if="!v$.registerAccount.email.minLength"
-                >Ihre Email Adresse muss mindestens 5 Zeichen lang sein</small
+                >Ihre E-Mail-Adresse muss mindestens 5 Zeichen lang sein</small
               >
               <small class="form-text text-danger" v-if="!v$.registerAccount.email.maxLength"
-                >Ihre Email Adresse darf nicht länger als 50 Zeichen sein</small
+                >Ihre E-Mail-Adresse darf nicht länger als 50 Zeichen sein</small
               >
             </div>
           </div>

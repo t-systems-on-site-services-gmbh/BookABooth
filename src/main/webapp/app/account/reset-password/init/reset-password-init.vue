@@ -5,11 +5,11 @@
         <h1>Passwort zurücksetzen</h1>
 
         <div class="alert alert-warning" v-if="!success">
-          <p>Geben Sie die Email Adresse ein, welche Sie bei der Registrierung verwendet haben.</p>
+          <p>Geben Sie die E-Mail-Adresse ein, welche Sie bei der Registrierung verwendet haben.</p>
         </div>
 
         <div class="alert alert-success" v-if="success">
-          <p>Eine Email mit weiteren Instruktionen für das Zurücksetzen des Passworts wurde gesendet.</p>
+          <p>Eine E-Mail mit weiteren Instruktionen für das Zurücksetzen des Passworts wurde gesendet.</p>
         </div>
 
         <form v-if="!success" name="form" role="form" v-on:submit.prevent="requestReset()">
@@ -20,7 +20,7 @@
               class="form-control"
               id="email"
               name="email"
-              placeholder="Ihre Email Adresse"
+              placeholder="Ihre E-Mail-Adresse"
               :class="{ valid: !v$.resetAccount.email.$invalid, invalid: v$.resetAccount.email.$invalid }"
               v-model="v$.resetAccount.email.$model"
               minlength="5"
@@ -30,13 +30,13 @@
               data-cy="emailResetPassword"
             />
             <div v-if="v$.resetAccount.email.$anyDirty && v$.resetAccount.email.$invalid">
-              <small class="form-text text-danger" v-if="!v$.resetAccount.email.required">Ihre Email Adresse wird benötigt.</small>
-              <small class="form-text text-danger" v-if="!v$.resetAccount.email.email">Ihre Email Adresse ist ungültig.</small>
+              <small class="form-text text-danger" v-if="!v$.resetAccount.email.required">Ihre E-Mail-Adresse wird benötigt.</small>
+              <small class="form-text text-danger" v-if="!v$.resetAccount.email.email">Ihre E-Mail-Adresse ist ungültig.</small>
               <small class="form-text text-danger" v-if="!v$.resetAccount.email.minLength"
-                >Ihre Email Adresse muss mindestens 5 Zeichen lang sein</small
+                >Ihre E-Mail-Adresse muss mindestens 5 Zeichen lang sein</small
               >
               <small class="form-text text-danger" v-if="!v$.resetAccount.email.maxLength"
-                >Ihre Email Adresse darf nicht länger als 50 Zeichen sein</small
+                >Ihre E-Mail-Adresse darf nicht länger als 50 Zeichen sein</small
               >
             </div>
           </div>
