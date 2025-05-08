@@ -130,7 +130,7 @@
                       rows="5"
                     >
                     </textarea>
-                    <div v-if="v$.settingsAccount.company.description.$invalid">
+                    <div v-if="v$.settingsAccount.company.description.$anyDirty && v$.settingsAccount.company.description.$invalid">
                       <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.maxLength"
                         >Ihre Firmenbeschreibung darf nicht länger als 1024 Zeichen sein.</small
                       >
