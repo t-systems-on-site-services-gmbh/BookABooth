@@ -112,20 +112,26 @@
               name="password"
               :class="{ valid: !v$.registerAccount.password.$invalid, invalid: v$.registerAccount.password.$invalid }"
               v-model="v$.registerAccount.password.$model"
-              minlength="4"
-              maxlength="50"
               required
+              minlength="12"
+              maxlength="50"
               placeholder="Neues Passwort"
               data-cy="firstPassword"
             />
             <div v-if="v$.registerAccount.password.$anyDirty && v$.registerAccount.password.$invalid">
-              <small class="form-text text-danger" v-if="!v$.registerAccount.password.required">Ein neues Passwort wird benötigt.</small>
-              <small class="form-text text-danger" v-if="!v$.registerAccount.password.minLength"
-                >Das neue Passwort muss mindestens 4 Zeichen lang sein</small
+              <small class="form-text text-danger" v-if="v$.registerAccount.password.required.$invalid"
+                >Ein neues Passwort wird benötigt.</small
               >
-              <small class="form-text text-danger" v-if="!v$.registerAccount.password.maxLength"
+              <small class="form-text text-danger" v-if="v$.registerAccount.password.minLength.$invalid"
+                >Das neue Passwort muss mindestens 12 Zeichen lang sein</small
+              >
+              <small class="form-text text-danger" v-if="v$.registerAccount.password.maxLength.$invalid"
                 >Das neue Passwort darf nicht länger als 50 Zeichen sein</small
               >
+              <small class="form-text text-danger" v-if="v$.registerAccount.password.pattern.$invalid">
+                Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen
+                (@$!%*?+_=)(#><.:&"'|~^/\\\]\[{}) enthalten.
+              </small>
             </div>
           </div>
           <div class="form-group">
@@ -137,8 +143,7 @@
               name="confirmPasswordInput"
               :class="{ valid: !v$.confirmPassword.$invalid, invalid: v$.confirmPassword.$invalid }"
               v-model="v$.confirmPassword.$model"
-              minlength="4"
-              maxlength="50"
+              minlength="12"
               required
               placeholder="Bestätigen Sie Ihr neues Passwort"
               data-cy="secondPassword"
@@ -146,7 +151,7 @@
             <div v-if="v$.confirmPassword.$dirty && v$.confirmPassword.$invalid">
               <small class="form-text text-danger" v-if="!v$.confirmPassword.required">Sie müssen das Passwort bestätigen.</small>
               <small class="form-text text-danger" v-if="!v$.confirmPassword.minLength"
-                >Das bestätigte Passwort muss mindestens 4 Zeichen lang sein</small
+                >Das bestätigte Passwort muss mindestens 12 Zeichen lang sein</small
               >
               <small class="form-text text-danger" v-if="!v$.confirmPassword.maxLength"
                 >Das bestätigte Passwort darf nicht länger als 50 Zeichen sein</small

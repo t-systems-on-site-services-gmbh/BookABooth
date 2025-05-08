@@ -46,19 +46,25 @@
               placeholder="Neues Passwort"
               :class="{ valid: !v$.resetPassword.newPassword.$invalid, invalid: v$.resetPassword.newPassword.$invalid }"
               v-model="v$.resetPassword.newPassword.$model"
-              minlength="4"
+              minlength="12"
               maxlength="50"
               required
               data-cy="newPassword"
             />
             <div v-if="v$.resetPassword.newPassword.$anyDirty && v$.resetPassword.newPassword.$invalid">
-              <small class="form-text text-danger" v-if="!v$.resetPassword.newPassword.required">Ein neues Passwort wird benötigt.</small>
-              <small class="form-text text-danger" v-if="!v$.resetPassword.newPassword.minLength"
-                >Das neue Passwort muss mindestens 4 Zeichen lang sein</small
+              <small class="form-text text-danger" v-if="v$.resetPassword.newPassword.required.$invalid"
+                >Ein neues Passwort wird benötigt.</small
               >
-              <small class="form-text text-danger" v-if="!v$.resetPassword.newPassword.maxLength"
+              <small class="form-text text-danger" v-if="v$.resetPassword.newPassword.minLength.$invalid"
+                >Das neue Passwort muss mindestens 12 Zeichen lang sein</small
+              >
+              <small class="form-text text-danger" v-if="v$.resetPassword.newPassword.maxLength.$invalid"
                 >Das neue Passwort darf nicht länger als 50 Zeichen sein</small
               >
+              <small class="form-text text-danger" v-if="v$.resetPassword.newPassword.pattern.$invalid">
+                Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen
+                (@$!%*?+_=)(#><.:&"'|~^/\\\]\[{}) enthalten.
+              </small>
             </div>
           </div>
           <div class="form-group">
@@ -71,7 +77,7 @@
               :class="{ valid: !v$.resetPassword.confirmPassword.$invalid, invalid: v$.resetPassword.confirmPassword.$invalid }"
               placeholder="Bestätigen Sie Ihr neues Passwort"
               v-model="v$.resetPassword.confirmPassword.$model"
-              minlength="4"
+              minlength="12"
               maxlength="50"
               required
               data-cy="confirmPassword"

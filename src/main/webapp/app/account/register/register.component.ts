@@ -27,8 +27,11 @@ export default defineComponent({
         },
         password: {
           required,
-          minLength: minLength(4),
-          maxLength: maxLength(254),
+          minLength: minLength(12),
+          maxLength: maxLength(50),
+          pattern: helpers.regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?+_=)(#><.:&"'|~^/\\\]\[{}])[A-Za-z\d@$!%*?+_=)(#><.:&"'|~^/\\\]\[{}]{12,}$/,
+          ),
         },
         companyName: {
           required,
@@ -42,7 +45,7 @@ export default defineComponent({
       },
       confirmPassword: {
         required,
-        minLength: minLength(4),
+        minLength: minLength(12),
         maxLength: maxLength(50),
         sameAsPassword: sameAs(this.registerAccount.password),
       },
