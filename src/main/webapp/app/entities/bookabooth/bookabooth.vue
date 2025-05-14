@@ -15,28 +15,10 @@
       </span>
     </div>
     <br />
-    <div v-if="filteredServicePackages" class="row col-md-3">
-      <table class="table table-striped table-sm" aria-describedby="servicePackages">
-        <thead>
-          <tr>
-            <th scope="row"><span>Service Paket</span></th>
-            <th scope="row"><span>Preis</span></th>
-            <th scope="row"><span>Beschreibung</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="servicePackage in filteredServicePackages" :key="servicePackage.id" data-cy="entityTable">
-            <td>{{ servicePackage.name }}</td>
-            <td>{{ formatCurrency(servicePackage.price) }}</td>
-            <td>{{ servicePackage.description }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <label for="location" class="mt-3">Ort</label>
-    <select id="location" class="custom-select mb-3" v-model="selectedLocation">
-      <option value="">Alle</option>
-      <option v-for="location in locations" :key="location.id" :value="location">{{ location.location }}</option>
+    <label for="location" class="">Ort:</label>
+    <br />
+    <select id="location" class="custom-select mb-3 width-on-pc" v-model="selectedLocation">
+      <option v-for="location in locations" :key="location.id" :value="location" class="width-on-pc">{{ location.location }}</option>
     </select>
     <br />
     <div class="row">
@@ -63,7 +45,8 @@
               <th scope="row"><span>Name</span></th>
               <th scope="row"><span>Deckenhöhe in m</span></th>
               <th scope="row"><span>Ort</span></th>
-              <th scope="row"><span>Service Pakete</span></th>
+              <th scope="row"><span>Beschreibungen</span></th>
+              <th scope="row"><span>Preis</span></th>
               <th scope="row"><span>Firma</span></th>
               <th scope="row"></th>
             </tr>
@@ -78,10 +61,13 @@
                 </div>
               </td>
               <td>
-                <span v-for="(servicePackage, i) in booth.servicePackages" :key="servicePackage.id"
-                  >{{ i > 0 ? ', ' : '' }}
-                  {{ servicePackages.find(sp => sp.id == servicePackage.id)?.name }}
+                <span v-for="(servicePackage, i) in booth.servicePackages" :key="servicePackage.id">
+                  {{ servicePackages.find(sp => sp.id == servicePackage.id)?.description }}
+                  <br />
                 </span>
+              </td>
+              <td>
+                <span>{{ formatCurrency(calculatePrice(booth)) }}</span>
               </td>
               <td>{{ booth.companyName }}</td>
               <td class="text-right">
@@ -150,3 +136,11 @@
 </template>
 
 <script lang="ts" src="./bookabooth.component.ts"></script>
+
+<style lang="scss" scoped>
+.width-on-pc {
+  @media (min-width: 768px) {
+    width: 25%;
+  }
+}
+</style>

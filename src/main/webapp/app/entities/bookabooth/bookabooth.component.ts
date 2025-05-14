@@ -95,6 +95,9 @@ export default defineComponent({
         .retrieve()
         .then((res: { data: ILocation[] }) => {
           locations.value = res.data;
+          if (locations.value.length > 0) {
+            selectedLocation.value = locations.value[0]; // Setze das erste Element als Standard
+          }
         });
       servicePackageService()
         .retrieve()
