@@ -84,10 +84,6 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
                     .requestMatchers(mvc.pattern("/api/ausstellerliste")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/health")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/info")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
                 ;
                 // role specific access
                 authz
