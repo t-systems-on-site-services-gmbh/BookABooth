@@ -1,5 +1,8 @@
 package de.tsystems.onsite.bookabooth.service.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -10,6 +13,12 @@ public class PasswordChangeDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String currentPassword;
+
+    @NotNull
+    @Size(min = 12, max = 50)
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\])[a-zA-Z\\d@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\]{12,50}"
+    )
     private String newPassword;
 
     public PasswordChangeDTO() {
@@ -29,11 +38,17 @@ public class PasswordChangeDTO implements Serializable {
         this.currentPassword = currentPassword;
     }
 
-    public String getNewPassword() {
+    public @NotNull @Size(min = 12, max = 50) @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\])[a-zA-Z\\d@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\]{12,50}$"
+    ) String getNewPassword() {
         return newPassword;
     }
 
-    public void setNewPassword(String newPassword) {
+    public void setNewPassword(
+        @NotNull @Size(min = 12, max = 50) @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\])[a-zA-Z\\d@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\]{12,50}"
+        ) String newPassword
+    ) {
         this.newPassword = newPassword;
     }
 }

@@ -19,7 +19,8 @@ public class UserRegistrationDTO {
     private String email;
 
     @NotNull
-    @Size(min = 4, max = 50)
+    @Size(min = 12, max = 50)
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\]).+$")
     private String password;
 
     @NotNull
@@ -63,11 +64,17 @@ public class UserRegistrationDTO {
         this.termsAccepted = termsAccepted;
     }
 
-    public @NotNull @Size(min = 4, max = 50) String getPassword() {
+    public @NotNull @Size(min = 12, max = 50) @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\]).+$"
+    ) String getPassword() {
         return password;
     }
 
-    public void setPassword(@NotNull @Size(min = 4, max = 50) String password) {
+    public void setPassword(
+        @NotNull @Size(min = 12, max = 50) @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?+_=)(#><.:&\"'|~^/\\]\\[{}\\\\]).+$"
+        ) String password
+    ) {
         this.password = password;
     }
 }
