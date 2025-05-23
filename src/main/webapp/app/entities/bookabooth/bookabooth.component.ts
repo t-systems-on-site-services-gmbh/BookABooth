@@ -45,6 +45,7 @@ export default defineComponent({
     const boothId = ref(null);
     const componentKey = ref(new Date().getTime());
     const confirmConditions = ref(false);
+    const bookedBoothLocation = ref('');
 
     const getMyBooking = async () => {
       isFetching.value = true;
@@ -55,6 +56,21 @@ export default defineComponent({
         console.error(err.response);
       } finally {
         isFetching.value = false;
+      }
+    };
+
+    const setLocationForSelect = () => {
+      try {
+        // Setze die Location basierend auf dem gebuchten Stand
+        if (myBooking.value && myBooking.value.booth) {
+          const bookedBooth = booths.value.find(b => b.id === myBooking.value.booth.id);
+          if (bookedBooth && bookedBooth.location) {
+            selectedLocation.value = locations.value.find(l => l.id === bookedBooth.location.id) || null;
+            bookedBoothLocation.value = selectedLocation.value.location;
+          }
+        }
+      } catch (error) {
+        console.error('Fehler beim Setzen der Location:', error);
       }
     };
 
@@ -141,6 +157,7 @@ export default defineComponent({
     onMounted(async () => {
       await retrieveBooths();
       await getUnavailableBooths();
+      setLocationForSelect();
     });
 
     const filteredBooths = computed(() => {
@@ -163,6 +180,7 @@ export default defineComponent({
 
     return {
       alertService,
+      bookedBoothLocation,
       booths,
       unavailableBooths,
       getUnavailableBooths,
@@ -178,6 +196,7 @@ export default defineComponent({
       currentBooking,
       calculatePrice,
       bookingService,
+      setLocationForSelect,
       isBookingAllowed,
       system,
       boothId,
