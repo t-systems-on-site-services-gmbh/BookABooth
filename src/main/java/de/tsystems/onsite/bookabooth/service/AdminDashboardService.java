@@ -123,10 +123,12 @@ public class AdminDashboardService {
         adminDashboard
             .getChecklist()
             .sort((AdminChecklistDTO o1, AdminChecklistDTO o2) -> {
-                if (o1.isMandatoryComplete()) {
-                    return 0;
-                } else {
+                if (o1.isMandatoryComplete() && !o2.isMandatoryComplete()) {
+                    return 1;
+                } else if (!o1.isMandatoryComplete() && o2.isMandatoryComplete()) {
                     return -1;
+                } else {
+                    return o1.getCompanyName().toUpperCase().compareTo(o2.getCompanyName().toUpperCase());
                 }
             });
 
