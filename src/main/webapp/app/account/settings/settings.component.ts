@@ -219,12 +219,7 @@ export default defineComponent({
             .catch(error => {
               this.isSaving = false;
               console.log(error.response);
-              this.$bvToast.toast(error.response, {
-                toaster: 'b-toaster-top-center',
-                variant: 'danger',
-                solid: true,
-                autoHideDelay: 5000,
-              });
+              this.alertService.showHttpError(error.response);
             });
         };
         reader.readAsBinaryString(file);

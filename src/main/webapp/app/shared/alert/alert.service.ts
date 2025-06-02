@@ -88,6 +88,10 @@ export default class AlertService {
         errorMessage = 'Die Seite existiert nicht.';
         break;
 
+      case 413:
+        errorMessage = 'Die Datei ist zu groß.';
+        break;
+
       default:
         errorMessage = httpErrorResponse.message;
     }

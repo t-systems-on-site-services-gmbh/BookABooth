@@ -138,7 +138,7 @@
                   </div>
                   <!--- Unternehmenslogo Previewfenster -->
                   <div class="form-group">
-                    <label class="form-control-label" for="company.logo">Unternehmenslogo</label>
+                    <label class="form-control-label" for="company.logo">Unternehmenslogo (max. 10 MB)</label>
                     <br />
                     <img
                       v-if="settingsAccount.company?.logo"
