@@ -93,7 +93,11 @@ export default class AlertService {
         break;
 
       default:
-        errorMessage = httpErrorResponse.message;
+        if (httpErrorResponse.message != undefined) {
+          errorMessage = httpErrorResponse.message;
+        } else {
+          errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';
+        }
     }
     this.showError(errorMessage);
   }
