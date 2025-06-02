@@ -121,7 +121,7 @@ public class SecurityConfiguration {
                     .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/privacy-policy/check"))
                     .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
-                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/privacy-policy/accept"))
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/privacy-policy/accept"))
                     .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/service-packages"))
                     .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)

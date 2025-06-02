@@ -84,9 +84,9 @@ public class PrivacyPolicyResource {
     }
 
     /**
-     * {@code PUT  /privacy-policy/accept} : Accepts the latest privacy policy for the logged in user.
+     * {@code POST  /privacy-policy/accept} : Accepts the latest privacy policy for the logged in user.
      */
-    @PostMapping("/accept/")
+    @PostMapping("/accept")
     public ResponseEntity<Void> acceptPrivacyPolicy(Authentication authentication) {
         log.debug("REST request to accept the latest PrivacyPolicy");
 

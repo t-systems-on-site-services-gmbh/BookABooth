@@ -38,7 +38,7 @@ export default defineComponent({
     const closePrivacyPolicyModal = async () => {
       try {
         // Sende die POST-Anfrage an den Server
-        await axios.post('api/privacy-policy/accept/');
+        await axios.post('api/privacy-policy/accept');
 
         // Aktualisiere die akzeptierte Datenschutzerklärung im Frontend
         acceptedPrivacyPolicy.value = latestPrivacyPolicy.value;
