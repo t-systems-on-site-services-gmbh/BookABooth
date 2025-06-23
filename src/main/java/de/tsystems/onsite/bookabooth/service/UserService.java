@@ -227,9 +227,22 @@ public class UserService {
         if (existingUser.isActivated()) {
             return false;
         }
+
+        BoothUser boothUser = getBoothUser(existingUser);
+        long companyId = boothUser.getCompany().getId();
+
+        log.debug("Deleting not activated user {}", existingUser.getLogin());
         userRepository.delete(existingUser);
         userRepository.flush();
         this.clearUserCaches(existingUser);
+
+        boothUserRepository.delete(boothUser);
+
+        long boothUserCount = boothUserRepository.countByCompanyId(companyId);
+        if (boothUserCount == 0) {
+            log.debug("Deleting company with ID: {}", companyId);
+            companyService.delete(companyId);
+        }
         return true;
     }
 
@@ -619,12 +632,7 @@ public class UserService {
         long secs = applicationProperties.getUserRemovalThreshold();
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(secs, ChronoUnit.SECONDS))
-            .forEach(user -> {
-                log.debug("Deleting not activated user {}", user.getLogin());
-                userRepository.delete(user);
-                companyService.delete(getBoothUser(user).getCompany().getId());
-                this.clearUserCaches(user);
-            });
+            .forEach(this::removeNonActivatedUser);
     }
 
     /**
