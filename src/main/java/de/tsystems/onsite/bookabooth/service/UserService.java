@@ -612,12 +612,13 @@ public class UserService {
     /**
      * Not activated users should be automatically deleted after 3 days.
      * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
+     * This is scheduled to get fired every day, at 01:00 (am).
      */
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
+        long secs = applicationProperties.getUserRemovalThreshold();
         userRepository
-            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(3, ChronoUnit.DAYS))
+            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(secs, ChronoUnit.SECONDS))
             .forEach(user -> {
                 log.debug("Deleting not activated user {}", user.getLogin());
                 userRepository.delete(user);

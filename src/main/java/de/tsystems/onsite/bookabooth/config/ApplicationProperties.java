@@ -98,4 +98,14 @@ public class ApplicationProperties {
     public void setSupportEmail(String supportEmail) {
         this.supportEmail = supportEmail;
     }
+
+    private Long userRemovalThreshold;
+
+    public Long getUserRemovalThreshold() {
+        return userRemovalThreshold;
+    }
+
+    public void setUserRemovalThreshold(Long userRemovalThreshold) {
+        this.userRemovalThreshold = userRemovalThreshold;
+    }
 }
