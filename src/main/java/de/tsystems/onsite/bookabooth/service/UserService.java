@@ -219,7 +219,6 @@ public class UserService {
         //this.clearUserCaches(newUser);
 
         log.debug("Created Information for User: {}", newUser);
-        log.debug("user was rigistered: {}", newUser);
         return newBoothUser;
     }
 
@@ -231,11 +230,7 @@ public class UserService {
         BoothUser boothUser = getBoothUser(existingUser);
         long companyId = boothUser.getCompany().getId();
 
-        log.debug("Deleting not activated user {}", existingUser.getLogin());
-        userRepository.delete(existingUser);
-        userRepository.flush();
-        this.clearUserCaches(existingUser);
-
+        log.debug("Deleting not activated boothuser {}", existingUser.getLogin());
         boothUserRepository.delete(boothUser);
 
         long boothUserCount = boothUserRepository.countByCompanyId(companyId);
@@ -243,6 +238,12 @@ public class UserService {
             log.debug("Deleting company with ID: {}", companyId);
             companyService.delete(companyId);
         }
+
+        log.debug("Deleting not activated user {}", existingUser.getLogin());
+        userRepository.delete(existingUser);
+        userRepository.flush();
+        this.clearUserCaches(existingUser);
+
         return true;
     }
 
