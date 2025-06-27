@@ -78,11 +78,6 @@ public class WaitinglistService {
             } else {
                 users.forEach(user -> {
                     if ((user.getEmail() != null) && user.isActivated()) {
-                        String userEmail = user.getEmail();
-
-                        user.setLangKey(Constants.DEFAULT_LANGUAGE);
-                        user.setLogin(companyName);
-
                         mailService.sendWaitingListEmail(user);
                     }
                 });
