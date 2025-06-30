@@ -8,6 +8,11 @@
           Alle Firmen<br />
           <span class="badge badge-light">{{ countAllProfiles }}</span>
         </a>
+        <a :href="countCompaniesWithBooking === 0 ? null : bccForCompaniesWithBooking" class="btn btn-primary m-3"
+          >Mail an Firmen<br />
+          mit Buchung<br />
+          <span class="badge badge-light">{{ countCompaniesWithBooking }}</span></a
+        >
         <a :href="countIncompleteProfiles === 0 ? null : bccForAllUsersWithIncompleteProfile" class="btn btn-primary m-3"
           >Mail an <br />
           Unvollständige Profile<br />

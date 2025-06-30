@@ -20,6 +20,8 @@ export default defineComponent({
     const locations: Ref<ILocation[]> = ref([]);
     const checklists: Ref<IAdminChecklist[]> = ref([]);
     const bccForAllUsers: Ref<string> = ref('');
+    const countCompaniesWithBooking: Ref<number> = ref(0);
+    const bccForCompaniesWithBooking: Ref<string> = ref('');
     const countAllProfiles: Ref<number> = ref(0);
     const bccForAllUsersWithIncompleteProfile: Ref<string> = ref('');
     const countIncompleteProfiles: Ref<number> = ref(0);
@@ -35,10 +37,14 @@ export default defineComponent({
         .checklist()
         .then((res: { data: IAdminChecklist[] }) => {
           checklists.value = res.checklist;
+          const ListOfCompaniesWithBooking: string[] = [];
           const ListOfUsersWithIncompleteProfile: string[] = [];
           const ListOfUsers: string[] = [];
 
           res.checklist.forEach((c: IAdminChecklist) => {
+            if (c.booth != null && c.booth.length > 0 && c.mail != null) {
+              ListOfCompaniesWithBooking.push(c.mail);
+            }
             if (!c.mandatoryComplete && c.mail != null) {
               ListOfUsersWithIncompleteProfile.push(c.mail);
             }
@@ -49,6 +55,8 @@ export default defineComponent({
           });
           bccForAllUsers.value = 'mailTo:?bcc=' + ListOfUsers.join(';') + '&subject=Jade Karrieretag&body=Moin!';
           countAllProfiles.value = ListOfUsers.length;
+          countCompaniesWithBooking.value = ListOfCompaniesWithBooking.length;
+          bccForCompaniesWithBooking.value = 'mailTo:?bcc=' + ListOfCompaniesWithBooking.join(';') + '&subject=Jade Karrieretag&body=Moin!';
           bccForAllUsersWithIncompleteProfile.value =
             'mailTo:?bcc=' + ListOfUsersWithIncompleteProfile.join(';') + '&subject=Jade Karrieretag&body=Moin!';
           countIncompleteProfiles.value = ListOfUsersWithIncompleteProfile.length;
@@ -68,6 +76,8 @@ export default defineComponent({
       bccForAllUsersWithIncompleteProfile,
       countAllProfiles,
       countIncompleteProfiles,
+      countCompaniesWithBooking,
+      bccForCompaniesWithBooking,
     };
   },
   mounted() {

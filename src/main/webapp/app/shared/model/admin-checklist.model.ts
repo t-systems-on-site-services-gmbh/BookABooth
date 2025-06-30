@@ -5,6 +5,8 @@ export interface IAdminChecklist {
   phoneNumber?: boolean;
   description?: boolean;
   booth?: string;
+  mail?: string;
+  canceledBooth?: string;
 }
 
 export class Location implements IAdminChecklist {
@@ -15,5 +17,7 @@ export class Location implements IAdminChecklist {
     public phoneNumber?: boolean,
     public description?: boolean,
     public booth?: string,
+    public mail?: string,
+    public canceledBooth?: string,
   ) {}
 }
