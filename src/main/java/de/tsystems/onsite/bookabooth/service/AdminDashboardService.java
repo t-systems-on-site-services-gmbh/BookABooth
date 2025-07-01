@@ -75,6 +75,7 @@ public class AdminDashboardService {
             cl.setAddress(company.getBillingAddress() != null && !company.getBillingAddress().isBlank());
             cl.setLogo(company.getLogo() != null && !company.getLogo().isBlank());
             cl.setCompanyDescription(company.getDescription() != null && !company.getDescription().isBlank());
+            cl.setOnExhibitorList(company.getExhibitorList() != null && company.getExhibitorList().booleanValue());
 
             // information from BoothUser
             BoothUser companyBoothUser = companyBoothUsersMap.get(company.getId());

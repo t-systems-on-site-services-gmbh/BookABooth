@@ -7,6 +7,7 @@ export interface IAdminChecklist {
   booth?: string;
   mail?: string;
   canceledBooth?: string;
+  onExhibitorList?: boolean;
 }
 
 export class Location implements IAdminChecklist {
@@ -19,5 +20,6 @@ export class Location implements IAdminChecklist {
     public booth?: string,
     public mail?: string,
     public canceledBooth?: string,
+    public onExhibitorList?: boolean,
   ) {}
 }

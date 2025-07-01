@@ -310,7 +310,16 @@
             </div>
           </div>
           <br />
-          <button type="submit" :disabled="v$.settingsAccount.user.email.$invalid" class="btn btn-primary" data-cy="submit">
+          <button
+            type="submit"
+            :disabled="
+              v$.settingsAccount.user.email.$invalid ||
+              v$.settingsAccount.user.firstName.$invalid ||
+              v$.settingsAccount.user.lastName.$invalid
+            "
+            class="btn btn-primary"
+            data-cy="submit"
+          >
             Speichern
           </button>
         </form>
