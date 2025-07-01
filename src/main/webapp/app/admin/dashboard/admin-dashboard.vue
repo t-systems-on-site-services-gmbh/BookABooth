@@ -41,6 +41,7 @@
             <th scope="row"><span>Logo</span></th>
             <th scope="row"><span>Telefonnummer</span></th>
             <th scope="row"><span>Kurzbeschreibung</span></th>
+            <th scope="row"><span>Ausstellerliste</span></th>
             <th scope="row"><span>Stand</span></th>
           </tr>
         </thead>
@@ -62,6 +63,10 @@
             <td
               :class="{ 'list-group-item-success': checklist.companyDescription, 'list-group-item-danger': !checklist.companyDescription }"
               v-text="checklist.companyDescription ? 'Ja' : 'Nein'"
+            ></td>
+            <td
+              :class="{ 'list-group-item-success': checklist.onExhibitorList, 'list-group-item-danger': !checklist.onExhibitorList }"
+              v-text="checklist.onExhibitorList ? 'Ja' : 'Nein'"
             ></td>
             <td>
               <span v-if="checklist.booth" class="badge badge-pill badge-success">{{ checklist.booth }}</span>

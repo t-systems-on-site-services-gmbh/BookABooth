@@ -11,6 +11,7 @@ public class AdminChecklistDTO {
     private String booth;
     private String mail;
     private String canceledBooth;
+    private boolean onExhibitorList;
 
     public AdminChecklistDTO() {}
 
@@ -88,5 +89,13 @@ public class AdminChecklistDTO {
 
     public void setCanceledBooth(String canceledBooth) {
         this.canceledBooth = canceledBooth;
+    }
+
+    public boolean isOnExhibitorList() {
+        return onExhibitorList;
+    }
+
+    public void setOnExhibitorList(boolean onExhibitorList) {
+        this.onExhibitorList = onExhibitorList;
     }
 }
