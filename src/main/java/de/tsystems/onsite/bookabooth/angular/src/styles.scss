@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+$jhs-color-red: #e30613;
+$jhs-color-grey: rgba(83, 88, 80, 1);
+
+.bg-jhs-color-grey {
+  background-color: $jhs-color-grey !important;
+}
+
+.logo-img {
+  height: 100%;
+  background: url('assets/jadehs-logo.png') no-repeat center center;
+  background-size: contain;
+  width: 100%;
+  filter: drop-shadow(0 0 0.05rem white);
+  margin: 0 5px;
+  height: 45px;
+  display: inline-block;
+  vertical-align: middle;
+  width: 45px;
+}
