@@ -109,7 +109,14 @@ public class BoothService {
             .stream()
             .map(o -> {
                 BoothDTO dto = boothMapper.toDto((Booth) o[0]);
-                dto.setCompanyName((String) o[1]);
+                Boolean exhibitorList = (Boolean) o[2];
+                String companyName = (String) o[1];
+                if ((exhibitorList != null) && exhibitorList) {
+                    dto.setCompanyName(companyName);
+                } else if (companyName != null) {
+                    dto.setCompanyName("bereits gebucht");
+                }
+
                 return dto;
             })
             .toList();

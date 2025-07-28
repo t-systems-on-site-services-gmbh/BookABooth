@@ -73,6 +73,7 @@
               <td class="text-right">
                 <div class="btn-group">
                   <button
+                    v-if="booth.available"
                     @click="displayConfirmationModal(booth)"
                     class="btn btn-primary btn-sm edit"
                     data-cy="entityEditButton"
@@ -85,6 +86,10 @@
                   >
                     <font-awesome-icon icon="store"></font-awesome-icon>
                     <span class="d-none d-md-inline">Stand buchen</span>
+                  </button>
+                  <button v-else class="btn btn-light btn-sm" disabled>
+                    <font-awesome-icon icon="lock"></font-awesome-icon>
+                    <span class="d-none d-md-inline">Stand gesperrt</span>
                   </button>
                 </div>
               </td>
