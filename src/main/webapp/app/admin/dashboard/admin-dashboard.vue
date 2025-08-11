@@ -46,7 +46,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="checklist in checklists" :key="checklist.id" data-cy="entityTable">
+          <tr>
+            <td><input type="text" class="form-input" id="filter.firma" name="filter.firma" v-model="filterFirmenname" /></td>
+            <td>
+              <input
+                type="checkbox"
+                class="form-check"
+                id="filter.rechnungsanschrift"
+                name="filter.rechnungsanschrift"
+                :checked="filterRechnungsanschrift === true"
+                :indeterminate="filterRechnungsanschrift === null"
+                @change="toggleCheckboxState(filterRechnungsanschrift, $event)"
+              />
+            </td>
+            <td><input type="checkbox" class="form-check" id="filter.logo" name="filter.logo" /></td>
+            <td><input type="checkbox" class="form-check" id="filter.telefonnummer" name="filter.telefonnummer" /></td>
+            <td><input type="checkbox" class="form-check" id="filter.kurzbeschreibung" name="filter.kurzbeschreibung" /></td>
+            <td><input type="checkbox" class="form-check" id="filter.ausstellerliste" name="filter.ausstellerliste" /></td>
+          </tr>
+          <tr v-for="checklist in filteredChecklists" :key="checklist.id" data-cy="entityTable">
             <td>{{ checklist.companyName }}</td>
             <td
               :class="{ 'list-group-item-success': checklist.address, 'list-group-item-danger': !checklist.address }"

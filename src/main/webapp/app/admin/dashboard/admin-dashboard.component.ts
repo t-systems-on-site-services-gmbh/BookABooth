@@ -1,4 +1,4 @@
-import { defineComponent, inject, ref, type Ref } from 'vue';
+import { computed, defineComponent, inject, ref, type Ref } from 'vue';
 
 import type { ILocation } from '@/shared/model/location.model';
 import LocationService from '@/entities/location/location.service';
@@ -25,6 +25,8 @@ export default defineComponent({
     const countAllProfiles: Ref<number> = ref(0);
     const bccForAllUsersWithIncompleteProfile: Ref<string> = ref('');
     const countIncompleteProfiles: Ref<number> = ref(0);
+    const filterFirmenname: Ref<string> = ref('');
+    const filterRechnungsanschrift: Ref<boolean | null> = ref(null);
 
     const initRelationships = () => {
       locationService()
@@ -66,11 +68,22 @@ export default defineComponent({
         });
     };
 
+    const filteredChecklists = computed(() => {
+      return checklists.value.filter(
+        c =>
+          c.companyName?.toLowerCase().includes(filterFirmenname.value.toLowerCase()) &&
+          (filterRechnungsanschrift.value === null || c.address === filterRechnungsanschrift.value),
+      );
+    });
+
     initRelationships();
 
     return {
       locations,
       checklists,
+      filteredChecklists,
+      filterFirmenname,
+      filterRechnungsanschrift,
       adminDashboardService,
       bccForAllUsers,
       bccForAllUsersWithIncompleteProfile,
@@ -98,6 +111,22 @@ export default defineComponent({
       document.body.appendChild(link);
       link.click();
       link.remove();
+    },
+    toggleCheckboxState(event: any) {
+      // Zyklus: null -> true -> false -> null
+      if (this.filterRechnungsanschrift === null) {
+        this.filterRechnungsanschrift = true;
+        event.target.indeterminate = false;
+        event.target.checked = true;
+      } else if (this.filterRechnungsanschrift === true) {
+        this.filterRechnungsanschrift = false;
+        event.target.indeterminate = false;
+        event.target.checked = false;
+      } else {
+        // filterRechnungsanschrift === false
+        this.filterRechnungsanschrift = null;
+        event.target.indeterminate = true;
+      }
     },
   },
 });
