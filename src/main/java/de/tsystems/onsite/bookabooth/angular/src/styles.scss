@@ -2,6 +2,11 @@
 $jhs-color-red: #e30613;
 $jhs-color-grey: rgba(83, 88, 80, 1);
 
+$link-color: $jhs_color_red;
+$link-hover-color: mix(black, $link-color, 30%);
+
+$body-bg: #e4e5e6;
+
 .bg-jhs-color-grey {
   background-color: $jhs-color-grey !important;
 }
@@ -17,4 +22,27 @@ $jhs-color-grey: rgba(83, 88, 80, 1);
   display: inline-block;
   vertical-align: middle;
   width: 45px;
+}
+
+.news {
+  font-size: 11pt;
+  font-weight: 600;
+  margin-top: 25px;
+  text-align: center;
+  color: white;
+  background-color: $jhs_color_red;
+}
+
+.nav-item {
+  margin-left: 1.5rem;
+}
+
+.nav-icon {
+  padding: 0.5rem;
+}
+
+.card {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem;
 }
