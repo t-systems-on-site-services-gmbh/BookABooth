@@ -26,7 +26,14 @@ export default defineComponent({
     const bccForAllUsersWithIncompleteProfile: Ref<string> = ref('');
     const countIncompleteProfiles: Ref<number> = ref(0);
     const filterFirmenname: Ref<string> = ref('');
-    const filterRechnungsanschrift: Ref<boolean | null> = ref(null);
+
+    const filter = {
+      filterRechnungsanschrift: ref<boolean | null>(null),
+      filterLogo: ref<boolean | null>(null),
+      filterTelefonnummer: ref<boolean | null>(null),
+      filterKurzbeschreibung: ref<boolean | null>(null),
+      filterAusstellerliste: ref<boolean | null>(null),
+    };
 
     const initRelationships = () => {
       locationService()
@@ -72,9 +79,29 @@ export default defineComponent({
       return checklists.value.filter(
         c =>
           c.companyName?.toLowerCase().includes(filterFirmenname.value.toLowerCase()) &&
-          (filterRechnungsanschrift.value === null || c.address === filterRechnungsanschrift.value),
+          (filter.filterRechnungsanschrift.value === null || c.address === filter.filterRechnungsanschrift.value) &&
+          (filter.filterLogo.value === null || c.logo === filter.filterLogo.value) &&
+          (filter.filterTelefonnummer.value === null || c.phoneNumber === filter.filterTelefonnummer.value) &&
+          (filter.filterKurzbeschreibung.value === null || c.companyDescription === filter.filterKurzbeschreibung.value) &&
+          (filter.filterAusstellerliste.value === null || c.onExhibitorList === filter.filterAusstellerliste.value),
       );
     });
+
+    function toggleTriStateFilter(key: keyof typeof filter, event: any) {
+      const filterRef = filter[key];
+      if (filterRef.value === null) {
+        filterRef.value = true;
+        event.target.indeterminate = false;
+        event.target.checked = true;
+      } else if (filterRef.value === true) {
+        filterRef.value = false;
+        event.target.indeterminate = false;
+        event.target.checked = false;
+      } else {
+        filterRef.value = null;
+        event.target.indeterminate = true;
+      }
+    }
 
     initRelationships();
 
@@ -83,7 +110,8 @@ export default defineComponent({
       checklists,
       filteredChecklists,
       filterFirmenname,
-      filterRechnungsanschrift,
+      filter,
+      toggleTriStateFilter,
       adminDashboardService,
       bccForAllUsers,
       bccForAllUsersWithIncompleteProfile,
@@ -111,22 +139,6 @@ export default defineComponent({
       document.body.appendChild(link);
       link.click();
       link.remove();
-    },
-    toggleCheckboxState(event: any) {
-      // Zyklus: null -> true -> false -> null
-      if (this.filterRechnungsanschrift === null) {
-        this.filterRechnungsanschrift = true;
-        event.target.indeterminate = false;
-        event.target.checked = true;
-      } else if (this.filterRechnungsanschrift === true) {
-        this.filterRechnungsanschrift = false;
-        event.target.indeterminate = false;
-        event.target.checked = false;
-      } else {
-        // filterRechnungsanschrift === false
-        this.filterRechnungsanschrift = null;
-        event.target.indeterminate = true;
-      }
     },
   },
 });
