@@ -54,15 +54,55 @@
                 class="form-check"
                 id="filter.rechnungsanschrift"
                 name="filter.rechnungsanschrift"
-                :checked="filterRechnungsanschrift === true"
-                :indeterminate="filterRechnungsanschrift === null"
-                @change="toggleCheckboxState(filterRechnungsanschrift, $event)"
+                :checked="filter.filterRechnungsanschrift.value === true"
+                :indeterminate="filter.filterRechnungsanschrift.value === null"
+                @change="toggleTriStateFilter('filterRechnungsanschrift', $event)"
               />
             </td>
-            <td><input type="checkbox" class="form-check" id="filter.logo" name="filter.logo" /></td>
-            <td><input type="checkbox" class="form-check" id="filter.telefonnummer" name="filter.telefonnummer" /></td>
-            <td><input type="checkbox" class="form-check" id="filter.kurzbeschreibung" name="filter.kurzbeschreibung" /></td>
-            <td><input type="checkbox" class="form-check" id="filter.ausstellerliste" name="filter.ausstellerliste" /></td>
+            <td>
+              <input
+                type="checkbox"
+                class="form-check"
+                id="filter.logo"
+                name="filter.logo"
+                :checked="filter.filterLogo.value === true"
+                :indeterminate="filter.filterLogo.value === null"
+                @change="toggleTriStateFilter('filterLogo', $event)"
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                class="form-check"
+                id="filter.telefonnummer"
+                name="filter.telefonnummer"
+                :checked="filter.filterTelefonnummer.value === true"
+                :indeterminate="filter.filterTelefonnummer.value === null"
+                @change="toggleTriStateFilter('filterTelefonnummer', $event)"
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                class="form-check"
+                id="filter.kurzbeschreibung"
+                name="filter.kurzbeschreibung"
+                :checked="filter.filterKurzbeschreibung.value === true"
+                :indeterminate="filter.filterKurzbeschreibung.value === null"
+                @change="toggleTriStateFilter('filterKurzbeschreibung', $event)"
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                class="form-check"
+                id="filter.ausstellerliste"
+                name="filter.ausstellerliste"
+                :checked="filter.filterAusstellerliste.value === true"
+                :indeterminate="filter.filterAusstellerliste.value === null"
+                @change="toggleTriStateFilter('filterAusstellerliste', $event)"
+              />
+            </td>
           </tr>
           <tr v-for="checklist in filteredChecklists" :key="checklist.id" data-cy="entityTable">
             <td>{{ checklist.companyName }}</td>
