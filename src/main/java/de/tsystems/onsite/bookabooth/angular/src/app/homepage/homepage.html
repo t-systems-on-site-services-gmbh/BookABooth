@@ -9,9 +9,9 @@
           Nächster Termin: Mittwoch, 19. November 2025 <br />
         </div>
       </div>
-      <div class="col-md-9">
+      <div class="col-md-9" *ngIf="accountService.authenticated">
         <!-- Rechter Bereich -->
-        <h1>Willkommen!</h1>
+        <h1>Willkommen {{ (accountService.account$ | async)?.login }}!</h1>
         <p>Hier können Sie Ihren Stand für den Karrieretag buchen.</p>
         <div>
           <div>

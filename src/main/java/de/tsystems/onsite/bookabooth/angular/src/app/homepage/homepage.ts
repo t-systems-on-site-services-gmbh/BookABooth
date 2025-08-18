@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { Login } from '../login/login';
+import { Login } from '../account/login/login';
+import { LoginService } from '../account/login.service';
+import { AccountService } from '../account/account.service';
 
 @Component({
   selector: 'app-homepage',
@@ -8,4 +10,10 @@ import { Login } from '../login/login';
   templateUrl: './homepage.html',
   styleUrl: './homepage.scss',
 })
-export class Homepage {}
+export class Homepage {
+  constructor(private accountService: AccountService) {}
+
+  ngOnInit() {
+    this.accountService.retrieveAccount().subscribe();
+  }
+}
