@@ -26,6 +26,7 @@ export default defineComponent({
     const bccForAllUsersWithIncompleteProfile: Ref<string> = ref('');
     const countIncompleteProfiles: Ref<number> = ref(0);
     const filterFirmenname: Ref<string> = ref('');
+    const filterStand: Ref<string> = ref('');
 
     const filter = {
       filterRechnungsanschrift: ref<boolean | null>(null),
@@ -83,7 +84,8 @@ export default defineComponent({
           (filter.filterLogo.value === null || c.logo === filter.filterLogo.value) &&
           (filter.filterTelefonnummer.value === null || c.phoneNumber === filter.filterTelefonnummer.value) &&
           (filter.filterKurzbeschreibung.value === null || c.companyDescription === filter.filterKurzbeschreibung.value) &&
-          (filter.filterAusstellerliste.value === null || c.onExhibitorList === filter.filterAusstellerliste.value),
+          (filter.filterAusstellerliste.value === null || c.onExhibitorList === filter.filterAusstellerliste.value) &&
+          ((filterStand.value.trim().length == 0 && c.booth == null) || c.booth?.toLowerCase().includes(filterStand.value.toLowerCase())),
       );
     });
 
@@ -110,6 +112,7 @@ export default defineComponent({
       checklists,
       filteredChecklists,
       filterFirmenname,
+      filterStand,
       filter,
       toggleTriStateFilter,
       adminDashboardService,

@@ -103,6 +103,7 @@
                 @change="toggleTriStateFilter('filterAusstellerliste', $event)"
               />
             </td>
+            <td><input type="text" class="form-input" id="filter.stand" name="filter.stand" v-model="filterStand" /></td>
           </tr>
           <tr v-for="checklist in filteredChecklists" :key="checklist.id" data-cy="entityTable">
             <td>{{ checklist.companyName }}</td>
