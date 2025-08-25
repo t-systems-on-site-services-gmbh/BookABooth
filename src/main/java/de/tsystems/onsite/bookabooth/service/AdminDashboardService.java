@@ -128,6 +128,10 @@ public class AdminDashboardService {
                     return 1;
                 } else if (!o1.isMandatoryComplete() && o2.isMandatoryComplete()) {
                     return -1;
+                } else if (o1.isOnExhibitorList() && !o2.isOnExhibitorList()) {
+                    return 1;
+                } else if (!o1.isOnExhibitorList() && o2.isOnExhibitorList()) {
+                    return -1;
                 } else {
                     return o1.getCompanyName().toUpperCase().compareTo(o2.getCompanyName().toUpperCase());
                 }
