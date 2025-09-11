@@ -2,15 +2,26 @@ package de.tsystems.onsite.bookabooth.service;
 
 import de.tsystems.onsite.bookabooth.domain.Booth;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import de.tsystems.onsite.bookabooth.repository.BookingRepository;
 import de.tsystems.onsite.bookabooth.repository.BoothRepository;
 import de.tsystems.onsite.bookabooth.service.dto.AusstellerlisteDTO;
+import de.tsystems.onsite.bookabooth.service.dto.ExhibitorDTO;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +29,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AusstellerlisteService {
 
+    @Value("${application.upload-folder}")
+    private String uploadFolder;
+
     private final Logger log = LoggerFactory.getLogger(AusstellerlisteService.class);
     private final BoothRepository boothRepository;
     private final BookingService bookingService;
     private final CompanyService companyService;
+    private BookingRepository bookingRepository;
 
-    public AusstellerlisteService(BoothRepository boothRepository, BookingService bookingService, CompanyService companyService) {
+    public AusstellerlisteService(
+        BoothRepository boothRepository,
+        BookingService bookingService,
+        CompanyService companyService,
+        BookingRepository bookingRepository
+    ) {
         this.boothRepository = boothRepository;
         this.bookingService = bookingService;
         this.companyService = companyService;
+        this.bookingRepository = bookingRepository;
     }
 
     public List<AusstellerlisteDTO> getAussteller() {
@@ -66,5 +87,51 @@ public class AusstellerlisteService {
                 return new AusstellerlisteDTO(company.getId(), company.getName(), company.getLogo(), company.getDescription(), boothTitle);
             })
             .collect(Collectors.toList());
+    }
+
+    public List<ExhibitorDTO> getExhibitorsWithConfirmedBooking() {
+        return bookingRepository.findExhibitorsWithConfirmedBooking();
+    }
+
+    public void createExhibitorsZip(List<ExhibitorDTO> exhibitors, OutputStream outputStream) throws IOException {
+        try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {
+            for (ExhibitorDTO exhibitor : exhibitors) {
+                String baseDir = exhibitor.getLocationName() + "/";
+                if (!exhibitor.isExhibitorList()) {
+                    baseDir += "not-in-exhibitor-list/";
+                }
+
+                // create file name
+                String fileName = (exhibitor.getCompanyName() + "-" + exhibitor.getBoothTitle()).replaceAll("\\s+", "_");
+
+                // full path in zip file
+                String zipEntryName = baseDir + fileName;
+
+                // remove first path segment 'e.g. uploads, because its already' in uploadFolder path
+                String suffixPathOfLogo = "";
+                Path original = Paths.get(exhibitor.getCompanyLogo());
+                if (original.getNameCount() > 1) {
+                    suffixPathOfLogo = original.subpath(1, original.getNameCount()).toString();
+                }
+
+                File imageFile = new File(uploadFolder + suffixPathOfLogo);
+                if (imageFile.exists() && imageFile.isFile()) {
+                    try (FileInputStream fis = new FileInputStream(imageFile)) {
+                        zos.putNextEntry(new ZipEntry(zipEntryName));
+
+                        byte[] buffer = new byte[4096];
+                        int length;
+                        while ((length = fis.read(buffer)) >= 0) {
+                            zos.write(buffer, 0, length);
+                        }
+                        zos.closeEntry();
+                    }
+                } else {
+                    // create file not found file in case image is missing
+                    System.err.println("Image file not found: " + exhibitor.getCompanyLogo());
+                    zos.putNextEntry(new ZipEntry(zipEntryName + "-file_not_found"));
+                }
+            }
+        }
     }
 }
