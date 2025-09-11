@@ -101,18 +101,20 @@ public class AusstellerlisteService {
                     baseDir += "not-in-exhibitor-list/";
                 }
 
-                // create file name
-                String fileName = (exhibitor.getCompanyName() + "-" + exhibitor.getBoothTitle()).replaceAll("\\s+", "_");
-
-                // full path in zip file
-                String zipEntryName = baseDir + fileName;
-
                 // remove first path segment 'e.g. uploads, because its already' in uploadFolder path
                 String suffixPathOfLogo = "";
+                String extension = "";
                 Path original = Paths.get(exhibitor.getCompanyLogo());
                 if (original.getNameCount() > 1) {
                     suffixPathOfLogo = original.subpath(1, original.getNameCount()).toString();
+                    extension = suffixPathOfLogo.split("\\.")[suffixPathOfLogo.split("\\.").length - 1];
                 }
+
+                // create file name
+                String fileName = (exhibitor.getCompanyName() + "-" + exhibitor.getBoothTitle() + "." + extension).replaceAll("\\s+", "_");
+
+                // full path in zip file
+                String zipEntryName = baseDir + fileName;
 
                 File imageFile = new File(uploadFolder + suffixPathOfLogo);
                 if (imageFile.exists() && imageFile.isFile()) {
