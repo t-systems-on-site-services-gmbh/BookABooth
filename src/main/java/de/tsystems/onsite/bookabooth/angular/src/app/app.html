@@ -1,56 +1,55 @@
-<html class="bg-secondary-subtle">
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-jhs-color-grey">
-      <div class="container-fluid">
-        <span class="navbar-brand">
-          <span class="logo-img"></span>
-          <span>BookABooth</span>
-        </span>
-        <div>
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <span class="nav-link" aria-current="page" routerLink="/">
-                <fa-icon [icon]="faHome" class="nav-icon" />
-                <span>Startseite</span>
-              </span>
-            </li>
-            <li class="nav-item">
-              <span class="nav-link" routerLink="/ausstellerliste">
-                <fa-icon [icon]="faBuilding" class="nav-icon" />
-                <span>Ausstellerliste</span>
-              </span>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria>Zugang</a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" routerLink="/login">Login</a></li>
-                <li><a class="dropdown-item" routerLink="/registrierung">Registrierung</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
-
-  <main>
-    <router-outlet></router-outlet>
-  </main>
-
-  <footer>
-    <div class="footer d-flex flex-row justify-content-between">
-      <div class="ms-3">
-        <a href="https://www.jade-hs.de/impressum/" target="_blank">Impressum</a> |
-        <a href="https://www.jade-hs.de/datenschutz/" target="_blank">Datenschutzerklärung</a> |
-        <a href="ausstellerinfo">Ausstellerinformationen</a>
-      </div>
-      <div class="me-3">
-        powered by
-        <a style="color: #e20074" href="https://www.t-systems-onsite.de" target="_blank">
-          T-Systems on site services GmbH
-          <fa-icon [icon]="faExternalLink" />
-        </a>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-jhs-color-grey">
+    <div class="container-fluid">
+      <span class="navbar-brand">
+        <span class="logo-img"></span>
+        <span>BookABooth</span>
+      </span>
+      <div>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <span class="nav-link" aria-current="page" routerLink="/">
+              <fa-icon [icon]="faHome" class="nav-icon" />
+              <span>Startseite</span>
+            </span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" routerLink="/ausstellerliste">
+              <fa-icon [icon]="faBuilding" class="nav-icon" />
+              <span>Ausstellerliste</span>
+            </span>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria>Zugang</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" (click)="loginService.openLogin()">Login</a></li>
+              <li><a class="dropdown-item" (click)="loginService.logout()">Abmelden</a></li>
+              <li><a class="dropdown-item" routerLink="/registrierung">Registrierung</a></li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </div>
-  </footer>
-</html>
+  </nav>
+</header>
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<footer>
+  <div class="footer d-flex flex-row justify-content-between">
+    <div class="ms-3">
+      <a href="https://www.jade-hs.de/impressum/" target="_blank">Impressum</a> |
+      <a href="https://www.jade-hs.de/datenschutz/" target="_blank">Datenschutzerklärung</a> |
+      <a href="ausstellerinfo">Ausstellerinformationen</a>
+    </div>
+    <div class="me-3">
+      powered by
+      <a style="color: #e20074" href="https://www.t-systems-onsite.de" target="_blank">
+        T-Systems on site services GmbH
+        <fa-icon [icon]="faExternalLink" />
+      </a>
+    </div>
+  </div>
+</footer>

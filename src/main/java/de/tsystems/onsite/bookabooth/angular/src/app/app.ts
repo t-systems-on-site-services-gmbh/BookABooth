@@ -4,6 +4,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { faBuilding } from '@fortawesome/free-solid-svg-icons';
+import { LoginService } from './account/login.service';
 
 @Component({
   selector: 'app-root',
@@ -16,4 +17,5 @@ export class App {
   faExternalLink = faExternalLink;
   faHome = faHome;
   faBuilding = faBuilding;
+  constructor(public loginService: LoginService) {}
 }

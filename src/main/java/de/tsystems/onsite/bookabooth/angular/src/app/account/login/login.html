@@ -5,15 +5,13 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="loginModalLabel">Anmeldung</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form (ngSubmit)="onSubmit()">
+          <form (ngSubmit)="onSubmit()" class="m-5">
             <!-- Login Form mit Benutzername und Passwort-->
-            <div *ngIf="authenticationError" class="alert alert-danger" role="alert">Benutzername oder Passwort falsch!</div>
-            <div class="form-group">
+            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">Benutzername oder Passwort falsch!</div>
+            <div class="form-group m-3">
               <label for="username">Benutzername</label>
               <input
                 type="text"
@@ -21,9 +19,11 @@
                 id="username"
                 [(ngModel)]="username"
                 name="username"
-                placeholder="Benutzername eingeben"
+                placeholder="Ihr Benutzername"
                 required
               />
+            </div>
+            <div class="form-group m-3">
               <label for="password">Passwort</label>
               <input
                 type="password"
@@ -31,13 +31,23 @@
                 id="password"
                 [(ngModel)]="password"
                 name="password"
-                placeholder="Passwort eingeben"
+                placeholder="Ihr Passwort"
                 required
               />
             </div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary m-3">Anmelden</button>
           </form>
+          <div class="m-5">
+            <div class="alert alert-warning" role="alert">
+              <a [routerLink]="['/account/reset/request']" class="alert-link" data-cy="forgetYourPasswordSelector">
+                Sie haben Ihr Passwort vergessen?
+              </a>
+            </div>
+            <div class="alert alert-warning" role="alert">
+              Sie haben noch keinen Zugang? <br />
+              <a [routerLink]="['/register']" class="alert-link"> Registrieren Sie sich hier. </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

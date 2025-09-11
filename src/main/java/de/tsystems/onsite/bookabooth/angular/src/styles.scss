@@ -24,6 +24,13 @@ $body-bg: #e4e5e6;
   width: 45px;
 }
 
+.logo {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+
 .news {
   font-size: 11pt;
   font-weight: 600;
@@ -45,4 +52,10 @@ $body-bg: #e4e5e6;
   border-radius: 0.5rem;
   padding: 1rem;
   margin: 1rem;
+}
+
+.width-on-pc {
+  @media (min-width: 768px) {
+    width: 50%;
+  }
 }
