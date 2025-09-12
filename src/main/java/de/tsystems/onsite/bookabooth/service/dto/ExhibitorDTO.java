@@ -6,7 +6,7 @@ public class ExhibitorDTO {
     private String companyLogo;
     private String locationName;
     private String boothTitle;
-    private boolean exhibitorList;
+    private Boolean exhibitorList;
 
     public ExhibitorDTO(String companyName, String companyLogo, String locationName, String boothTitle, Boolean exhibitorList) {
         this.companyName = companyName;
