@@ -97,17 +97,19 @@ public class AusstellerlisteService {
         try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {
             for (ExhibitorDTO exhibitor : exhibitors) {
                 String baseDir = exhibitor.getLocationName() + "/";
-                if (!exhibitor.isExhibitorList()) {
+                if (!Boolean.TRUE.equals(exhibitor.isExhibitorList())) {
                     baseDir += "not-in-exhibitor-list/";
                 }
 
                 // remove first path segment 'e.g. uploads, because its already' in uploadFolder path
                 String suffixPathOfLogo = "";
                 String extension = "";
-                Path original = Paths.get(exhibitor.getCompanyLogo());
-                if (original.getNameCount() > 1) {
-                    suffixPathOfLogo = original.subpath(1, original.getNameCount()).toString();
-                    extension = suffixPathOfLogo.split("\\.")[suffixPathOfLogo.split("\\.").length - 1];
+                if (exhibitor.getCompanyLogo() != null) {
+                    Path original = Paths.get(exhibitor.getCompanyLogo());
+                    if (original.getNameCount() > 1) {
+                        suffixPathOfLogo = original.subpath(1, original.getNameCount()).toString();
+                        extension = suffixPathOfLogo.split("\\.")[suffixPathOfLogo.split("\\.").length - 1];
+                    }
                 }
 
                 // create file name
@@ -130,7 +132,7 @@ public class AusstellerlisteService {
                     }
                 } else {
                     // create file not found file in case image is missing
-                    System.err.println("Image file not found: " + exhibitor.getCompanyLogo());
+                    System.err.println("Image file not found: " + exhibitor.getCompanyName());
                     zos.putNextEntry(new ZipEntry(zipEntryName + "-file_not_found"));
                 }
             }

@@ -1,8 +1,11 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div>
-        <a class="btn btn-primary m-3" @click="downloadExcel">Rechnungsdaten</a>
+      <div class="d-flex flex-wrap">
+        <div class="d-flex flex-column m-3">
+          <a class="btn btn-primary mb-3" @click="downloadExcel">Rechnungsdaten</a>
+          <a class="btn btn-primary" href="api/ausstellerliste/zip">Download Logos</a>
+        </div>
         <a :href="countAllProfiles === 0 ? null : bccForAllUsers" class="btn btn-primary m-3"
           >Mail an <br />
           Alle Firmen<br />
