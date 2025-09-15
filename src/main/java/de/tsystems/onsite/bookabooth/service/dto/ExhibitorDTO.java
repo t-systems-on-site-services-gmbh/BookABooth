@@ -6,14 +6,18 @@ public class ExhibitorDTO {
     private String companyLogo;
     private String locationName;
     private String boothTitle;
-    private Boolean exhibitorList;
+    private boolean exhibitorList;
 
     public ExhibitorDTO(String companyName, String companyLogo, String locationName, String boothTitle, Boolean exhibitorList) {
         this.companyName = companyName;
         this.companyLogo = companyLogo;
         this.locationName = locationName;
         this.boothTitle = boothTitle;
-        this.exhibitorList = exhibitorList;
+        if (exhibitorList == null) {
+            this.exhibitorList = false;
+        } else {
+            this.exhibitorList = exhibitorList;
+        }
     }
 
     public String getCompanyName() {
@@ -53,6 +57,10 @@ public class ExhibitorDTO {
     }
 
     public void setExhibitorList(Boolean exhibitorList) {
-        this.exhibitorList = exhibitorList;
+        if (exhibitorList == null) {
+            this.exhibitorList = false;
+        } else {
+            this.exhibitorList = exhibitorList;
+        }
     }
 }
