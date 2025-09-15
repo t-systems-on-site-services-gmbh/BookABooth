@@ -97,7 +97,7 @@ public class AusstellerlisteService {
         try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {
             for (ExhibitorDTO exhibitor : exhibitors) {
                 String baseDir = exhibitor.getLocationName() + "/";
-                if (!Boolean.TRUE.equals(exhibitor.isExhibitorList())) {
+                if (exhibitor.isExhibitorList()) {
                     baseDir += "not-in-exhibitor-list/";
                 }
 
