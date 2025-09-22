@@ -135,15 +135,10 @@ public class CompanyResource {
 
         var filePath = fileUploadService.saveFile("companies", id, imageBase64);
 
-        companyDTO.get().setLogo(getRelativeImagePath(filePath));
+        companyDTO.get().setLogo(filePath);
         var resultDTO = companyService.update(companyDTO.get());
 
         return ResponseEntity.ok().body(resultDTO);
-    }
-
-    private String getRelativeImagePath(String filePath) {
-        int idx = applicationProperties.getUploadFolder().lastIndexOf("/uploads/");
-        return filePath.substring(idx);
     }
 
     /**

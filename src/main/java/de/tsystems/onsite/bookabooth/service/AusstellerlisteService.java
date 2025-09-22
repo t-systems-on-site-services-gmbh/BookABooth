@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.service;
 
+import de.tsystems.onsite.bookabooth.config.ApplicationProperties;
 import de.tsystems.onsite.bookabooth.domain.Booth;
 import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
 import de.tsystems.onsite.bookabooth.repository.BookingRepository;
@@ -22,6 +23,7 @@ import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.wavefront.WavefrontProperties.Application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AusstellerlisteService {
 
-    @Value("${application.upload-folder}")
-    private String uploadFolder;
+    private final ApplicationProperties applicationProperties;
 
     private final Logger log = LoggerFactory.getLogger(AusstellerlisteService.class);
     private final BoothRepository boothRepository;
@@ -39,11 +40,13 @@ public class AusstellerlisteService {
     private BookingRepository bookingRepository;
 
     public AusstellerlisteService(
+        ApplicationProperties applicationProperties,
         BoothRepository boothRepository,
         BookingService bookingService,
         CompanyService companyService,
         BookingRepository bookingRepository
     ) {
+        this.applicationProperties = applicationProperties;
         this.boothRepository = boothRepository;
         this.bookingService = bookingService;
         this.companyService = companyService;
@@ -102,13 +105,12 @@ public class AusstellerlisteService {
                 }
 
                 // remove first path segment 'e.g. uploads, because its already' in uploadFolder path
-                String suffixPathOfLogo = "";
                 String extension = "";
                 if (exhibitor.getCompanyLogo() != null) {
                     Path original = Paths.get(exhibitor.getCompanyLogo());
+
                     if (original.getNameCount() > 1) {
-                        suffixPathOfLogo = original.subpath(1, original.getNameCount()).toString();
-                        extension = suffixPathOfLogo.split("\\.")[suffixPathOfLogo.split("\\.").length - 1];
+                        extension = original.toString().split("\\.")[original.toString().split("\\.").length - 1];
                     }
                 }
 
@@ -118,7 +120,7 @@ public class AusstellerlisteService {
                 // full path in zip file
                 String zipEntryName = baseDir + fileName;
 
-                File imageFile = new File(uploadFolder + suffixPathOfLogo);
+                File imageFile = new File(applicationProperties.getWorkDir() + File.separator + exhibitor.getCompanyLogo());
                 if (imageFile.exists() && imageFile.isFile()) {
                     try (FileInputStream fis = new FileInputStream(imageFile)) {
                         zos.putNextEntry(new ZipEntry(zipEntryName));

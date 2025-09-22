@@ -159,7 +159,11 @@ export default defineComponent({
   computed: {
     absoluteImageUrl(): string {
       const logoPath = this.settingsAccount.company?.logo ? this.settingsAccount.company?.logo.replace(/\\/g, '/') : '';
-      return logoPath ? `${this.siteUrl}${logoPath}?key=${this.componentKey}` : '';
+      if (logoPath && !logoPath.startsWith('/')) {
+        return `/${logoPath}?key=${this.componentKey}`;
+      }
+
+      return logoPath ? `${logoPath}?key=${this.componentKey}` : '';
     },
   },
   methods: {

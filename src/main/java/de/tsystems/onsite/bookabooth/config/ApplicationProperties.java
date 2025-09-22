@@ -1,5 +1,6 @@
 package de.tsystems.onsite.bookabooth.config;
 
+import java.nio.file.Paths;
 import java.util.Date;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -46,6 +47,20 @@ public class ApplicationProperties {
 
     public void setUploadFolder(String uploadFolder) {
         this.uploadFolder = uploadFolder;
+    }
+
+    private String workDir;
+
+    public String getWorkDir() {
+        return workDir;
+    }
+
+    public void setWorkDir(String workDir) {
+        this.workDir = workDir;
+    }
+
+    public String getUploadFolderFull() {
+        return Paths.get(workDir, uploadFolder).toString();
     }
 
     private Integer cancellationReimbursement;

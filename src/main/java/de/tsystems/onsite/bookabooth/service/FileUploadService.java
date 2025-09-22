@@ -39,19 +39,23 @@ public class FileUploadService {
                 throw new RuntimeException("Could not determine file suffix");
             }
 
-            var path = Paths.get(applicationProperties.getUploadFolder(), dir, id + suffix);
+            var path = Paths.get(applicationProperties.getUploadFolderFull(), dir, id + suffix);
             Files.write(path, content);
             removeFiles(dir, id, path);
-            return path.toString();
+            return getRelativePath(path);
         } catch (IOException e) {
             log.error("Could not save file", e);
             throw new RuntimeException("Could not save file", e);
         }
     }
 
+    private String getRelativePath(Path fullPath) {
+        return fullPath.toString().substring(applicationProperties.getWorkDir().length() + 1);
+    }
+
     // Create directory inside upload-folder if it does not exist
     private void ensureDirectoryExists(String directory) throws IOException {
-        var basePath = Paths.get(applicationProperties.getUploadFolder());
+        var basePath = Paths.get(applicationProperties.getUploadFolderFull());
         var path = basePath.resolve(directory).normalize();
 
         if (!path.startsWith(basePath)) {
@@ -83,7 +87,7 @@ public class FileUploadService {
     private void removeFiles(String directory, Long id, Path excludePath) {
         try {
             String filePattern = String.format("%d.*", id);
-            var path = Paths.get(applicationProperties.getUploadFolder(), directory);
+            var path = Paths.get(applicationProperties.getUploadFolderFull(), directory);
             var files = getFilesMatchingPattern(path.toString(), filePattern);
             files.removeIf(p -> p.equals(excludePath));
 
