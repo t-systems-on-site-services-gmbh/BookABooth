@@ -166,15 +166,10 @@ public class LocationResource {
 
         var filePath = fileUploadService.saveFile("locations", id, imageBase64);
 
-        locationDTO.get().setImageUrl(getRelativeImagePath(filePath));
+        locationDTO.get().setImageUrl(filePath);
         var resultDTO = locationService.update(locationDTO.get());
 
         return ResponseEntity.ok().body(resultDTO);
-    }
-
-    private String getRelativeImagePath(String filePath) {
-        int idx = applicationProperties.getUploadFolder().lastIndexOf("uploads/");
-        return filePath.substring(idx);
     }
 
     /**

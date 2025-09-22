@@ -45,8 +45,8 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
     }
 
     protected void initializeResourceHandler(ResourceHandlerRegistration resourceHandlerRegistration) {
-        String[] locations = applicationProperties.getUploadFolder() != null
-            ? new String[] { "file:" + applicationProperties.getUploadFolder() }
+        String[] locations = applicationProperties.getUploadFolderFull() != null
+            ? new String[] { "file:" + applicationProperties.getUploadFolderFull() + "/" }
             : RESOURCE_LOCATIONS;
         resourceHandlerRegistration.addResourceLocations(locations).setCacheControl(getCacheControl());
     }
