@@ -115,7 +115,12 @@ public class AusstellerlisteService {
                 }
 
                 // create file name
-                String fileName = (exhibitor.getCompanyName() + "-" + exhibitor.getBoothTitle() + "." + extension).replaceAll("\\s+", "_");
+                // filename darf spezielle Zeichen nicht enthalten, windows und linux inkompatibel
+                String fileName =
+                    (exhibitor.getCompanyName() + "-" + exhibitor.getBoothTitle() + "." + extension).replaceAll(
+                            "[\\\\/:*?\"<>|]",
+                            "_"
+                        ).replaceAll(" ", "_");
 
                 // full path in zip file
                 String zipEntryName = baseDir + fileName;
