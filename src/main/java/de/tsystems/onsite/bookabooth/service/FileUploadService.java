@@ -80,7 +80,10 @@ public class FileUploadService {
 
     private String getFileSuffix(byte[] imageBytes) throws IOException {
         Tika tika = new Tika();
-        var fileType = tika.detect(imageBytes);
+        String fileType = tika.detect(imageBytes);
+        if ("image/svg+xml".equals(fileType)) {
+            return ".svg";
+        }
         return "." + fileType.split("/")[1];
     }
 
