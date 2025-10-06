@@ -56,59 +56,6 @@
                       >
                     </div>
                   </div>
-                  <!--- Adresse des Unternehmens -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.billingAddress">Rechnungsanschrift</label>
-                    <textarea
-                      id="company.billingAddress"
-                      name="company.billingAddress"
-                      class="form-control"
-                      placeholder="Firmenname // Straße Hausnummer // PLZ Ort"
-                      :class="{
-                        valid: !v$.settingsAccount.company.billingAddress.$invalid,
-                        invalid: v$.settingsAccount.company.billingAddress.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.billingAddress.$model"
-                      minlength="1"
-                      required
-                      data-cy="company.billingaddress"
-                    >
-                    </textarea>
-                    <div v-if="v$.settingsAccount.company.billingAddress.$anyDirty && v$.settingsAccount.company.billingAddress.$invalid">
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.required"
-                        >Eine Rechnungsanschrift wird benötigt.</small
-                      >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.minLength"
-                        >Ihre Rechnungsanschrift muss mindestens 1 Zeichen lang sein.</small
-                      >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.maxLength"
-                        >Ihre Rechnungsanschrift darf nicht länger als 254 Zeichen sein.</small
-                      >
-                    </div>
-                  </div>
-                  <!-- Bemerkung -->
-                  <div class="form-group">
-                    <label class="form-control-label" for="company.comment">Bemerkung, wird für Rechnung übernommen</label>
-                    <textarea
-                      id="company.comment"
-                      name="company.comment"
-                      class="form-control"
-                      placeholder="Bemerkung"
-                      :class="{
-                        valid: !v$.settingsAccount.company.comment.$invalid,
-                        invalid: v$.settingsAccount.company.comment.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.comment.$model"
-                      minlength="0"
-                      data-cy="company.bemerkung"
-                    >
-                    </textarea>
-                    <div v-if="v$.settingsAccount.company.comment.$invalid">
-                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.comment.maxLength">
-                        Die Bemerkung darf nicht länger als 1024 Zeichen sein.
-                      </small>
-                    </div>
-                  </div>
                   <!--- Kurzbeschreibung des Unternehmens -->
                   <div class="form-group">
                     <label class="form-control-label" for="company.description"
@@ -168,6 +115,59 @@
                       accept="image/*"
                       @change="logoUpload"
                     />
+                  </div>
+                  <!--- Adresse des Unternehmens -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.billingAddress">Rechnungsanschrift</label>
+                    <textarea
+                      id="company.billingAddress"
+                      name="company.billingAddress"
+                      class="form-control"
+                      placeholder="Firmenname // Straße Hausnummer // PLZ Ort"
+                      :class="{
+                        valid: !v$.settingsAccount.company.billingAddress.$invalid,
+                        invalid: v$.settingsAccount.company.billingAddress.$invalid,
+                      }"
+                      v-model="v$.settingsAccount.company.billingAddress.$model"
+                      minlength="1"
+                      required
+                      data-cy="company.billingaddress"
+                    >
+                    </textarea>
+                    <div v-if="v$.settingsAccount.company.billingAddress.$anyDirty && v$.settingsAccount.company.billingAddress.$invalid">
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.required"
+                        >Eine Rechnungsanschrift wird benötigt.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.minLength"
+                        >Ihre Rechnungsanschrift muss mindestens 1 Zeichen lang sein.</small
+                      >
+                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.maxLength"
+                        >Ihre Rechnungsanschrift darf nicht länger als 254 Zeichen sein.</small
+                      >
+                    </div>
+                  </div>
+                  <!-- Bemerkung -->
+                  <div class="form-group">
+                    <label class="form-control-label" for="company.comment">Bemerkung, wird für Rechnung übernommen</label>
+                    <textarea
+                      id="company.comment"
+                      name="company.comment"
+                      class="form-control"
+                      placeholder="Bemerkung"
+                      :class="{
+                        valid: !v$.settingsAccount.company.comment.$invalid,
+                        invalid: v$.settingsAccount.company.comment.$invalid,
+                      }"
+                      v-model="v$.settingsAccount.company.comment.$model"
+                      minlength="0"
+                      data-cy="company.bemerkung"
+                    >
+                    </textarea>
+                    <div v-if="v$.settingsAccount.company.comment.$invalid">
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.comment.maxLength">
+                        Die Bemerkung darf nicht länger als 1024 Zeichen sein.
+                      </small>
+                    </div>
                   </div>
                   <!--- Checkbox um Freigabe in Ausstellerliste zu widerrufen -->
                   <div class="form-group">
