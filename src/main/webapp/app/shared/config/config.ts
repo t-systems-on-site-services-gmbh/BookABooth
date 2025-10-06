@@ -44,6 +44,7 @@ import { faBuilding } from '@fortawesome/free-solid-svg-icons/faBuilding';
 import { faReceipt } from '@fortawesome/free-solid-svg-icons/faReceipt';
 import { faStore } from '@fortawesome/free-solid-svg-icons/faStore';
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons/faExternalLink';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons/faTriangleExclamation';
 
 export function initFortAwesome(vue) {
   vue.component('font-awesome-icon', FontAwesomeIcon);
@@ -92,5 +93,6 @@ export function initFortAwesome(vue) {
     faReceipt,
     faStore,
     faExternalLink,
+    faTriangleExclamation,
   );
 }

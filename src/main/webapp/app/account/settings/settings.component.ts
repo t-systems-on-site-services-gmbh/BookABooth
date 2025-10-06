@@ -41,6 +41,7 @@ export default defineComponent({
     const componentKey = ref(new Date().getTime());
     const adminCount = ref<number>(0);
     const onlyOneAdmin = ref<boolean>(true);
+    const billingAddressWarning = ref<boolean>(true);
 
     const isAdmin = computed(() => {
       if (authorities.value && Array.isArray(authorities.value)) {
@@ -75,6 +76,7 @@ export default defineComponent({
     onMounted(() => {
       fetchAdminCount();
       retrieveSystem();
+      checkBillingAddress();
     });
 
     const validations = {
@@ -130,8 +132,24 @@ export default defineComponent({
       },
     };
 
+    const v$ = useVuelidate(validations, { settingsAccount: settingsAccount.value, deleteAccount: deleteAccount.value });
+
+    const checkBillingAddress = () => {
+      const companyName = v$?.value?.settingsAccount?.company?.name?.$model || settingsAccount.value?.company?.name || '';
+      const billingAddress =
+        v$?.value?.settingsAccount?.company?.billingAddress?.$model || settingsAccount.value?.company?.billingAddress || '';
+
+      if (companyName && billingAddress && !billingAddress.trim().toLowerCase().includes(companyName.trim().toLowerCase())) {
+        billingAddressWarning.value = true;
+      } else if (companyName === '' || billingAddress === '') {
+        billingAddressWarning.value = true;
+      } else {
+        billingAddressWarning.value = false;
+      }
+    };
+
     return {
-      v$: useVuelidate(validations, { settingsAccount: settingsAccount.value, deleteAccount: deleteAccount.value }),
+      v$,
       success,
       error,
       errorEmailExists,
@@ -154,6 +172,8 @@ export default defineComponent({
       adminCount,
       onlyOneAdmin,
       system,
+      billingAddressWarning,
+      checkBillingAddress,
     };
   },
   computed: {
