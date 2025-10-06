@@ -22,10 +22,10 @@
           <div class="accordion" id="accordionProfile">
             <div class="card" v-if="!hasAnyAuthority('ROLE_ADMIN')">
               <div class="card-header" Id="headingOne">
-                <h4 class="mb-0">
+                <h3 class="mb-0">
                   <!--- <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></button> -->
                   Unternehmensdaten
-                </h4>
+                </h3>
               </div>
               <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionProfile">
                 <div class="card-body">
@@ -43,6 +43,7 @@
                       minlength="1"
                       required
                       data-cy="company.name"
+                      @input="checkBillingAddress"
                     />
                     <div v-if="v$.settingsAccount.company.name.$anyDirty && v$.settingsAccount.company.name.$invalid">
                       <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.required"
@@ -119,6 +120,13 @@
                   <!--- Adresse des Unternehmens -->
                   <div class="form-group">
                     <label class="form-control-label" for="company.billingAddress">Rechnungsanschrift</label>
+                    <div v-if="billingAddressWarning" class="alert alert-warning" id="warningBillingAddress">
+                      <font-awesome-icon icon="triangle-exclamation" />
+                      <span
+                        >Hinweis: Der Firmenname <i>{{ v$.settingsAccount.company.name.$model }}</i> ist aktuell nicht in der
+                        Rechnungsanschrift enthalten. Sind Sie sich sicher?</span
+                      >
+                    </div>
                     <textarea
                       id="company.billingAddress"
                       name="company.billingAddress"
@@ -132,6 +140,8 @@
                       minlength="1"
                       required
                       data-cy="company.billingaddress"
+                      rows="5"
+                      @input="checkBillingAddress"
                     >
                     </textarea>
                     <div v-if="v$.settingsAccount.company.billingAddress.$anyDirty && v$.settingsAccount.company.billingAddress.$invalid">
@@ -194,10 +204,10 @@
             </div>
             <div class="card">
               <div class="card-header" id="headingTwo">
-                <h4 class="mb-0">
+                <h3 class="mb-0">
                   <!--- <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo"></button> -->
                   Benutzerdaten
-                </h4>
+                </h3>
               </div>
               <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionProfile">
                 <div class="card-body">
