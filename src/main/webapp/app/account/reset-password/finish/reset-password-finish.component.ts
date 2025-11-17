@@ -1,7 +1,7 @@
 import { defineComponent, inject, ref, type Ref } from 'vue';
 import axios from 'axios';
 import { useVuelidate } from '@vuelidate/core';
-import { maxLength, minLength, required, sameAs } from '@vuelidate/validators';
+import { maxLength, minLength, required, helpers, sameAs } from '@vuelidate/validators';
 import type LoginService from '@/account/login.service';
 
 export default defineComponent({
@@ -12,8 +12,11 @@ export default defineComponent({
       resetAccount: {
         newPassword: {
           required,
-          minLength: minLength(4),
-          maxLength: maxLength(254),
+          minLength: minLength(12),
+          maxLength: maxLength(50),
+          pattern: helpers.regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?+_=)(#><.:&"'|~^/\\\]\[{}])[A-Za-z\d@$!%*?+_=)(#><.:&"'|~^/\\\]\[{}]{12,}$/,
+          ),
         },
         confirmPassword: {
           sameAsPassword: sameAs(this.resetAccount.newPassword),
