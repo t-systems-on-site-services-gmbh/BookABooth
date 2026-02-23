@@ -119,7 +119,7 @@
                   </div>
                   <!--- Adresse des Unternehmens -->
                   <div class="form-group">
-                    <label class="form-control-label" for="company.billingAddress">Rechnungsanschrift</label>
+                    <label class="form-control-label">Rechnungsanschrift</label>
                     <div v-if="billingAddressWarning" class="alert alert-warning" id="warningBillingAddress">
                       <font-awesome-icon icon="triangle-exclamation" />
                       <span
@@ -127,33 +127,149 @@
                         Rechnungsanschrift enthalten. Sind Sie sich sicher?</span
                       >
                     </div>
-                    <textarea
-                      id="company.billingAddress"
-                      name="company.billingAddress"
-                      class="form-control"
-                      placeholder="Firmenname // Straße Hausnummer // PLZ Ort"
-                      :class="{
-                        valid: !v$.settingsAccount.company.billingAddress.$invalid,
-                        invalid: v$.settingsAccount.company.billingAddress.$invalid,
-                      }"
-                      v-model="v$.settingsAccount.company.billingAddress.$model"
-                      minlength="1"
-                      required
-                      data-cy="company.billingaddress"
-                      rows="5"
-                      @input="checkBillingAddress"
-                    >
-                    </textarea>
-                    <div v-if="v$.settingsAccount.company.billingAddress.$anyDirty && v$.settingsAccount.company.billingAddress.$invalid">
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.required"
-                        >Eine Rechnungsanschrift wird benötigt.</small
-                      >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.minLength"
-                        >Ihre Rechnungsanschrift muss mindestens 1 Zeichen lang sein.</small
-                      >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddress.maxLength"
-                        >Ihre Rechnungsanschrift darf nicht länger als 254 Zeichen sein.</small
-                      >
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label class="form-control-label" for="company.billingAddressRow1">Adresszeile 1</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="company.billingAddressRow1"
+                          name="company.billingAddressRow1"
+                          placeholder="Firmenname"
+                          :class="{
+                            valid: !v$.settingsAccount.company.billingAddressRow1.$invalid,
+                            invalid: v$.settingsAccount.company.billingAddressRow1.$invalid,
+                          }"
+                          v-model="v$.settingsAccount.company.billingAddressRow1.$model"
+                          minlength="1"
+                          required
+                          data-cy="company.billingaddressrow1"
+                          @input="checkBillingAddress"
+                        />
+                        <div
+                          v-if="
+                            v$.settingsAccount.company.billingAddressRow1.$anyDirty &&
+                            v$.settingsAccount.company.billingAddressRow1.$invalid
+                          "
+                        >
+                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddressRow1.required"
+                            >Adresszeile 1 wird benötigt.</small
+                          >
+                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddressRow1.minLength"
+                            >Adresszeile 1 muss mindestens 1 Zeichen lang sein.</small
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col-md-12">
+                        <label class="form-control-label" for="company.billingAddressRow2">Adresszeile 2</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="company.billingAddressRow2"
+                          name="company.billingAddressRow2"
+                          placeholder="Zusatzinformationen (z.B. Abteilung, etc.)"
+                          :class="{
+                            valid: !v$.settingsAccount.company.billingAddressRow2.$invalid,
+                            invalid: v$.settingsAccount.company.billingAddressRow2.$invalid,
+                          }"
+                          v-model="v$.settingsAccount.company.billingAddressRow2.$model"
+                          data-cy="company.billingaddressrow2"
+                        />
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col-md-12">
+                        <label class="form-control-label" for="company.billingAddressRow3">Adresszeile 3</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="company.billingAddressRow3"
+                          name="company.billingAddressRow3"
+                          placeholder="Zusatzinformationen"
+                          :class="{
+                            valid: !v$.settingsAccount.company.billingAddressRow3.$invalid,
+                            invalid: v$.settingsAccount.company.billingAddressRow3.$invalid,
+                          }"
+                          v-model="v$.settingsAccount.company.billingAddressRow3.$model"
+                          data-cy="company.billingaddressrow3"
+                        />
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col-md-12">
+                        <label class="form-control-label" for="company.billingAddressRow4">Adresse Zeile 4</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="company.billingAddressRow4"
+                          name="company.billingAddressRow4"
+                          placeholder="z.B. Straße und Hausnummer oder Postfach"
+                          :class="{
+                            valid: !v$.settingsAccount.company.billingAddressRow4.$invalid,
+                            invalid: v$.settingsAccount.company.billingAddressRow4.$invalid,
+                          }"
+                          v-model="v$.settingsAccount.company.billingAddressRow4.$model"
+                          data-cy="company.billingaddressrow4"
+                        />
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col-md-6">
+                        <label class="form-control-label" for="company.billingZipCode">PLZ</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="company.billingZipCode"
+                          name="company.billingZipCode"
+                          placeholder="PLZ"
+                          :class="{
+                            valid: !v$.settingsAccount.company.billingZipCode.$invalid,
+                            invalid: v$.settingsAccount.company.billingZipCode.$invalid,
+                          }"
+                          v-model="v$.settingsAccount.company.billingZipCode.$model"
+                          minlength="1"
+                          required
+                          data-cy="company.billingzipcode"
+                        />
+                        <div
+                          v-if="v$.settingsAccount.company.billingZipCode.$anyDirty && v$.settingsAccount.company.billingZipCode.$invalid"
+                        >
+                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingZipCode.required"
+                            >PLZ wird benötigt.</small
+                          >
+                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingZipCode.minLength"
+                            >PLZ muss mindestens 1 Zeichen lang sein.</small
+                          >
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-control-label" for="company.billingCity">Ort</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="company.billingCity"
+                          name="company.billingCity"
+                          placeholder="Ort"
+                          :class="{
+                            valid: !v$.settingsAccount.company.billingCity.$invalid,
+                            invalid: v$.settingsAccount.company.billingCity.$invalid,
+                          }"
+                          v-model="v$.settingsAccount.company.billingCity.$model"
+                          minlength="1"
+                          required
+                          data-cy="company.billingcity"
+                        />
+                        <div v-if="v$.settingsAccount.company.billingCity.$anyDirty && v$.settingsAccount.company.billingCity.$invalid">
+                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingCity.required"
+                            >Ort wird benötigt.</small
+                          >
+                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingCity.minLength"
+                            >Ort muss mindestens 1 Zeichen lang sein.</small
+                          >
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!-- Bemerkung -->
