@@ -18,6 +18,7 @@ import de.tsystems.onsite.bookabooth.service.mapper.BookingMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.BoothUserMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.CompanyMapper;
 import de.tsystems.onsite.bookabooth.service.mapper.UserMapper;
+import de.tsystems.onsite.bookabooth.util.StringUtils;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.Instant;
@@ -664,16 +665,16 @@ public class UserService {
         if (bUser.getUser().isActivated()) {
             cl.setVerified(true);
         }
-        if (isNotEmpty(bUser.getCompany().getBillingAddress())) {
+        if (bUser.getCompany().hasBillingAddress()) {
             cl.setAddress(true);
         }
-        if (isNotEmpty(bUser.getCompany().getLogo())) {
+        if (StringUtils.isNotEmpty(bUser.getCompany().getLogo())) {
             cl.setLogo(true);
         }
-        if (isNotEmpty(bUser.getPhone())) {
+        if (StringUtils.isNotEmpty(bUser.getPhone())) {
             cl.setPhoneNumber(true);
         }
-        if (isNotEmpty(bUser.getCompany().getDescription())) {
+        if (StringUtils.isNotEmpty(bUser.getCompany().getDescription())) {
             cl.setCompanyDescription(true);
         }
         cl.setBookingStatus(booking.map(Booking::getStatus));
@@ -682,11 +683,6 @@ public class UserService {
         }
 
         return cl;
-    }
-
-    // Utility Method for checklist to prevent NullPointerException
-    private boolean isNotEmpty(String value) {
-        return value != null && !value.isEmpty();
     }
 
     public List<User> findUsersByCompanyId(Long companyId) {

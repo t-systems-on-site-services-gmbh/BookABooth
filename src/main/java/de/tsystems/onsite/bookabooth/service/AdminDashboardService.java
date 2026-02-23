@@ -72,7 +72,7 @@ public class AdminDashboardService {
             // information from company
             cl.setCompanyId(company.getId());
             cl.setCompanyName(company.getName());
-            cl.setAddress(company.getBillingAddress() != null && !company.getBillingAddress().isBlank());
+            cl.setAddress(company.hasBillingAddress());
             cl.setLogo(company.getLogo() != null && !company.getLogo().isBlank());
             cl.setCompanyDescription(company.getDescription() != null && !company.getDescription().isBlank());
             cl.setOnExhibitorList(company.getExhibitorList() != null && company.getExhibitorList().booleanValue());

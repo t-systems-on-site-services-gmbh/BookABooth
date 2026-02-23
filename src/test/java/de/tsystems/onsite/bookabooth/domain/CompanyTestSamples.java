@@ -10,18 +10,18 @@ public class CompanyTestSamples {
     private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     public static Company getCompanySample1() {
-        return new Company().id(1L).name("name1").billingAddress("billingAddress1").logo("logo1").description("description1");
+        return new Company().id(1L).name("name1").billingAddressRow1("billingAddress1").logo("logo1").description("description1");
     }
 
     public static Company getCompanySample2() {
-        return new Company().id(2L).name("name2").billingAddress("billingAddress2").logo("logo2").description("description2");
+        return new Company().id(2L).name("name2").billingAddressRow1("billingAddress2").logo("logo2").description("description2");
     }
 
     public static Company getCompanyRandomSampleGenerator() {
         return new Company()
             .id(longCount.incrementAndGet())
             .name(UUID.randomUUID().toString())
-            .billingAddress(UUID.randomUUID().toString())
+            .billingAddressRow1(UUID.randomUUID().toString())
             .logo(UUID.randomUUID().toString())
             .description(UUID.randomUUID().toString());
     }

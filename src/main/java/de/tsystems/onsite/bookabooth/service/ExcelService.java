@@ -76,7 +76,12 @@ public class ExcelService {
             "Firmenname",
             "Ansprechpartner",
             "Mail-Adresse",
-            "Rechnungsadresse",
+            "Rechnungsadresse 1",
+            "Rechnungsadresse 2",
+            "Rechnungsadresse 3",
+            "Rechnungsadresse 4",
+            "Rechnungsadresse PLZ",
+            "Rechnungsadresse Ort",
             "Bemerkung",
             "Standnummer",
             "Preis",
@@ -103,16 +108,22 @@ public class ExcelService {
                 );
                 createCell(bodyRow, 2, null).setCellValue(user.getEmail());
             }
-            createCell(bodyRow, 3, addressStyle).setCellValue(booking.getCompany().getBillingAddress());
-            createCell(bodyRow, 4, null).setCellValue(booking.getCompany().getComment());
+            createCell(bodyRow, 3, addressStyle).setCellValue(booking.getCompany().getBillingAddressRow1());
+            createCell(bodyRow, 4, addressStyle).setCellValue(booking.getCompany().getBillingAddressRow2());
+            createCell(bodyRow, 5, addressStyle).setCellValue(booking.getCompany().getBillingAddressRow3());
+            createCell(bodyRow, 6, addressStyle).setCellValue(booking.getCompany().getBillingAddressRow4());
+            createCell(bodyRow, 7, addressStyle).setCellValue(booking.getCompany().getBillingZipCode());
+            createCell(bodyRow, 8, addressStyle).setCellValue(booking.getCompany().getBillingCity());
+
+            createCell(bodyRow, 9, null).setCellValue(booking.getCompany().getComment());
             String locBooth = String.format(
                 "%s-%s",
                 locationNames.get(booking.getBooth().getLocation().getId()),
                 booking.getBooth().getTitle()
             );
-            createCell(bodyRow, 5, null).setCellValue(locBooth);
-            createCell(bodyRow, 6, numberStyle).setCellValue(booking.getPrice() == null ? 0.00 : booking.getPrice().doubleValue());
-            createCell(bodyRow, 7, numberStyle).setCellValue(
+            createCell(bodyRow, 10, null).setCellValue(locBooth);
+            createCell(bodyRow, 11, numberStyle).setCellValue(booking.getPrice() == null ? 0.00 : booking.getPrice().doubleValue());
+            createCell(bodyRow, 12, numberStyle).setCellValue(
                 booking.getCancellationFee() == null ? 0.00 : booking.getCancellationFee().doubleValue()
             );
             i++;
