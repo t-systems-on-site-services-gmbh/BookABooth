@@ -21,7 +21,17 @@ public class CompanyDTO implements Serializable {
 
     private String comment;
 
-    private String billingAddress;
+    private String billingAddressRow1;
+
+    private String billingAddressRow2;
+
+    private String billingAddressRow3;
+
+    private String billingAddressRow4;
+
+    private String billingZipCode;
+
+    private String billingCity;
 
     private String logo;
 
@@ -63,12 +73,52 @@ public class CompanyDTO implements Serializable {
         this.comment = comment;
     }
 
-    public String getBillingAddress() {
-        return billingAddress;
+    public String getBillingAddressRow1() {
+        return billingAddressRow1;
     }
 
-    public void setBillingAddress(String billingAddress) {
-        this.billingAddress = billingAddress;
+    public void setBillingAddressRow1(String billingAddressRow1) {
+        this.billingAddressRow1 = billingAddressRow1;
+    }
+
+    public String getBillingAddressRow2() {
+        return billingAddressRow2;
+    }
+
+    public void setBillingAddressRow2(String billingAddressRow2) {
+        this.billingAddressRow2 = billingAddressRow2;
+    }
+
+    public String getBillingAddressRow3() {
+        return billingAddressRow3;
+    }
+
+    public void setBillingAddressRow3(String billingAddressRow3) {
+        this.billingAddressRow3 = billingAddressRow3;
+    }
+
+    public String getBillingAddressRow4() {
+        return billingAddressRow4;
+    }
+
+    public void setBillingAddressRow4(String billingAddressRow4) {
+        this.billingAddressRow4 = billingAddressRow4;
+    }
+
+    public String getBillingZipCode() {
+        return billingZipCode;
+    }
+
+    public void setBillingZipCode(String billingZipCode) {
+        this.billingZipCode = billingZipCode;
+    }
+
+    public String getBillingCity() {
+        return billingCity;
+    }
+
+    public void setBillingCity(String billingCity) {
+        this.billingCity = billingCity;
     }
 
     public String getLogo() {
@@ -130,7 +180,12 @@ public class CompanyDTO implements Serializable {
         return "CompanyDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", billingAddress='" + getBillingAddress() + "'" +
+            ", billingAddressRow1='" + getBillingAddressRow1() + "'" +
+            ", billingAddressRow2='" + getBillingAddressRow2() + "'" +
+            ", billingAddressRow3='" + getBillingAddressRow3() + "'" +
+            ", billingAddressRow4='" + getBillingAddressRow4() + "'" +
+            ", billingZipCode='" + getBillingZipCode() + "'" +
+            ", billingCity='" + getBillingCity() + "'" +
             ", comment='" + getComment() + "'" +
             ", logo='" + getLogo() + "'" +
             ", description='" + getDescription() + "'" +
