@@ -46,13 +46,13 @@
                       @input="checkBillingAddress"
                     />
                     <div v-if="v$.settingsAccount.company.name.$anyDirty && v$.settingsAccount.company.name.$invalid">
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.required"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.name.required.$invalid"
                         >Ein Firmenname wird benötigt.</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.minLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.name.minLength.$invalid"
                         >Ihr Firmenname muss mindestens 1 Zeichen lang sein.</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.company.name.maxLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.name.maxLength.$invalid"
                         >Ihr Firmenname darf nicht länger als 100 Zeichen sein.</small
                       >
                     </div>
@@ -72,14 +72,20 @@
                         invalid: v$.settingsAccount.company.description.$invalid,
                       }"
                       v-model="v$.settingsAccount.company.description.$model"
-                      minlength="0"
+                      minlength="10"
                       required
                       data-cy="company.description"
                       rows="5"
                     >
                     </textarea>
                     <div v-if="v$.settingsAccount.company.description.$anyDirty && v$.settingsAccount.company.description.$invalid">
-                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.maxLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.required.$invalid"
+                        >Eine Firmenbeschreibung wird benötigt.</small
+                      >
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.minLength.$invalid"
+                        >Ihre Firmenbeschreibung muss mindestens 10 Zeichen lang sein.</small
+                      >
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.description.maxLength.$invalid"
                         >Ihre Firmenbeschreibung darf nicht länger als 1024 Zeichen sein.</small
                       >
                     </div>
@@ -152,10 +158,10 @@
                             v$.settingsAccount.company.billingAddressRow1.$invalid
                           "
                         >
-                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddressRow1.required"
+                          <small class="form-text text-danger" v-if="v$.settingsAccount.company.billingAddressRow1.required.$invalid"
                             >Adresszeile 1 wird benötigt.</small
                           >
-                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingAddressRow1.minLength"
+                          <small class="form-text text-danger" v-if="v$.settingsAccount.company.billingAddressRow1.minLength.$invalid"
                             >Adresszeile 1 muss mindestens 1 Zeichen lang sein.</small
                           >
                         </div>
@@ -236,10 +242,10 @@
                         <div
                           v-if="v$.settingsAccount.company.billingZipCode.$anyDirty && v$.settingsAccount.company.billingZipCode.$invalid"
                         >
-                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingZipCode.required"
+                          <small class="form-text text-danger" v-if="v$.settingsAccount.company.billingZipCode.required.$invalid"
                             >PLZ wird benötigt.</small
                           >
-                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingZipCode.minLength"
+                          <small class="form-text text-danger" v-if="v$.settingsAccount.company.billingZipCode.minLength.$invalid"
                             >PLZ muss mindestens 1 Zeichen lang sein.</small
                           >
                         </div>
@@ -262,10 +268,10 @@
                           data-cy="company.billingcity"
                         />
                         <div v-if="v$.settingsAccount.company.billingCity.$anyDirty && v$.settingsAccount.company.billingCity.$invalid">
-                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingCity.required"
+                          <small class="form-text text-danger" v-if="v$.settingsAccount.company.billingCity.required.$invalid"
                             >Ort wird benötigt.</small
                           >
-                          <small class="form-text text-danger" v-if="!v$.settingsAccount.company.billingCity.minLength"
+                          <small class="form-text text-danger" v-if="v$.settingsAccount.company.billingCity.minLength.$invalid"
                             >Ort muss mindestens 1 Zeichen lang sein.</small
                           >
                         </div>
@@ -290,7 +296,7 @@
                     >
                     </textarea>
                     <div v-if="v$.settingsAccount.company.comment.$invalid">
-                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.comment.maxLength">
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.company.comment.maxLength.$invalid">
                         Die Bemerkung darf nicht länger als 1024 Zeichen sein.
                       </small>
                     </div>
@@ -344,13 +350,13 @@
                       data-cy="user.firstname"
                     />
                     <div v-if="v$.settingsAccount.user.firstName.$anyDirty && v$.settingsAccount.user.firstName.$invalid">
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.required"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.firstName.required.$invalid"
                         >Ihr Vorname wird benötigt.</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.minLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.firstName.minLength.$invalid"
                         >Ihr Vorname muss mindestens 1 Zeichen lang sein</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.firstName.maxLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.firstName.maxLength.$invalid"
                         >Ihr Vorname darf nicht länger als 50 Zeichen sein</small
                       >
                     </div>
@@ -372,13 +378,13 @@
                       data-cy="user.lastname"
                     />
                     <div v-if="v$.settingsAccount.user.lastName.$anyDirty && v$.settingsAccount.user.lastName.$invalid">
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.required"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.lastName.required.$invalid"
                         >Ihr Nachname wird benötigt.</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.minLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.lastName.minLength.$invalid"
                         >Ihr Nachname muss mindestens 1 Zeichen lang sein</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.lastName.maxLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.lastName.maxLength.$invalid"
                         >Ihr Nachname darf nicht länger als 50 Zeichen sein</small
                       >
                     </div>
@@ -401,16 +407,16 @@
                       data-cy="user.email"
                     />
                     <div v-if="v$.settingsAccount.user.email.$anyDirty && v$.settingsAccount.user.email.$invalid">
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.required"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.email.required.$invalid"
                         >Ihre E-Mail-Adresse wird benötigt.</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.email"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.email.email.$invalid"
                         >Ihre E-Mail-Adresse ist ungültig.</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.minLength">
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.email.minLength.$invalid">
                         Ihre E-Mail-Adresse muss mindestens 5 Zeichen lang sein</small
                       >
-                      <small class="form-text text-danger" v-if="!v$.settingsAccount.user.email.maxLength"
+                      <small class="form-text text-danger" v-if="v$.settingsAccount.user.email.maxLength.$invalid"
                         >Ihre E-Mail-Adresse darf nicht länger als 50 Zeichen sein</small
                       >
                     </div>
