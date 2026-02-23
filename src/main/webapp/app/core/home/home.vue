@@ -3,8 +3,8 @@
     <div class="col-12 col-md-3 mb-3 mb-md-0">
       <span><img class="logo" src="/content/images/jadehs-logo.png" /></span>
       <div class="news">
-        ++ Jade Karrieretag 2025 ++ <br />
-        Nächster Termin: Mittwoch, 19. November 2025 <br />
+        ++ Jade Karrieretag 2026 ++ <br />
+        Nächster Termin: Mittwoch, 18. November 2026 <br />
       </div>
     </div>
     <div class="col-md-9">

@@ -1,5 +1,5 @@
 <template>
-  <h1>Ausstellerinformationen Jade Karrieretag 2025</h1>
+  <h1>Ausstellerinformationen Jade Karrieretag 2026</h1>
   <p>
     Die Karrieremesse am Campus Wilhelmshaven findet in der Aula und zusätzlichen Messezelten statt. Wir bieten über 1.000qm
     Ausstellungsfläche an. Die Standflächen auf der Karrieremesse sind in zwei Kategorien ausschließlich über das Buchungstool buchbar:
@@ -24,14 +24,14 @@
   </p>
   <h2>Stornierung</h2>
   <p>
-    Wird die Teilnahme eines angemeldeten Ausstellers abgesagt, so werden bei einer Absage bis zum 20. September 2025 50% der Standgebühr
+    Wird die Teilnahme eines angemeldeten Ausstellers abgesagt, so werden bei einer Absage bis zum 20. September 2026 50% der Standgebühr
     erstattet. Bei einer kurzfristigeren Absage erfolgt keine Erstattung der Standgebühr. Die Stornierung der Standplatzbuchung erfolgt
     ebenfalls über das Buchungstool.
   </p>
   <h2>Auf- und Abbau</h2>
   <p>
-    Dienstag, 18. November 2025, 16:00 – 18:00 Uhr<br />
-    Mittwoch, 19. November 2025, 07:00 – 08:30 Uhr<br />
+    Dienstag, 17. November 2026, 16:00 – 18:00 Uhr<br />
+    Mittwoch, 18. November 2026, 07:00 – 08:30 Uhr<br />
     Der <strong>Aufbau</strong> soll spätestens am Mittwoch um 08:30 Uhr beendet sein. Veranstaltungsbeginn ist 09.00 Uhr.<br />
     Der <strong>Abbau</strong> findet direkt im Anschluss ab 14:00 Uhr statt. Bitte beachten Sie die Einhaltung dieser Zeit, damit wir eine
     vorherige Unruhe vermeiden können.<br />
