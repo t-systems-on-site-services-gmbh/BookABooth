@@ -15,7 +15,7 @@ COPY . .
 RUN mvn -DskipTests --batch-mode -Pprod clean verify
 
 # Stage 3: Create the final image
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-ea-jdk-slim
 WORKDIR /app
 RUN mkdir /app/uploads
 RUN mkdir /app/logs
