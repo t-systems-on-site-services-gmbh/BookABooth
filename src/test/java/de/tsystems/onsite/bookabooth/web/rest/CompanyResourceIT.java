@@ -89,7 +89,7 @@ class CompanyResourceIT {
     public static Company createEntity(EntityManager em) {
         Company company = new Company()
             .name(DEFAULT_NAME)
-            .billingAddress(DEFAULT_BILLING_ADDRESS)
+            .billingAddressRow1(DEFAULT_BILLING_ADDRESS)
             .logo(DEFAULT_LOGO)
             .description(DEFAULT_DESCRIPTION)
             .waitingList(DEFAULT_WAITING_LIST)
@@ -106,7 +106,7 @@ class CompanyResourceIT {
     public static Company createUpdatedEntity(EntityManager em) {
         Company company = new Company()
             .name(UPDATED_NAME)
-            .billingAddress(UPDATED_BILLING_ADDRESS)
+            .billingAddressRow1(UPDATED_BILLING_ADDRESS)
             .logo(UPDATED_LOGO)
             .description(UPDATED_DESCRIPTION)
             .waitingList(UPDATED_WAITING_LIST)
@@ -224,7 +224,7 @@ class CompanyResourceIT {
         em.detach(updatedCompany);
         updatedCompany
             .name(UPDATED_NAME)
-            .billingAddress(UPDATED_BILLING_ADDRESS)
+            .billingAddressRow1(UPDATED_BILLING_ADDRESS)
             .logo(UPDATED_LOGO)
             .description(UPDATED_DESCRIPTION)
             .waitingList(UPDATED_WAITING_LIST)
@@ -321,7 +321,7 @@ class CompanyResourceIT {
         Company partialUpdatedCompany = new Company();
         partialUpdatedCompany.setId(company.getId());
 
-        partialUpdatedCompany.billingAddress(UPDATED_BILLING_ADDRESS).waitingList(UPDATED_WAITING_LIST);
+        partialUpdatedCompany.billingAddressRow1(UPDATED_BILLING_ADDRESS).waitingList(UPDATED_WAITING_LIST);
 
         restCompanyMockMvc
             .perform(
@@ -352,7 +352,7 @@ class CompanyResourceIT {
 
         partialUpdatedCompany
             .name(UPDATED_NAME)
-            .billingAddress(UPDATED_BILLING_ADDRESS)
+            .billingAddressRow1(UPDATED_BILLING_ADDRESS)
             .logo(UPDATED_LOGO)
             .description(UPDATED_DESCRIPTION)
             .waitingList(UPDATED_WAITING_LIST)

@@ -87,13 +87,24 @@ export default defineComponent({
             minLength: minLength(1),
             maxLength: maxLength(100),
           },
-          billingAddress: {
+          billingAddressRow1: {
             required: requiredUnless(isAdmin),
             minLength: minLength(1),
-            maxLength: maxLength(254),
+          },
+          billingAddressRow2: {},
+          billingAddressRow3: {},
+          billingAddressRow4: {},
+          billingZipCode: {
+            required: requiredUnless(isAdmin),
+            minLength: minLength(1),
+          },
+          billingCity: {
+            required: requiredUnless(isAdmin),
+            minLength: minLength(1),
           },
           description: {
             required: requiredUnless(isAdmin),
+            minLength: minLength(10),
             maxLength: maxLength(1024),
           },
           comment: {
@@ -136,12 +147,12 @@ export default defineComponent({
 
     const checkBillingAddress = () => {
       const companyName = v$?.value?.settingsAccount?.company?.name?.$model || settingsAccount.value?.company?.name || '';
-      const billingAddress =
-        v$?.value?.settingsAccount?.company?.billingAddress?.$model || settingsAccount.value?.company?.billingAddress || '';
+      const billingAddressRow1 =
+        v$?.value?.settingsAccount?.company?.billingAddressRow1?.$model || settingsAccount.value?.company?.billingAddressRow1 || '';
 
-      if (companyName && billingAddress && !billingAddress.trim().toLowerCase().includes(companyName.trim().toLowerCase())) {
+      if (companyName && billingAddressRow1 && !billingAddressRow1.trim().toLowerCase().includes(companyName.trim().toLowerCase())) {
         billingAddressWarning.value = true;
-      } else if (companyName === '' || billingAddress === '') {
+      } else if (companyName === '' || billingAddressRow1 === '') {
         billingAddressWarning.value = true;
       } else {
         billingAddressWarning.value = false;

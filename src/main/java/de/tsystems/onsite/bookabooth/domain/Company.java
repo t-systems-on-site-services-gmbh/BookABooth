@@ -1,14 +1,12 @@
 package de.tsystems.onsite.bookabooth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import de.tsystems.onsite.bookabooth.domain.enumeration.BookingStatus;
+import de.tsystems.onsite.bookabooth.util.StringUtils;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -33,8 +31,23 @@ public class Company implements Serializable {
     @Column(name = "name", length = 200)
     private String name;
 
-    @Column(name = "billing_address")
-    private String billingAddress;
+    @Column(name = "billing_address_row1")
+    private String billingAddressRow1;
+
+    @Column(name = "billing_address_row2")
+    private String billingAddressRow2;
+
+    @Column(name = "billing_address_row3")
+    private String billingAddressRow3;
+
+    @Column(name = "billing_address_row4")
+    private String billingAddressRow4;
+
+    @Column(name = "billing_zip_code")
+    private String billingZipCode;
+
+    @Column(name = "billing_city")
+    private String billingCity;
 
     @Column(name = "comment", length = 1024)
     private String comment;
@@ -84,17 +97,90 @@ public class Company implements Serializable {
         this.name = name;
     }
 
-    public String getBillingAddress() {
-        return this.billingAddress;
+    public String getBillingAddressRow1() {
+        return this.billingAddressRow1;
     }
 
-    public Company billingAddress(String billingAddress) {
-        this.setBillingAddress(billingAddress);
+    public Company billingAddressRow1(String billingAddressRow1) {
+        this.setBillingAddressRow1(billingAddressRow1);
         return this;
     }
 
-    public void setBillingAddress(String billingAddress) {
-        this.billingAddress = billingAddress;
+    public void setBillingAddressRow1(String billingAddressRow1) {
+        this.billingAddressRow1 = billingAddressRow1;
+    }
+
+    public String getBillingAddressRow2() {
+        return this.billingAddressRow2;
+    }
+
+    public Company billingAddressRow2(String billingAddressRow2) {
+        this.setBillingAddressRow2(billingAddressRow2);
+        return this;
+    }
+
+    public void setBillingAddressRow2(String billingAddressRow2) {
+        this.billingAddressRow2 = billingAddressRow2;
+    }
+
+    public String getBillingAddressRow3() {
+        return this.billingAddressRow3;
+    }
+
+    public Company billingAddressRow3(String billingAddressRow3) {
+        this.setBillingAddressRow3(billingAddressRow3);
+        return this;
+    }
+
+    public void setBillingAddressRow3(String billingAddressRow3) {
+        this.billingAddressRow3 = billingAddressRow3;
+    }
+
+    public String getBillingAddressRow4() {
+        return this.billingAddressRow4;
+    }
+
+    public Company billingAddressRow4(String billingAddressRow4) {
+        this.setBillingAddressRow4(billingAddressRow4);
+        return this;
+    }
+
+    public void setBillingAddressRow4(String billingAddressRow4) {
+        this.billingAddressRow4 = billingAddressRow4;
+    }
+
+    public String getBillingZipCode() {
+        return this.billingZipCode;
+    }
+
+    public Company billingZipCode(String billingZipCode) {
+        this.setBillingZipCode(billingZipCode);
+        return this;
+    }
+
+    public void setBillingZipCode(String billingZipCode) {
+        this.billingZipCode = billingZipCode;
+    }
+
+    public String getBillingCity() {
+        return this.billingCity;
+    }
+
+    public Company billingCity(String billingCity) {
+        this.setBillingCity(billingCity);
+        return this;
+    }
+
+    public void setBillingCity(String billingCity) {
+        this.billingCity = billingCity;
+    }
+
+    public boolean hasBillingAddress() {
+        return (
+            StringUtils.isNotEmpty(this.billingAddressRow1) &&
+            StringUtils.isNotEmpty(this.billingZipCode) &&
+            StringUtils.isNotEmpty(this.billingCity)
+        );
     }
 
     public String getComment() {
@@ -213,7 +299,12 @@ public class Company implements Serializable {
         return "Company{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", billingAddress='" + getBillingAddress() + "'" +
+            ", billingAddressRow1='" + getBillingAddressRow1() + "'" +
+            ", billingAddressRow2='" + getBillingAddressRow2() + "'" +
+            ", billingAddressRow3='" + getBillingAddressRow3() + "'" +
+            ", billingAddressRow4='" + getBillingAddressRow4() + "'" +
+            ", billingZipCode='" + getBillingZipCode() + "'" +
+            ", billingCity='" + getBillingCity() + "'" +
             ", comment='" + getComment() + "'" +
             ", logo='" + getLogo() + "'" +
             ", description='" + getDescription() + "'" +
