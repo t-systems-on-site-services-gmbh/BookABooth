@@ -154,6 +154,10 @@ public class AccountResource {
         if (user.isEmpty()) {
             throw new AccountResourceException("User could not be found");
         }
+        if (!user.get().getId().equals(userProfileDTO.getUser().getId())) {
+            throw new AccountResourceException("Not authorized to change this profile");
+        }
+
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userProfileDTO.getUser().getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
