@@ -82,10 +82,14 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private ProblemDetailWithCause getProblemDetailWithCause(Throwable ex) {
-        if (ex instanceof UsernameAlreadyUsedException) return (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
+        if (ex instanceof UsernameAlreadyUsedException) return ProblemDetailWithCauseBuilder.instance()
+            .withStatus(toStatus(ex).value())
+            .withDetail(toStatus(ex).name())
+            .build();
         if (
             ex instanceof de.tsystems.onsite.bookabooth.service.exception.EmailAlreadyUsedException
-        ) return (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
+        ) return ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).withDetail(toStatus(ex).name()).build();
+
         if (
             ex instanceof de.tsystems.onsite.bookabooth.service.exception.InvalidPasswordException
         ) return (ProblemDetailWithCause) new InvalidPasswordException().getBody();
@@ -93,6 +97,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         if (
             ex instanceof ErrorResponseException exp && exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause
         ) return problemDetailWithCause;
+
         return ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
     }
 
