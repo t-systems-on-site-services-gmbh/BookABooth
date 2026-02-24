@@ -290,10 +290,14 @@
                         <div>
                           <p>Vorschau der Rechnungsanschrift</p>
                           <p class="alert alert-secondary p-2 rounded">
-                            {{ v$.settingsAccount.company.billingAddressRow1.$model }}<br />
-                            {{ v$.settingsAccount.company.billingAddressRow2.$model }}<br />
-                            {{ v$.settingsAccount.company.billingAddressRow3.$model }}<br />
-                            {{ v$.settingsAccount.company.billingAddressRow4.$model }}<br />
+                            {{ v$.settingsAccount.company.billingAddressRow1.$model
+                            }}<br v-if="v$.settingsAccount.company.billingAddressRow1.$model" />
+                            {{ v$.settingsAccount.company.billingAddressRow2.$model
+                            }}<br v-if="v$.settingsAccount.company.billingAddressRow2.$model" />
+                            {{ v$.settingsAccount.company.billingAddressRow3.$model
+                            }}<br v-if="v$.settingsAccount.company.billingAddressRow3.$model" />
+                            {{ v$.settingsAccount.company.billingAddressRow4.$model
+                            }}<br v-if="v$.settingsAccount.company.billingAddressRow4.$model" />
                             {{ v$.settingsAccount.company.billingZipCode.$model }} {{ v$.settingsAccount.company.billingCity.$model }}
                           </p>
                         </div>
