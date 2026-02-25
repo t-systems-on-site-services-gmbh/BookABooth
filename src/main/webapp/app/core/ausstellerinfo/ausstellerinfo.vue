@@ -10,16 +10,14 @@
     Strom (230V) & WLAN<br />
     Getränkecatering im Ausstellercafé und bis zu 5 Gutscheine für ein Mittagessen in der Mensa oder Cafeteria<br />
     Zugang zum Karriereportal der Jade Hochschule<br />
-    Zugang zur App talentefinder<br />
     Firmenvorstellung im Ausstellerverzeichnis
   </p>
   <h2>Paket 2 (860€ netto)</h2>
   <p>
     Standfläche im beheizten Messezelt 3 x 2,50m (BxT; max. Standhöhe 2,35m)<br />
     Strom (230V) & WLAN<br />
-    Getränkecatering im Ausstellercafé und bis zu 3 Gutscheine für ein Mittagessen in der Mensa oder Cafeteria<br />
+    Getränkecatering im Ausstellercafé und bis zu 5 Gutscheine für ein Mittagessen in der Mensa oder Cafeteria<br />
     Zugang zum Karriereportal der Jade Hochschule<br />
-    Zugang zur App talentefinder<br />
     Firmennennung im Ausstellerverzeichnis
   </p>
   <h2>Stornierung</h2>
@@ -35,7 +33,7 @@
     Der <strong>Aufbau</strong> soll spätestens am Mittwoch um 08:30 Uhr beendet sein. Veranstaltungsbeginn ist 09.00 Uhr.<br />
     Der <strong>Abbau</strong> findet direkt im Anschluss ab 14:00 Uhr statt. Bitte beachten Sie die Einhaltung dieser Zeit, damit wir eine
     vorherige Unruhe vermeiden können.<br />
-    Eine Bewachung der Messestände in der Nacht auf den 19. November kann nicht gestellt werden. Für Material und Equipment, das über Nacht
+    Eine Bewachung der Messestände in der Nacht auf den 18. November kann nicht gestellt werden. Für Material und Equipment, das über Nacht
     in der Hochschule oder im Messezelt gelagert wird, wird keine Haftung übernommen.<br />
     Zum <strong>Anliefern bzw. Abtransport</strong> Ihres Equipments stehen Ihnen während der Aufbauzeiten verschiedene Ein- und Ausgänge
     der Hochschule zur Verfügung.
@@ -48,33 +46,27 @@
   <p>Messezelte befinden sich vor dem Haupteingang und sind ebenfalls über Rampen zugänglich.</p>
   <p>
     Eine <strong>Stromversorgung</strong> (230V) steht für alle Stände zur Verfügung. Wir möchten Sie jedoch bitten, mit eigenen Mitteln für
-    eine Verteilung zu sorgen, also unbedingt 25m Kabeltrommeln bzw. Verlängerungskabel mitzubringen. Wir bitten um Kenntnisnahme der
-    Informationen zum Arbeits- bzw. Brandschutz. Zugang zur kostenlosen <strong>WLAN</strong>-Nutzung erhalten Sie am Tag der Veranstaltung.
+    eine Verteilung zu sorgen, also unbedingt 15m Kabeltrommeln bzw. Verlängerungskabel mitzubringen. Wir bitten um Kenntnisnahme der
+    Informationen zum Arbeits- bzw. Brandschutz. Zugang zur kostenlosen <strong>WLAN</strong>-Nutzung erhalten Sie am Tag der Veranstaltung
+    am Infopoint.
   </p>
   <h2>Parken</h2>
   <p>
     Unser Campus verfügt über zwei große Parkflächen vor dem Hauptgebäude, die Sie nutzen können. Bis 8:30 Uhr am Veranstaltungstag können
-    Sie zum Be- und Entladen selbstverständlich die Parkflächen direkt vor der Tür bzw. vor den Zelten nutzen, wir möchten Sie jedoch
-    bitten, Ihr Fahrzeug danach umzuparken.
+    Sie zum Be- und Entladen die Parkflächen direkt vor der Tür bzw. vor den Zelten nutzen, wir möchten Sie jedoch bitten, Ihr Fahrzeug
+    danach umzuparken.
   </p>
   <h2>Catering</h2>
   <p>
     Für die Dauer der Veranstaltung stehen Ihnen im Verwaltungstrakt (im Erdgeschoss des Hauptgebäudes) kostenlose warme und kalte Getränke
     zur Verfügung. Außerdem laden wir Sie und Ihre Mitarbeiter_Innen an diesem Tag zu einem Mittagessen in unserer Mensa ein; dafür erhalten
-    Sie bis zu drei Gutscheine am Tag der Veranstaltung.
+    Sie Gutscheine am Tag der Veranstaltung.
   </p>
   <h2>Infopoint</h2>
   <p>
     Im Hauptgebäude richten wir einen Infopoint ein, an dem Sie Ihre Ausstellerunterlagen, WLAN-Zugänge und Catering-Gutscheine erhalten.<br />
     Beim Aufbau ist das Team des Zentralen Veranstaltungsmanagements vor Ort ansprechbar. Sollten Sie uns nicht am Infopoint im Hauptgebäude
     finden, erreichen Sie uns auch am Veranstaltungstag unter 04421 9852275.
-  </p>
-  <h2>Talentefinder</h2>
-  <p>
-    Mit Teilnahme an der Karrieremesse haben Sie Gelegenheit, ihr Ausstellerprofil in der App Talentefinder zu erstellen bzw. zu bearbeiten.
-    Im Vorfeld der Veranstaltung werden die Profile für das Matching freigeschaltet und Studierende und SchülerInnen erhalten nach und nach
-    Zugang zur App. Sie können dann mit dem Matching starten, interessante Profile identifizieren und ggf. Gesprächstermine für die
-    Präsenzmesse am 19. bzw. digitale Gespräche für den 20. November vereinbaren.
   </p>
   <p>
     Die Jade Hochschule ist eine offene und vielfältige Hochschule, die sich ausdrücklich gegen Geschlechterstereotype ausspricht. Daher
