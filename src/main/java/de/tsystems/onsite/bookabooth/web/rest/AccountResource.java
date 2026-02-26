@@ -157,6 +157,10 @@ public class AccountResource {
         if (!user.get().getId().equals(userProfileDTO.getUser().getId())) {
             throw new AccountResourceException("Not authorized to change this profile");
         }
+        BoothUserDTO boothUserDto = userService.getBoothUserDTO(user.get());
+        if (!boothUserDto.getCompany().getId().equals(userProfileDTO.getCompany().getId())) {
+            throw new AccountResourceException("Not authorized to change the company");
+        }
 
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userProfileDTO.getUser().getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
