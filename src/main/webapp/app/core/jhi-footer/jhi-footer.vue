@@ -3,7 +3,8 @@
     <div>
       <a href="https://www.jade-hs.de/impressum/" target="_blank">Impressum</a> |
       <a href="https://www.jade-hs.de/datenschutz/" target="_blank">Datenschutzerklärung</a> |
-      <a href="ausstellerinfo">Ausstellerinformationen</a>
+      <a href="ausstellerinfo">Ausstellerinformationen</a> |
+      <a href="sicherheitshinweise">Sicherheitshinweise</a>
     </div>
     <div>
       powered by

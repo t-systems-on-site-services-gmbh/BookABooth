@@ -3,6 +3,7 @@ import { createRouter as createVueRouter, createWebHistory } from 'vue-router';
 const Home = () => import('@/core/home/home.vue');
 const Ausstellerliste = () => import('@/core/ausstellerliste/ausstellerliste.vue');
 const Ausstellerinfo = () => import('@/core/ausstellerinfo/ausstellerinfo.vue');
+const Sicherheitshinweise = () => import('@/core/sicherheitshinweise/sicherheitshinweise.vue');
 const Error = () => import('@/core/error/error.vue');
 import account from '@/router/account';
 import admin from '@/router/admin';
@@ -27,6 +28,11 @@ export const createRouter = () =>
         path: '/ausstellerinfo',
         name: 'Ausstellerinfo',
         component: Ausstellerinfo,
+      },
+      {
+        path: '/sicherheitshinweise',
+        name: 'Sicherheitshinweise',
+        component: Sicherheitshinweise,
       },
       {
         path: '/forbidden',
