@@ -114,13 +114,17 @@
         <input class="form-check-input" type="checkbox" id="confirmConditions" v-model="v$.confirmConditions.$model" />
         <label class="form-check-label" for="confirmConditions"
           >Ich habe die <b-link @click="showInfoModal()">Ausstellerbedingungen</b-link> gelesen und akzeptiert.</label
+        ><br />
+        <input class="form-check-input" type="checkbox" id="confirmSafety" v-model="v$.confirmSafety.$model" />
+        <label class="form-check-label" for="confirmSafety"
+          >Ich habe die <b-link @click="showSafetyModal()">Sicherheitshinweise</b-link> gelesen und akzeptiert.</label
         >
       </p>
     </div>
     <div class="d-flex justify-content-end">
       <b-button class="btn btn-secondary" @click="abortBooking(currentBooking.id)">Abbrechen</b-button>
       <b-button
-        :disabled="!v$.confirmConditions.$model"
+        :disabled="!v$.confirmConditions.$model || !v$.confirmSafety.$model"
         type="submit"
         class="btn btn-success ml-3"
         id="confirmBooking"
@@ -136,6 +140,14 @@
     </div>
     <div class="d-flex justify-content-end">
       <b-button type="submit" class="btn btn-success ml-3" id="confirmInfo" @click="hideInfoModal()"> Ok </b-button>
+    </div>
+  </b-modal>
+  <b-modal size="xl" ref="sicherheitshinweise-modal" hide-footer title="Sicherheitshinweise">
+    <div class="d-block text-left">
+      <sicherheitshinweise></sicherheitshinweise>
+    </div>
+    <div class="d-flex justify-content-end">
+      <b-button type="submit" class="btn btn-success ml-3" id="confirmSafety" @click="hideSafetyModal()"> Ok </b-button>
     </div>
   </b-modal>
 </template>

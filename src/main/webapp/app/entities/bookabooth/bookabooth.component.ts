@@ -12,6 +12,7 @@ import { type IBooking } from '@/shared/model/booking.model';
 import SystemService from '@/entities/system/system.service';
 import { type ISystem } from '@/shared/model/system.model';
 import Ausstellerinfo from '@/core/ausstellerinfo/ausstellerinfo.vue';
+import Sicherheitshinweise from '@/core/sicherheitshinweise/sicherheitshinweise.vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import axios from 'axios';
@@ -21,6 +22,7 @@ export default defineComponent({
   name: 'Booth',
   components: {
     ausstellerinfo: Ausstellerinfo,
+    sicherheitshinweise: Sicherheitshinweise,
   },
   setup() {
     const systemService = inject('systemService', () => new SystemService());
@@ -45,6 +47,7 @@ export default defineComponent({
     const boothId = ref(null);
     const componentKey = ref(new Date().getTime());
     const confirmConditions = ref(false);
+    const confirmSafety = ref(false);
     const bookedBoothLocation = ref('');
 
     const getMyBooking = async () => {
@@ -174,9 +177,10 @@ export default defineComponent({
 
     const rules = {
       confirmConditions: { required },
+      confirmSafety: { required },
     };
 
-    const v$ = useVuelidate(rules, { confirmConditions });
+    const v$ = useVuelidate(rules, { confirmConditions, confirmSafety });
 
     return {
       alertService,
@@ -203,6 +207,7 @@ export default defineComponent({
       componentKey,
       filteredServicePackages,
       confirmConditions,
+      confirmSafety,
       v$,
     };
   },
@@ -234,6 +239,12 @@ export default defineComponent({
     },
     hideInfoModal() {
       this.$refs['ausstellerinfo-modal'].hide();
+    },
+    showSafetyModal() {
+      this.$refs['sicherheitshinweise-modal'].show();
+    },
+    hideSafetyModal() {
+      this.$refs['sicherheitshinweise-modal'].hide();
     },
     showLageplanModal() {
       this.$refs['lageplan-modal'].show();
