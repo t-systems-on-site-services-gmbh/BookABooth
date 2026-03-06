@@ -32,7 +32,7 @@
           Nachwuchskräften zu führen.
         </div>
         <br />
-        <div>Um einen unserer 90 Stellplätze zu buchen, geht es hier zur <a class="alert-link" v-on:click="openLogin()">Anmeldung</a>.</div>
+        <div>Um einen Stellplatz zu buchen, geht es hier zur <a class="alert-link" v-on:click="openLogin()">Anmeldung</a>.</div>
         <br />
         <div>
           Falls Sie noch keinen Zugang haben, können Sie sich hier
