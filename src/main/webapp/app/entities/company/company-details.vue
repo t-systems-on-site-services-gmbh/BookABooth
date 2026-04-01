@@ -17,10 +17,40 @@
             <span>{{ company.mail }}</span>
           </dd>
           <dt>
-            <span>Billing Address</span>
+            <span>Adresszeile 1</span>
           </dt>
           <dd>
-            <span>{{ company.billingAddress }}</span>
+            <span>{{ company.billingAddressRow1 }}</span>
+          </dd>
+          <dt>
+            <span>Adresszeile 2</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingAddressRow2 }}</span>
+          </dd>
+          <dt>
+            <span>Adresszeile 3</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingAddressRow3 }}</span>
+          </dd>
+          <dt>
+            <span>Adresszeile 4</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingAddressRow4 }}</span>
+          </dd>
+          <dt>
+            <span>PLZ</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingZipCode }}</span>
+          </dd>
+          <dt>
+            <span>Ort</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingCity }}</span>
           </dd>
           <dt>
             <span>Logo</span>

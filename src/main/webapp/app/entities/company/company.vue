@@ -30,7 +30,9 @@
             <th scope="row"><span>ID</span></th>
             <th scope="row"><span>Name</span></th>
             <th scope="row"><span>Mail</span></th>
-            <th scope="row"><span>Billing Address</span></th>
+            <th scope="row"><span>Rechnungsanschrift</span></th>
+            <th scope="row"><span>PLZ</span></th>
+            <th scope="row"><span>Ort</span></th>
             <th scope="row"><span>Logo</span></th>
             <th scope="row"><span>Description</span></th>
             <th scope="row"><span>Waiting List</span></th>
@@ -45,7 +47,9 @@
             </td>
             <td>{{ company.name }}</td>
             <td>{{ company.mail }}</td>
-            <td>{{ company.billingAddress }}</td>
+            <td>{{ company.billingAddressRow1 }}</td>
+            <td>{{ company.billingZipCode }}</td>
+            <td>{{ company.billingCity }}</td>
             <td>{{ company.logo }}</td>
             <td>{{ company.description }}</td>
             <td>{{ company.waitingList }}</td>
