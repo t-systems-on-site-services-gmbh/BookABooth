@@ -31,8 +31,8 @@
             <th scope="row"><span>Login</span></th>
             <th scope="row"><span>Vorname</span></th>
             <th scope="row"><span>Nachname</span></th>
-            <th scope="row"><span>Firma</span></th>
             <th scope="row"><span>E-Mail</span></th>
+            <th scope="row"><span>Firma</span></th>
             <th scope="row"><span>Role</span></th>
             <th scope="row"></th>
           </tr>
@@ -42,11 +42,18 @@
             <td>
               <router-link :to="{ name: 'UserView', params: { userLogin: user.login } }">{{ user.id }}</router-link>
             </td>
-            <td>{{ user.login}}</td>
-            <td>{{ user.firstName}}</td>
-            <td>{{ user.lastName}}</td>
-            <td>{{ user.user.company?.name}}</td>
-            <td>{{ user.email}}</td>
+            <td>{{ user.login }}</td>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+            <td>
+              <router-link
+                v-if="user.company"
+                :to="{ name: 'CompanyView', params: { companyId: user.company.id } }"
+              >
+                {{ user.company?.name }}
+              </router-link>
+            </td>
+            <td>{{ user.email }}</td>
             <td>{{ user.authorities?.includes('ROLE_ADMIN') ? 'Administrator' : 'Benutzer' }}</td>
             <td class="text-right">
               <div class="btn-group">
