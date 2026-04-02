@@ -3,6 +3,7 @@ package de.tsystems.onsite.bookabooth.service.dto;
 import de.tsystems.onsite.bookabooth.config.Constants;
 import de.tsystems.onsite.bookabooth.domain.Authority;
 import de.tsystems.onsite.bookabooth.domain.User;
+import de.tsystems.onsite.bookabooth.domain.Company;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
