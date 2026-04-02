@@ -542,6 +542,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<User> getUserWithBoothUserCompanyAndAuthoritiesByLogin(String login) {
+    return userRepository.findOneWithBoothUserCompanyAndAuthoritiesByLogin(login);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
     }
