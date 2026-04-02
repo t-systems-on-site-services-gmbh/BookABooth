@@ -17,6 +17,8 @@ export default defineComponent({
     const company: Ref<ICompany> = ref(new Company());
 
     const isSaving = ref(false);
+    const selectedLogoFile: Ref<File | null> = ref(null);
+    const logoPreview: Ref<string | null> = ref(null);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'de'), true);
 
     const route = useRoute();
@@ -67,6 +69,8 @@ export default defineComponent({
       company,
       previousState,
       isSaving,
+      selectedLogoFile,
+      logoPreview,
       currentLanguage,
       v$,
     };
@@ -78,6 +82,7 @@ export default defineComponent({
         this.companyService()
           .update(this.company)
           .then(param => {
+            this.uploadLogo(param.id);
             this.isSaving = false;
             this.previousState();
             this.alertService.showInfo('A Company is updated with identifier ' + param.id);
@@ -90,6 +95,7 @@ export default defineComponent({
         this.companyService()
           .create(this.company)
           .then(param => {
+            this.uploadLogo(param.id);
             this.isSaving = false;
             this.previousState();
             this.alertService.showSuccess('A Company is created with identifier ' + param.id);
@@ -99,6 +105,31 @@ export default defineComponent({
             this.alertService.showHttpError(error.response);
           });
       }
+    },
+
+    onLogoChange(event: Event): void {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        this.selectedLogoFile = file;
+        this.logoPreview = URL.createObjectURL(file);
+      }
+    },
+
+    uploadLogo(companyId: number): void {
+      if (!this.selectedLogoFile) return;
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const contentBase64 = btoa(e.target?.result as string);
+        this.companyService()
+          .uploadImage(companyId, contentBase64)
+          .then(param => {
+            this.company.logo = param.logo;
+          })
+          .catch(error => {
+            this.alertService.showHttpError(error.response);
+          });
+      };
+      reader.readAsBinaryString(this.selectedLogoFile);
     },
 
     getSelected(selectedVals, option, pkField = 'id'): any {

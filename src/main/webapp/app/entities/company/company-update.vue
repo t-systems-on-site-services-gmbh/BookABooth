@@ -110,14 +110,14 @@
           <div class="form-group">
             <label class="form-control-label" for="company-logo">Logo</label>
             <input
-              type="text"
+              type="file"
               class="form-control"
               name="logo"
               id="company-logo"
-              data-cy="logo"
-              :class="{ valid: !v$.logo.$invalid, invalid: v$.logo.$invalid }"
-              v-model="v$.logo.$model"
+              accept="image/*"
+              @change="onLogoChange"
             />
+            <img v-if="logoPreview" :src="logoPreview" alt="Logo preview" style="margin-top: 10px; max-height: 150px;" />
           </div>
           <div class="form-group">
             <label class="form-control-label" for="company-description">Description</label>
