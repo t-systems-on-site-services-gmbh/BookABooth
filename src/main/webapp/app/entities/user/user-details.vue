@@ -38,7 +38,7 @@
             <span>Role</span>
           </dt>
           <dd>
-            <span>{{ user.authorities }}</span>
+            <span>{{ user.authorities?.includes('ROLE_ADMIN') ? 'Administrator' : 'Benutzer' }}</span>
           </dd>
         </dl>
         <button type="submit" v-on:click.prevent="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

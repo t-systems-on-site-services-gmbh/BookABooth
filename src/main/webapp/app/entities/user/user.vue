@@ -47,7 +47,7 @@
             <td>{{ user.lastName}}</td>
             <td>{{ user.user.company?.name}}</td>
             <td>{{ user.email}}</td>
-            <td>{{ user.authorities}}</td>
+            <td>{{ user.authorities?.includes('ROLE_ADMIN') ? 'Administrator' : 'Benutzer' }}</td>
             <td class="text-right">
               <div class="btn-group">
                 <router-link

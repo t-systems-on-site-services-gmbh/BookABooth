@@ -61,6 +61,9 @@ export default defineComponent({
       lastName: {},
       email: {},
       company: {},
+      authorities: {
+        required: validations.required('Dieses Feld wird benötigt.'),
+      },
       activated: {},
       langKey: {},
       createdBy: {},
@@ -71,6 +74,13 @@ export default defineComponent({
     const v$ = useVuelidate(validationRules, user as any);
     v$.value.$validate();
 
+    const selectedAuthority = computed({
+      get: () => user.value.authorities?.includes('ROLE_ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER',
+      set: (val: string) => {
+        user.value.authorities = val === 'ROLE_ADMIN' ? ['ROLE_USER', 'ROLE_ADMIN'] : ['ROLE_USER'];
+      },
+    });
+
     return {
       userService,
       alertService,
@@ -80,6 +90,7 @@ export default defineComponent({
       currentLanguage,
       v$,
       companies,
+      selectedAuthority,
     };
   },
   methods: {

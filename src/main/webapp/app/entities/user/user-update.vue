@@ -52,6 +52,23 @@
               </option>
             </select>
           </div>
+          <div class="form-group">
+            <label class="form-control-label" for="user-authorities">Role</label>
+            <select
+              class="form-control"
+              name="authorities"
+              id="user-authorities"
+              data-cy="authorities"
+              :class="{ valid: !v$.authorities.$invalid, invalid: v$.authorities.$invalid }"
+              v-model="selectedAuthority"
+            >
+              <option value="ROLE_USER">Benutzer</option>
+              <option value="ROLE_ADMIN">Administrator</option>
+            </select>
+            <div v-if="v$.authorities.$anyDirty && v$.authorities.$invalid">
+              <small class="form-text text-danger" v-for="error of v$.authorities.$errors" :key="error.$uid">{{ error.$message }}</small>
+            </div>
+          </div>
         </div>
         <div>
           <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" v-on:click="previousState()">
