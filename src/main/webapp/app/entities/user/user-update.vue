@@ -39,6 +39,19 @@
               <small class="form-text text-danger" v-for="error of v$.firstName.$errors" :key="error.$uid">{{ error.$message }}</small>
             </div>
           </div>
+          <div class="form-group">
+            <label class="form-control-label" for="user-company">Firma</label>
+            <select class="form-control" id="user-company" data-cy="company" name="company" v-model="user.company">
+              <option v-bind:value="null"></option>
+              <option
+                v-bind:value="user.company && companyOption.id === user.company.id ? user.company : companyOption"
+                v-for="companyOption in companies"
+                :key="companyOption.id"
+              >
+                {{ companyOption.name }}
+              </option>
+            </select>
+          </div>
         </div>
         <div>
           <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" v-on:click="previousState()">

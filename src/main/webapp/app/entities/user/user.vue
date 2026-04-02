@@ -45,7 +45,7 @@
             <td>{{ user.login}}</td>
             <td>{{ user.firstName}}</td>
             <td>{{ user.lastName}}</td>
-            <td>{{ user.companyName}}</td>
+            <td>{{ user.user.company?.name}}</td>
             <td>{{ user.email}}</td>
             <td>{{ user.authorities}}</td>
             <td class="text-right">

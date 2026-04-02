@@ -26,7 +26,7 @@
             <span>Firma</span>
           </dt>
           <dd>
-            <span>{{ user.companyName }}</span>
+            <span>{{ user.user.company?.name }}</span>
           </dd>
           <dt>
             <span>E-Mail</span>

@@ -37,7 +37,18 @@ export default defineComponent({
       retrieveUser(route.params.userLogin);
     }
 
-    const initRelationships = () => {};
+    const retrieveCompanies = async () => {
+      try {
+        const res = await companyService().retrieve();
+        companies.value = res.data;
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const initRelationships = () => {
+      retrieveCompanies();
+    };
 
     initRelationships();
 
@@ -49,6 +60,7 @@ export default defineComponent({
       firstName: {},
       lastName: {},
       email: {},
+      company: {},
       activated: {},
       langKey: {},
       createdBy: {},
@@ -67,6 +79,7 @@ export default defineComponent({
       isSaving,
       currentLanguage,
       v$,
+      companies,
     };
   },
   methods: {
