@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
 
 import UserService from './user.service';
+import CompanyService from '@/entities/company/company.service';
 import { useValidation } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
 import { type IUser, User } from '@/shared/model/user.model';
@@ -13,8 +14,10 @@ export default defineComponent({
   setup() {
     const userService = inject('userService', () => new UserService());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const companyService = inject('companyService', () => new CompanyService());
 
     const user: Ref<IUser> = ref(new User());
+    const companies = ref([]);
 
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'de'), true);
