@@ -23,16 +23,16 @@
             <span>{{ user.lastName }}</span>
           </dd>
           <dt>
-            <span>Firma</span>
-          </dt>
-          <dd>
-            <span>{{ user.user.company?.name }}</span>
-          </dd>
-          <dt>
             <span>E-Mail</span>
           </dt>
           <dd>
             <span>{{ user.email }}</span>
+          </dd>
+          <dt>
+            <span>Firma</span>
+          </dt>
+          <dd>
+            <span>{{ user.company?.name }}</span>
           </dd>
           <dt>
             <span>Role</span>
