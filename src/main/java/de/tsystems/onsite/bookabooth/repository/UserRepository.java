@@ -32,6 +32,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Cacheable(cacheNames = USERS_BY_EMAIL_CACHE)
     Optional<User> findOneWithAuthoritiesByEmailIgnoreCase(String email);
 
+    @Query("SELECT u FROM User u "  +
+       "LEFT JOIN FETCH u.boothUser bu "  +
+       "LEFT JOIN FETCH bu.company "  +
+       "LEFT JOIN FETCH u.authorities "  +
+       "WHERE u.login = :login ")
+    Optional<User> findOneWithBoothUserCompanyAndAuthoritiesByLogin(@Param("login") String login);
+    
     Page<User> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
 
     long countByAuthoritiesName(String authorityName);

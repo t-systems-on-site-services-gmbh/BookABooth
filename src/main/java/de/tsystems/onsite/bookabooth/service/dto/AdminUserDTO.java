@@ -36,8 +36,7 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 256)
     private String imageUrl;
 
-    @Size(max = 256)
-    private String companyName;
+    private CompanyDTO company;
 
     @AssertTrue(message = "must be accepted")
     private boolean termsAccepted = false;
@@ -69,6 +68,13 @@ public class AdminUserDTO implements Serializable {
         this.email = user.getEmail();
         this.activated = user.isActivated();
         this.imageUrl = user.getImageUrl();
+        if (user.getBoothUser() != null && user.getBoothUser().getCompany() != null) {
+                Company c = user.getBoothUser().getCompany();
+                CompanyDTO dto = new CompanyDTO();
+                dto.setId(c.getId());
+                dto.setName(c.getName());
+            this.company = dto; 
+        }
         this.langKey = user.getLangKey();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
@@ -121,12 +127,12 @@ public class AdminUserDTO implements Serializable {
         return imageUrl;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public CompanyDTO getCompany() {
+         return company; 
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public void setCompany(CompanyDTO company) {
+         this.company = company; 
     }
 
     public boolean isTermsAccepted() {
@@ -206,7 +212,7 @@ public class AdminUserDTO implements Serializable {
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
-            ", company='" + companyName + '\'' +
+            ", company='" + company + '\'' +
             ", termsAccepted='" + termsAccepted + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
