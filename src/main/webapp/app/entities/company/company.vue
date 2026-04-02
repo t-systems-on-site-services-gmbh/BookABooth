@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 id="page-heading" data-cy="CompanyHeading">
-      <span id="company-heading">Companies</span>
+      <span id="company-heading">Firmen</span>
       <div class="d-flex justify-content-end">
         <button class="btn btn-info mr-2" v-on:click="handleSyncList" :disabled="isFetching">
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon> <span>Liste aktualisieren</span>
@@ -14,14 +14,14 @@
             class="btn btn-primary jh-create-entity create-company"
           >
             <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span>Company erstellen</span>
+            <span>Firma erstellen</span>
           </button>
         </router-link>
       </div>
     </h2>
     <br />
     <div class="alert alert-warning" v-if="!isFetching && companies && companies.length === 0">
-      <span>Keine Companies gefunden</span>
+      <span>Keine Firmen gefunden</span>
     </div>
     <div class="table-responsive" v-if="companies && companies.length > 0">
       <table class="table table-striped" aria-describedby="companies">
@@ -29,12 +29,14 @@
           <tr>
             <th scope="row"><span>ID</span></th>
             <th scope="row"><span>Name</span></th>
-            <th scope="row"><span>Mail</span></th>
-            <th scope="row"><span>Billing Address</span></th>
+            <th scope="row"><span>E-Mail</span></th>
+            <th scope="row"><span>Rechnungsanschrift</span></th>
+            <th scope="row"><span>PLZ</span></th>
+            <th scope="row"><span>Ort</span></th>
             <th scope="row"><span>Logo</span></th>
-            <th scope="row"><span>Description</span></th>
-            <th scope="row"><span>Waiting List</span></th>
-            <th scope="row"><span>Exhibitor List</span></th>
+            <th scope="row"><span>Beschreibung</span></th>
+            <th scope="row"><span>Warteliste</span></th>
+            <th scope="row"><span>Ausstellerliste</span></th>
             <th scope="row"></th>
           </tr>
         </thead>
@@ -45,7 +47,9 @@
             </td>
             <td>{{ company.name }}</td>
             <td>{{ company.mail }}</td>
-            <td>{{ company.billingAddress }}</td>
+            <td>{{ company.billingAddressRow1 }}</td>
+            <td>{{ company.billingZipCode }}</td>
+            <td>{{ company.billingCity }}</td>
             <td>{{ company.logo }}</td>
             <td>{{ company.description }}</td>
             <td>{{ company.waitingList }}</td>
@@ -89,7 +93,7 @@
         <span id="bookaboothApp.company.delete.question" data-cy="companyDeleteDialogHeading">Löschen bestätigen</span>
       </template>
       <div class="modal-body">
-        <p id="jhi-delete-company-heading">Soll Company {{ removeId }} wirklich dauerhaft gelöscht werden?</p>
+        <p id="jhi-delete-company-heading">Soll Firma {{ removeId }} wirklich dauerhaft gelöscht werden?</p>
       </div>
       <template #modal-footer>
         <div>

@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <form name="editForm" role="form" novalidate v-on:submit.prevent="save()">
-        <h2 id="bookaboothApp.company.home.createOrEditLabel" data-cy="CompanyCreateUpdateHeading">Company erstellen oder bearbeiten</h2>
+        <h2 id="bookaboothApp.company.home.createOrEditLabel" data-cy="CompanyCreateUpdateHeading">Firma erstellen oder bearbeiten</h2>
         <div>
           <div class="form-group" v-if="company.id">
             <label for="id">ID</label>
@@ -24,7 +24,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-mail">Mail</label>
+            <label class="form-control-label" for="company-mail">E-Mail</label>
             <input
               type="text"
               class="form-control"
@@ -36,31 +36,91 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-billingAddress">Billing Address</label>
+            <label class="form-control-label" for="company-billingAddressRow1">Adresszeile 1</label>
             <input
               type="text"
               class="form-control"
-              name="billingAddress"
-              id="company-billingAddress"
-              data-cy="billingAddress"
-              :class="{ valid: !v$.billingAddress.$invalid, invalid: v$.billingAddress.$invalid }"
-              v-model="v$.billingAddress.$model"
+              name="billingAddressRow1"
+              id="company-billingAddressRow1"
+              data-cy="billingAddressRow1"
+              :class="{ valid: !v$.billingAddressRow1.$invalid, invalid: v$.billingAddressRow1.$invalid }"
+              v-model="v$.billingAddressRow1.$model"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="company-billingAddressRow2">Adresszeile 2</label>
+            <input
+              type="text"
+              class="form-control"
+              name="billingAddressRow2"
+              id="company-billingAddressRow2"
+              data-cy="billingAddressRow2"
+              :class="{ valid: !v$.billingAddressRow2.$invalid, invalid: v$.billingAddressRow2.$invalid }"
+              v-model="v$.billingAddressRow2.$model"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="company-billingAddressRow3">Adresszeile 3</label>
+            <input
+              type="text"
+              class="form-control"
+              name="billingAddressRow3"
+              id="company-billingAddressRow3"
+              data-cy="billingAddressRow3"
+              :class="{ valid: !v$.billingAddressRow3.$invalid, invalid: v$.billingAddressRow3.$invalid }"
+              v-model="v$.billingAddressRow3.$model"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="company-billingAddressRow4">Adresszeile 4</label>
+            <input
+              type="text"
+              class="form-control"
+              name="billingAddressRow4"
+              id="company-billingAddressRow4"
+              data-cy="billingAddressRow4"
+              :class="{ valid: !v$.billingAddressRow4.$invalid, invalid: v$.billingAddressRow4.$invalid }"
+              v-model="v$.billingAddressRow4.$model"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="company-billingZipCode">PLZ</label>
+            <input
+              type="text"
+              class="form-control"
+              name="billingZipCode"
+              id="company-billingZipCode"
+              data-cy="billingZipCode"
+              :class="{ valid: !v$.billingZipCode.$invalid, invalid: v$.billingZipCode.$invalid }"
+              v-model="v$.billingZipCode.$model"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="company-billingCity">Ort</label>
+            <input
+              type="text"
+              class="form-control"
+              name="billingCity"
+              id="company-billingCity"
+              data-cy="billingCity"
+              :class="{ valid: !v$.billingCity.$invalid, invalid: v$.billingCity.$invalid }"
+              v-model="v$.billingCity.$model"
             />
           </div>
           <div class="form-group">
             <label class="form-control-label" for="company-logo">Logo</label>
             <input
-              type="text"
+              type="file"
               class="form-control"
               name="logo"
               id="company-logo"
-              data-cy="logo"
-              :class="{ valid: !v$.logo.$invalid, invalid: v$.logo.$invalid }"
-              v-model="v$.logo.$model"
+              accept="image/*"
+              @change="onLogoChange"
             />
+            <img v-if="logoPreview" :src="logoPreview" alt="Logo preview" style="margin-top: 10px; max-height: 150px;" />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-description">Description</label>
+            <label class="form-control-label" for="company-description">Beschreibung</label>
             <input
               type="text"
               class="form-control"
@@ -72,7 +132,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-waitingList">Waiting List</label>
+            <label class="form-control-label" for="company-waitingList">Warteliste</label>
             <input
               type="checkbox"
               class="form-check"
@@ -84,7 +144,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-exhibitorList">Exhibitor List</label>
+            <label class="form-control-label" for="company-exhibitorList">Ausstellerliste</label>
             <input
               type="checkbox"
               class="form-check"

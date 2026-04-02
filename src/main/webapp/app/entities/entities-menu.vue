@@ -28,6 +28,14 @@
       <font-awesome-icon icon="asterisk" />
       <span>Datenschutzerklärung aktualisieren</span>
     </b-dropdown-item>
+    <b-dropdown-item to="/user">
+      <font-awesome-icon icon="asterisk" />
+      <span>Benutzer</span>
+    </b-dropdown-item>
+    <b-dropdown-item to="/company">
+      <font-awesome-icon icon="asterisk" />
+      <span>Firmen</span>
+    </b-dropdown-item>
     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
   </div>
 </template>

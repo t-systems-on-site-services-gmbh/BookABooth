@@ -7,10 +7,12 @@ import de.tsystems.onsite.bookabooth.security.AuthoritiesConstants;
 import de.tsystems.onsite.bookabooth.service.MailService;
 import de.tsystems.onsite.bookabooth.service.UserService;
 import de.tsystems.onsite.bookabooth.service.dto.AdminUserDTO;
+import de.tsystems.onsite.bookabooth.service.dto.UserDTO;
 import de.tsystems.onsite.bookabooth.web.rest.errors.BadRequestAlertException;
 import de.tsystems.onsite.bookabooth.web.rest.errors.EmailAlreadyUsedException;
 import de.tsystems.onsite.bookabooth.web.rest.errors.LoginAlreadyUsedException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -59,6 +61,8 @@ import tech.jhipster.web.util.ResponseUtil;
 @RestController
 @RequestMapping("/api/admin")
 public class UserResource {
+
+    private static final String ENTITY_NAME = "user";
 
     private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
@@ -188,7 +192,7 @@ public class UserResource {
     @GetMapping("/users/{login}")
     public ResponseEntity<AdminUserDTO> getUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         log.debug("REST request to get User : {}", login);
-        return ResponseUtil.wrapOrNotFound(userService.getUserWithAuthoritiesByLogin(login).map(AdminUserDTO::new));
+        return ResponseUtil.wrapOrNotFound(userService.getUserWithBoothUserCompanyAndAuthoritiesByLogin(login).map(AdminUserDTO::new));
     }
 
     /**

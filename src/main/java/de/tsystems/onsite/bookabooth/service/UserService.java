@@ -313,6 +313,16 @@ public class UserService {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .forEach(managedAuthorities::add);
+                if (userDTO.getCompany() != null && userDTO.getCompany().getId() != null) {
+                    BoothUser boothUser = boothUserRepository.findById(user.getId()).orElse(null);
+                    if (boothUser != null) {
+                        Optional<Company> companyOpt = companyRepository.findById(userDTO.getCompany().getId());
+                        if (companyOpt.isPresent()) {
+                            boothUser.setCompany(companyOpt.get());
+                            boothUserRepository.save(boothUser);
+                        }
+                    }
+                }
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
@@ -529,6 +539,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
         return userRepository.findOneWithAuthoritiesByLogin(login);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> getUserWithBoothUserCompanyAndAuthoritiesByLogin(String login) {
+    return userRepository.findOneWithBoothUserCompanyAndAuthoritiesByLogin(login);
     }
 
     @Transactional(readOnly = true)

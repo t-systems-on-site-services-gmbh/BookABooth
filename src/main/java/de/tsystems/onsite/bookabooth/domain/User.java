@@ -83,6 +83,18 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     private Instant resetDate = null;
 
     @JsonIgnore
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private BoothUser boothUser;
+
+    public BoothUser getBoothUser() {
+        return boothUser;
+    }
+
+    public void setBoothUser(BoothUser boothUser) { 
+        this.boothUser = boothUser;
+    }
+
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
         name = "jhi_user_authority",

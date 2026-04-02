@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <div v-if="company">
-        <h2 class="jh-entity-heading" data-cy="companyDetailsHeading"><span>Company</span> {{ company.id }}</h2>
+        <h2 class="jh-entity-heading" data-cy="companyDetailsHeading"><span>Firma</span> {{ company.id }}</h2>
         <dl class="row jh-entity-details">
           <dt>
             <span>Name</span>
@@ -11,16 +11,46 @@
             <span>{{ company.name }}</span>
           </dd>
           <dt>
-            <span>Mail</span>
+            <span>E-Mail</span>
           </dt>
           <dd>
             <span>{{ company.mail }}</span>
           </dd>
           <dt>
-            <span>Billing Address</span>
+            <span>Adresszeile 1</span>
           </dt>
           <dd>
-            <span>{{ company.billingAddress }}</span>
+            <span>{{ company.billingAddressRow1 }}</span>
+          </dd>
+          <dt>
+            <span>Adresszeile 2</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingAddressRow2 }}</span>
+          </dd>
+          <dt>
+            <span>Adresszeile 3</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingAddressRow3 }}</span>
+          </dd>
+          <dt>
+            <span>Adresszeile 4</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingAddressRow4 }}</span>
+          </dd>
+          <dt>
+            <span>PLZ</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingZipCode }}</span>
+          </dd>
+          <dt>
+            <span>Ort</span>
+          </dt>
+          <dd>
+            <span>{{ company.billingCity }}</span>
           </dd>
           <dt>
             <span>Logo</span>
@@ -29,19 +59,19 @@
             <span>{{ company.logo }}</span>
           </dd>
           <dt>
-            <span>Description</span>
+            <span>Beschreibung</span>
           </dt>
           <dd>
             <span>{{ company.description }}</span>
           </dd>
           <dt>
-            <span>Waiting List</span>
+            <span>Warteliste</span>
           </dt>
           <dd>
             <span>{{ company.waitingList }}</span>
           </dd>
           <dt>
-            <span>Exhibitor List</span>
+            <span>Ausstellerliste</span>
           </dt>
           <dd>
             <span>{{ company.exhibitorList }}</span>

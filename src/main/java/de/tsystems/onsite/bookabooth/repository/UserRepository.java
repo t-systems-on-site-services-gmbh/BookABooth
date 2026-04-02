@@ -9,6 +9,8 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * Spring Data JPA repository for the {@link User} entity.
@@ -32,6 +34,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Cacheable(cacheNames = USERS_BY_EMAIL_CACHE)
     Optional<User> findOneWithAuthoritiesByEmailIgnoreCase(String email);
 
+    @Query("SELECT u FROM User u "  +
+       "LEFT JOIN FETCH u.boothUser bu "  +
+       "LEFT JOIN FETCH bu.company "  +
+       "LEFT JOIN FETCH u.authorities "  +
+       "WHERE u.login = :login ")
+    Optional<User> findOneWithBoothUserCompanyAndAuthoritiesByLogin(@Param("login") String login);
+    
     Page<User> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
 
     long countByAuthoritiesName(String authorityName);

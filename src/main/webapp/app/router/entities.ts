@@ -21,6 +21,10 @@ const Company = () => import('@/entities/company/company.vue');
 const CompanyUpdate = () => import('@/entities/company/company-update.vue');
 const CompanyDetails = () => import('@/entities/company/company-details.vue');
 
+const User = () => import('@/entities/user/user.vue');
+const UserUpdate = () => import('@/entities/user/user-update.vue');
+const UserDetails = () => import('@/entities/user/user-details.vue');
+
 const ServicePackage = () => import('@/entities/service-package/service-package.vue');
 const ServicePackageUpdate = () => import('@/entities/service-package/service-package-update.vue');
 const ServicePackageDetails = () => import('@/entities/service-package/service-package-details.vue');
@@ -138,6 +142,30 @@ export default {
       path: 'company/:companyId/view',
       name: 'CompanyView',
       component: CompanyDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+     {
+      path: 'user',
+      name: 'User',
+      component: User,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'user/new',
+      name: 'UserCreate',
+      component: UserUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'user/:userLogin/edit',
+      name: 'UserEdit',
+      component: UserUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'user/:userLogin/view',
+      name: 'UserView',
+      component: UserDetails,
       meta: { authorities: [Authority.USER] },
     },
     {
