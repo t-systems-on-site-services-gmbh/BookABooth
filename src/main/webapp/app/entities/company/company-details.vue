@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <div v-if="company">
-        <h2 class="jh-entity-heading" data-cy="companyDetailsHeading"><span>Company</span> {{ company.id }}</h2>
+        <h2 class="jh-entity-heading" data-cy="companyDetailsHeading"><span>Firma</span> {{ company.id }}</h2>
         <dl class="row jh-entity-details">
           <dt>
             <span>Name</span>
@@ -11,7 +11,7 @@
             <span>{{ company.name }}</span>
           </dd>
           <dt>
-            <span>Mail</span>
+            <span>E-Mail</span>
           </dt>
           <dd>
             <span>{{ company.mail }}</span>
@@ -59,19 +59,19 @@
             <span>{{ company.logo }}</span>
           </dd>
           <dt>
-            <span>Description</span>
+            <span>Beschreibung</span>
           </dt>
           <dd>
             <span>{{ company.description }}</span>
           </dd>
           <dt>
-            <span>Waiting List</span>
+            <span>Warteliste</span>
           </dt>
           <dd>
             <span>{{ company.waitingList }}</span>
           </dd>
           <dt>
-            <span>Exhibitor List</span>
+            <span>Ausstellerliste</span>
           </dt>
           <dd>
             <span>{{ company.exhibitorList }}</span>

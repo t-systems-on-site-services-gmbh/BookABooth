@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-8">
       <form name="editForm" role="form" novalidate v-on:submit.prevent="save()">
-        <h2 id="bookaboothApp.company.home.createOrEditLabel" data-cy="CompanyCreateUpdateHeading">Company erstellen oder bearbeiten</h2>
+        <h2 id="bookaboothApp.company.home.createOrEditLabel" data-cy="CompanyCreateUpdateHeading">Firma erstellen oder bearbeiten</h2>
         <div>
           <div class="form-group" v-if="company.id">
             <label for="id">ID</label>
@@ -24,7 +24,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-mail">Mail</label>
+            <label class="form-control-label" for="company-mail">E-Mail</label>
             <input
               type="text"
               class="form-control"
@@ -120,7 +120,7 @@
             <img v-if="logoPreview" :src="logoPreview" alt="Logo preview" style="margin-top: 10px; max-height: 150px;" />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-description">Description</label>
+            <label class="form-control-label" for="company-description">Beschreibung</label>
             <input
               type="text"
               class="form-control"
@@ -132,7 +132,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-waitingList">Waiting List</label>
+            <label class="form-control-label" for="company-waitingList">Warteliste</label>
             <input
               type="checkbox"
               class="form-check"
@@ -144,7 +144,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-control-label" for="company-exhibitorList">Exhibitor List</label>
+            <label class="form-control-label" for="company-exhibitorList">Ausstellerliste</label>
             <input
               type="checkbox"
               class="form-check"
